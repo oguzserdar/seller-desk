@@ -7,7 +7,9 @@ import {
   type ModelChoice,
 } from "@/components/assistant/internal/model-selector";
 import { Input } from "@/components/arc/input/input";
+import type { AiConnectionView } from "@/server/domain/ai-settings";
 import { CopyField } from "../install/copy-field";
+import { AiKeyForm } from "./ai-key-form";
 
 const PROVIDERS = {
   gateway: {
@@ -109,10 +111,11 @@ const connections: ModelChoice[] = Object.entries(PROVIDERS).map(([id, p]) => ({
 }));
 
 /** Produces installation instructions only. Keys stay in the private server environment. */
-export function AiSettings() {
-  const [provider, setProvider] = useState<keyof typeof PROVIDERS>("gateway");
-  const [customModel, setCustomModel] = useState(false);
-  const [model, setModel] = useState<string>(PROVIDERS.gateway.model);
+export function AiSettings({ connection }: { connection: AiConnectionView }) {
+  const start = (connection.provider && connection.provider in PROVIDERS ? connection.provider : "gateway") as keyof typeof PROVIDERS;
+  const [provider, setProvider] = useState<keyof typeof PROVIDERS>(start);
+  const [customModel, setCustomModel] = useState(Boolean(connection.modelId && connection.modelId !== PROVIDERS[start].model));
+  const [model, setModel] = useState<string>(connection.modelId ?? PROVIDERS[start].model);
   const [routing, setRouting] =
     useState<keyof typeof ROUTING_CONNECTIONS>("off");
   const decision = ROUTING_CONNECTIONS[routing];
@@ -199,6 +202,7 @@ export function AiSettings() {
           />
         </div>
       ) : null}
+      <AiKeyForm connection={connection} provider={provider} providerLabel={selected.label} modelId={safeModel} />
       <div className="border-line mt-6 space-y-3 border-y py-5">
         <p className="text-[15px] font-semibold">
           Guide conversations before replying

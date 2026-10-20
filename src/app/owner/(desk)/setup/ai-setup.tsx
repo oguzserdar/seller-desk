@@ -1,3 +1,4 @@
+import type { AiConnectionView } from "@/server/domain/ai-settings";
 import { AiSettings } from "./ai-settings";
 
 /** Keeps installation choices separate from the actual running configuration. */
@@ -5,7 +6,9 @@ export function AiSetup({
   reply,
   routing,
   routine,
+  connection,
 }: {
+  connection: AiConnectionView;
   reply: string;
   routing: string;
   routine: string;
@@ -29,7 +32,7 @@ export function AiSetup({
         </p>
       </div>
       <div className="px-5 pt-6 sm:px-7">
-        <AiSettings />
+        <AiSettings connection={connection} />
       </div>
       <div className="border-line border-t bg-canvas px-5 sm:px-7">
         <details>

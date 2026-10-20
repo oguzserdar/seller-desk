@@ -7,7 +7,8 @@ import { requireOwner } from "@/server/auth/owner";
 import { getReadiness } from "@/server/domain/readiness";
 import { ProfileForm } from "./profile-form";
 import { ReadinessList } from "./readiness-list";
-import { getServerConfig } from "@/server/env";
+import { describeAiConnection } from "@/server/domain/ai-settings";
+import { getEffectiveConfig } from "@/server/effective-config";
 import { AiSetup } from "./ai-setup";
 import { PayPalSetup } from "./paypal-setup";
 
@@ -17,7 +18,7 @@ export const metadata: Metadata = { title: "Setup" };
 export default async function SetupPage() {
   const { seller } = await requireOwner(await headers());
   const readiness = await getReadiness(seller);
-  const config = getServerConfig();
+  const [config, connection] = await Promise.all([getEffectiveConfig(), describeAiConnection()]);
   const deskTheme = deskThemeId(
     (await cookies()).get(DESK_THEME_COOKIE)?.value,
   );
@@ -33,6 +34,7 @@ export default async function SetupPage() {
         <ReadinessList readiness={readiness} />
       </div>
       <AiSetup
+        connection={connection}
         reply={
           config.ai.status === "ready"
             ? `${config.ai.modelId} through ${config.ai.provider}`
