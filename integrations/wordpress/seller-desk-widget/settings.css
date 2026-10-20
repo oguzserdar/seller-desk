@@ -1,0 +1,40 @@
+/* Scoped to this plugin screen. The WordPress shell and admin color scheme stay native. */
+.sd-settings { --sd-ink: #16181d; --sd-muted: #4a505c; --sd-line: #e4e6ea; max-width: 1080px; padding: 24px 20px 32px 0; color: var(--sd-ink); }
+.sd-settings * { box-sizing: border-box; }
+.sd-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.sd-settings .sd-heading h1 { padding: 0; font-size: 30px; line-height: 1.2; font-weight: 600; letter-spacing: -.6px; }
+.sd-settings p { color: var(--sd-muted); font-size: 14px; line-height: 1.65; margin: 8px 0 16px; }
+.sd-layout { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 36px; align-items: start; }
+.sd-panel { background: #fff; border: 1px solid var(--sd-line); border-radius: 12px; overflow: hidden; }
+.sd-step { display: flex; gap: 16px; padding: 28px; }
+.sd-step + .sd-step { border-top: 1px solid var(--sd-line); }
+.sd-step-number { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 28px; height: 28px; border: 1px solid #cdd1d8; border-radius: 50%; color: var(--sd-muted); font-size: 13px; font-weight: 600; }
+.sd-step-content { min-width: 0; flex: 1; }
+.sd-settings h2 { font-size: 18px; line-height: 1.45; margin: 0; }
+.sd-settings h3 { font-size: 14px; margin: 24px 0 8px; }
+.sd-settings label { display: block; font-size: 13px; font-weight: 600; margin: 20px 0 7px; }
+.sd-settings input[type=url] { min-height: 44px; width: 100%; border-color: #8c939e; border-radius: 6px; font-size: 15px; padding: 8px 12px; }
+.sd-settings .sd-help { font-size: 12px; margin: 7px 0 0; }
+.sd-settings .submit { margin: 16px 0 0; padding: 0; }
+.sd-settings .button { min-height: 40px; padding: 4px 14px; border-radius: 6px; font-size: 13px; }
+.sd-settings .button-primary { background: var(--wp-admin-theme-color, #2271b1); border-color: var(--wp-admin-theme-color, #2271b1); }
+.sd-copy { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.sd-copy code { min-width: 0; padding: 8px 0; background: none; font-size: 13px; overflow-wrap: anywhere; }
+.sd-copy .button { flex-shrink: 0; }
+.sd-link { display: inline-block; margin-top: 16px; font-weight: 600; line-height: 1.7; }
+.sd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.sd-settings .sd-result { margin: 16px 0 0; padding-left: 12px; border-left: 3px solid var(--sd-line); font-size: 13px; }
+.sd-status { flex-shrink: 0; display: inline-block; padding: 6px 10px; background: #e9ebee; color: var(--sd-muted); border-radius: 20px; font-size: 12px; font-weight: 600; }
+.sd-status[data-state=success] { background: #e4f3ea; color: #1b7448; }
+.sd-result[data-state=success] { border-color: #1b7448; }
+.sd-status[data-state=attention] { background: #fdf1dc; color: #85480a; }
+.sd-result[data-state=attention] { border-color: #85480a; }
+.sd-aside { padding-top: 8px; }
+.sd-aside hr { border: 0; border-top: 1px solid var(--sd-line); margin: 24px 0; }
+.sd-settings .sd-aside p { font-size: 13px; }
+.sd-details { margin-top: 24px; max-width: 760px; }
+.sd-details summary { cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px 0; }
+.sd-settings .sd-details p { font-size: 13px; }
+.sd-settings :is(button, a, input, summary):focus-visible { outline: 2px solid var(--wp-admin-theme-color, #2271b1); outline-offset: 3px; }
+@media (max-width: 1100px) { .sd-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; } .sd-aside { max-width: 640px; } }
+@media (max-width: 600px) { .sd-settings { padding: 16px 0 24px; } .sd-heading { flex-direction: column; gap: 4px; margin-bottom: 20px; } .sd-settings .sd-heading h1 { font-size: 26px; } .sd-step { padding: 22px 16px; gap: 12px; } .sd-copy { align-items: flex-start; flex-direction: column; gap: 4px; } }
