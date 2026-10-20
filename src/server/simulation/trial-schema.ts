@@ -104,5 +104,6 @@ export const TRIAL_SCHEMA: readonly string[] = [
   "CREATE UNIQUE INDEX `simulation_run_one_running` ON `simulation_run` (`seller_id`) WHERE \"simulation_run\".\"state\" = 'running';",
   "CREATE TABLE `storage_sequence` (\n\t`name` text PRIMARY KEY NOT NULL,\n\t`value` integer NOT NULL,\n\tCONSTRAINT \"storage_sequence_name_valid\" CHECK(\"storage_sequence\".\"name\" in ('message', 'owner_message', 'orders')),\n\tCONSTRAINT \"storage_sequence_value_valid\" CHECK(typeof(\"storage_sequence\".\"value\") = 'integer' and \"storage_sequence\".\"value\" between 1 and 2147483647)\n);",
   "CREATE TABLE `storage_identity` (\n\t`singleton` integer PRIMARY KEY DEFAULT 1 NOT NULL,\n\t`id` text NOT NULL,\n\tCONSTRAINT \"storage_identity_singleton\" CHECK(\"storage_identity\".\"singleton\"=1)\n);",
-  "CREATE UNIQUE INDEX `storage_identity_id_unique` ON `storage_identity` (`id`);"
+  "CREATE UNIQUE INDEX `storage_identity_id_unique` ON `storage_identity` (`id`);",
+  "ALTER TABLE `installation` ADD `ai_settings_sealed` text;"
 ];

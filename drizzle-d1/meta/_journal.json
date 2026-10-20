@@ -22,6 +22,13 @@
       "when": 1792068180104,
       "tag": "0002_isolated_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792537169744,
+      "tag": "0003_ai_settings_sealed",
+      "breakpoints": true
     }
   ]
 }

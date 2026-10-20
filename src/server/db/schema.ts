@@ -93,6 +93,8 @@ export const installation = pgTable(
     aiCheckOk: boolean("ai_check_ok"),
     aiCheckDetail: text("ai_check_detail"),
     aiCheckedAt: ts("ai_checked_at"),
+    /** AI connection saved in Setup, sealed with SETTINGS_ENCRYPTION_KEY; never readable without it. */
+    aiSettingsSealed: text("ai_settings_sealed"),
     createdAt: createdAt(),
   },
   (t) => [

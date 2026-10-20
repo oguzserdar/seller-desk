@@ -1,0 +1,1 @@
+ALTER TABLE "installation" ADD COLUMN "ai_settings_sealed" text;
