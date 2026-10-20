@@ -1,0 +1,18 @@
+// New installations only. The existing hosted demo uses cloudflare.config.ts.
+// Cloudflare's Deploy Button provisions its own D1 database and trial namespace.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "seller-desk-install",
+  "main": ".cloudflare/output/v0/workers/default/bundle/index.js",
+  "compatibility_date": "2026-10-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "keep_vars": true,
+  "assets": { "directory": ".cloudflare/output/v0/workers/default/assets", "binding": "ASSETS", "not_found_handling": "none" },
+  "vars": { "APP_MODE": "sandbox", "DATABASE_KIND": "d1", "CLIENT_IP_HEADER": "cf-connecting-ip" },
+  "d1_databases": [{ "binding": "DB", "database_name": "seller-desk-install", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "drizzle-d1" }],
+  "durable_objects": { "bindings": [{ "name": "SIMULATIONS", "class_name": "SimulationDatabase" }] },
+  "migrations": [{ "tag": "trial-sqlite-v1", "new_sqlite_classes": ["SimulationDatabase"] }],
+  "triggers": { "crons": ["* * * * *"] },
+  "observability": { "enabled": true }
+}
