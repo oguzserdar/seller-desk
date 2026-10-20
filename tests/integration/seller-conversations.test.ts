@@ -1,0 +1,85 @@
+import { convertToModelMessages } from "ai";
+import { beforeEach, describe, expect, it } from "vitest";
+import { ensureConversation, loadMessages } from "@/server/ai/conversation";
+import { changeConversationHandler } from "@/server/domain/conversation-control";
+import { receiveBuyerMessage, readBuyerConversation, readSellerConversation, listSellerConversations, sendSellerMessage } from "@/server/domain/conversation-messages";
+import { sellerReplyOf, sellerReplyToModel } from "@/lib/conversation-messages";
+import { askSeller, dueResumes, latestQuestion } from "@/server/domain/seller-questions";
+import type { OwnerPrincipal } from "@/server/domain/principal";
+import { newBuyer, resetShop, tally } from "../support/shop";
+
+let owner: OwnerPrincipal;
+beforeEach(async () => { ({ owner } = await resetShop()); });
+describe("direct seller conversations", () => {
+  it("delivers messages without AI, attributes the seller, preserves history, and supplies human context after handback", async () => {
+    const buyer = await newBuyer(); const id = await ensureConversation(buyer);
+    const before = await tally();
+    await changeConversationHandler(owner, { id, expectedRevision: 1, handler: "seller" });
+    const input = { id: crypto.randomUUID(), text: "Could you help with my repair?" };
+    expect((await receiveBuyerMessage(buyer, id, input, false)).claim).toBeNull();
+    await receiveBuyerMessage(buyer, id, input, false);
+    const reply = { id: crypto.randomUUID(), conversationId: id, expectedRevision: 2, text: "Bring your bike on Tuesday; I need to inspect it before confirming a price." };
+    const sent = await sendSellerMessage(owner, reply); await sendSellerMessage(owner, reply);
+    expect(sent.messages).toHaveLength(2); expect(sellerReplyOf(sent.messages[1]!)).toMatchObject({ text: reply.text });
+    expect(await listSellerConversations(owner)).toEqual([expect.objectContaining({ id, handler: "seller", preview: reply.text })]);
+    const converted = await convertToModelMessages(sent.messages, { convertDataPart: sellerReplyToModel });
+    expect(JSON.stringify(converted)).toContain(reply.text); expect(JSON.stringify(converted)).toContain("not a quote approval");
+    await changeConversationHandler(owner, { id, expectedRevision: 2, handler: "assistant" });
+    expect((await receiveBuyerMessage(buyer, id, { id: crypto.randomUUID(), text: "Actually, I need this Friday." }, true)).claim).not.toBeNull();
+    expect((await loadMessages(id)).map(m => m.role)).toEqual(["user", "assistant", "user"]);
+    expect(await tally()).toEqual(before);
+  });
+  it("rejects wrong owners, wrong buyers, stale replies and nonce reuse with different content", async () => {
+    const buyer = await newBuyer(); const other = await newBuyer(); const id = await ensureConversation(buyer);
+    await changeConversationHandler(owner, { id, expectedRevision: 1, handler: "seller" });
+    const reply = { id: crypto.randomUUID(), conversationId: id, expectedRevision: 2, text: "Human response." };
+    await expect(readBuyerConversation(other, id)).rejects.toThrow();
+    await expect(receiveBuyerMessage(other, id, { id: crypto.randomUUID(), text: "intrusion" }, false)).rejects.toThrow();
+    const stranger = { ...owner, userId: crypto.randomUUID() };
+    await expect(readSellerConversation(stranger, id)).rejects.toThrow(); await expect(listSellerConversations(stranger)).rejects.toThrow();
+    await expect(sendSellerMessage(stranger, reply)).rejects.toThrow();
+    await sendSellerMessage(owner, reply); await expect(sendSellerMessage(owner, { ...reply, text: "Rewritten" })).rejects.toThrow();
+    await changeConversationHandler(owner, { id, expectedRevision: 2, handler: "assistant" });
+    await expect(sendSellerMessage(owner, { ...reply, id: crypto.randomUUID() })).rejects.toThrow();
+    expect((await loadMessages(id))).toHaveLength(1);
+  });
+  it("closes a pending request only with explicit matching revision, without automatic duplicate AI replies", async () => {
+    const buyer = await newBuyer(); const id = await ensureConversation(buyer);
+    const { question } = await askSeller(buyer, { question: "Can I collect Friday?", customerGoal: "Collect Friday", knownFacts: [] });
+    await changeConversationHandler(owner, { id, expectedRevision: 1, handler: "seller" });
+    const reply = { id: crypto.randomUUID(), conversationId: id, expectedRevision: 2, text: "Let me check." };
+    await sendSellerMessage(owner, reply); expect((await latestQuestion(buyer))?.state).toBe("open");
+    await expect(sendSellerMessage(owner, { ...reply, id: crypto.randomUUID(), answerPending: { id: question.id, revision: 2 } })).rejects.toThrow();
+    expect(await loadMessages(id)).toHaveLength(1);
+    await sendSellerMessage(owner, { ...reply, id: crypto.randomUUID(), text: "Tuesday is the earliest.", answerPending: { id: question.id, revision: 1 } });
+    expect((await latestQuestion(buyer))?.answer).toBe("Tuesday is the earliest.");
+    await changeConversationHandler(owner, { id, expectedRevision: 2, handler: "assistant" });
+    expect(await dueResumes(20)).not.toContain(question.id);
+  });
+  it("rejects retries that change which request a saved reply resolves", async () => {
+    const buyer = await newBuyer(); const id = await ensureConversation(buyer);
+    const { question } = await askSeller(buyer, { question: "Can I collect Friday?", customerGoal: "Collect Friday", knownFacts: [] });
+    await changeConversationHandler(owner, { id, expectedRevision: 1, handler: "seller" });
+    const reply = { id: crypto.randomUUID(), conversationId: id, expectedRevision: 2, text: "Let me check." };
+    await sendSellerMessage(owner, reply);
+    await expect(sendSellerMessage(owner, { ...reply, answerPending: { id: question.id, revision: 1 } })).rejects.toThrow();
+    expect((await latestQuestion(buyer))?.state).toBe("open");
+    const answer = { ...reply, id: crypto.randomUUID(), text: "Friday at noon works.", answerPending: { id: question.id, revision: 1 } };
+    await sendSellerMessage(owner, answer);
+    await expect(sendSellerMessage(owner, { ...answer, answerPending: undefined })).rejects.toThrow();
+    await expect(sendSellerMessage(owner, { ...answer, answerPending: { id: question.id, revision: 2 } })).rejects.toThrow();
+    await changeConversationHandler(owner, { id, expectedRevision: 2, handler: "assistant" });
+    await sendSellerMessage(owner, answer);
+    expect(await loadMessages(id)).toHaveLength(2);
+    expect((await latestQuestion(buyer))?.revision).toBe(2);
+  });
+  it("concurrent retries save one human reply and resolve the request once", async () => {
+    const buyer = await newBuyer(); const id = await ensureConversation(buyer);
+    const { question } = await askSeller(buyer, { question: "Can I collect Friday?", customerGoal: "Collect Friday", knownFacts: [] });
+    await changeConversationHandler(owner, { id, expectedRevision: 1, handler: "seller" });
+    const reply = { id: crypto.randomUUID(), conversationId: id, expectedRevision: 2, text: "Friday at noon works.", answerPending: { id: question.id, revision: 1 } };
+    await Promise.all([sendSellerMessage(owner, reply), sendSellerMessage(owner, reply)]);
+    expect(await loadMessages(id)).toHaveLength(1);
+    expect((await latestQuestion(buyer))?.revision).toBe(2);
+  });
+});
