@@ -1,0 +1,14 @@
+Vercel AI Elements
+Copyright 2023 Vercel, Inc.
+Licensed under the Apache License, Version 2.0.
+https://github.com/vercel/ai-elements/tree/6a9d5b1822ffb10bba4bd97175f01edd7d8651cd
+
+Adapted files: src/components/assistant/internal/conversation.tsx and message-response.tsx.
+Based on packages/elements/src/conversation.tsx and message.tsx.
+Modified 2026-10-09 for Seller Desk: original visual design, narrow internal APIs, instant scrolling, accessible scroll control, restricted Markdown, no plugins or remote media.
+These adaptations retain Apache-2.0. Original Seller Desk code is MIT licensed.
+
+Additional adaptation 2026-10-11: src/components/assistant/internal/model-selector.tsx,
+from packages/elements/src/model-selector.tsx at the same source pin.
+Modified: narrow API, direct Radix Popover/cmdk composition, original trigger and search rows,
+mobile viewport bounds, no remote provider logos. Retains Apache-2.0.

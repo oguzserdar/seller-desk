@@ -1,0 +1,161 @@
+{
+  "name": "seller-desk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source AI seller desk for PayPal sellers: buyer assistant, reviewed quotes, verified PayPal checkout and recovery, and an owner desk.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.2.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "next dev --hostname localhost --port 4310",
+    "build": "tsx scripts/build.ts",
+    "start": "next start --hostname localhost --port 4310",
+    "demo": "tsx scripts/demo.ts",
+    "doctor": "tsx scripts/doctor.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:check": "drizzle-kit check",
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "db:check:d1": "tsx scripts/db-migrate-d1.ts --check",
+    "db:migrate:d1": "tsx scripts/db-migrate-d1.ts",
+    "db:seed": "tsx scripts/db-seed.ts",
+    "owner:bootstrap": "tsx scripts/owner-bootstrap.ts",
+    "jobs:run": "tsx scripts/jobs-run.ts",
+    "fixture:fault": "tsx scripts/fixture-fault.ts",
+    "example:site": "tsx scripts/example-site.ts",
+    "notices": "tsx scripts/notices.ts",
+    "check": "next typegen && tsc --noEmit && tsx scripts/trial-schema.ts --check && tsx scripts/source-guard.ts",
+    "test": "vitest run",
+    "eval:chat": "tsx scripts/eval-chat.ts",
+    "eval:journey": "tsx scripts/eval-journey.ts",
+    "release:archive": "tsx scripts/release-archive.ts",
+    "smoke:purchase": "tsx scripts/smoke-purchase.ts",
+    "smoke:recovery": "tsx scripts/smoke-recovery.ts",
+    "smoke:stale-hold": "tsx scripts/smoke-stale-hold.ts",
+    "demo:orders": "tsx scripts/demo-orders.ts",
+    "dev:cloudflare": "vite dev --host localhost --port 4310",
+    "build:cloudflare": "vite build",
+    "preview:cloudflare": "vite preview --host localhost --port 4310",
+    "deploy:cloudflare": "vinext-cloudflare deploy",
+    "package:wordpress": "tsx scripts/package-wordpress.ts",
+    "d1:admin": "tsx scripts/d1-admin.ts",
+    "demo:d1": "tsx scripts/demo-d1.ts",
+    "db:generate:d1": "drizzle-kit generate --config drizzle.d1.config.ts",
+    "trial:schema": "tsx scripts/trial-schema.ts",
+    "build:vercel": "tsx scripts/build-vercel.ts",
+    "build:cloudflare:install": "tsx scripts/build-cloudflare-install.ts",
+    "deploy": "tsx scripts/deploy-cloudflare-install.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "4.0.80",
+    "@ai-sdk/google": "4.0.96",
+    "@ai-sdk/openai": "4.0.94",
+    "@ai-sdk/provider": "4.0.27",
+    "@ai-sdk/react": "4.0.145",
+    "@ai-sdk/typesafe-ai": "3.0.19",
+    "@better-auth/drizzle-adapter": "1.7.7",
+    "@js-temporal/polyfill": "0.5.1",
+    "@openrouter/ai-sdk-provider": "3.1.0",
+    "@radix-ui/react-accordion": "1.2.21",
+    "@radix-ui/react-checkbox": "1.3.12",
+    "@radix-ui/react-dialog": "1.2.0",
+    "@radix-ui/react-dropdown-menu": "2.1.25",
+    "@radix-ui/react-popover": "1.2.0",
+    "@radix-ui/react-select": "2.3.8",
+    "@radix-ui/react-switch": "1.3.8",
+    "@radix-ui/react-tabs": "1.1.22",
+    "@radix-ui/react-tooltip": "1.3.0",
+    "@vinext/cloudflare": "1.1.0",
+    "ag-grid-community": "36.2.0",
+    "ag-grid-react": "36.2.0",
+    "ai": "7.0.141",
+    "better-auth": "1.7.7",
+    "class-variance-authority": "0.7.1",
+    "cmdk": "1.1.1",
+    "cn": "0.4.0",
+    "csv-parse": "7.0.3",
+    "drizzle-orm": "0.45.3",
+    "html-to-text": "10.0.1",
+    "lucide-react": "1.52.0",
+    "motion": "13.5.1",
+    "next": "16.3.8",
+    "next-safe-action": "8.7.3",
+    "pg": "8.23.1",
+    "radix-ui": "1.8.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-server-dom-webpack": "19.3.0",
+    "server-only": "0.0.1",
+    "streamdown": "2.7.0",
+    "tw-animate-css": "1.4.0",
+    "use-stick-to-bottom": "1.1.6",
+    "vinext": "1.1.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "2.0.0-beta.sha-91c870c02",
+    "@cloudflare/workers-types": "5.20261006.1",
+    "@playwright/test": "1.57.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/html-to-text": "9.0.4",
+    "@types/node": "24.19.1",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitejs/plugin-rsc": "0.5.36",
+    "cf": "1.0.0-beta.14",
+    "drizzle-kit": "0.31.11",
+    "embedded-postgres": "18.4.0-beta.17",
+    "fflate": "0.8.3",
+    "happy-dom": "20.14.6",
+    "miniflare": "5.20261006.2-beta",
+    "postcss": "8.5.29",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vite": "8.3.0",
+    "vitest": "5.0.3",
+    "wrangler": "4.150.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@embedded-postgres/darwin-arm64",
+      "@embedded-postgres/darwin-x64",
+      "@embedded-postgres/linux-arm",
+      "@embedded-postgres/linux-arm64",
+      "@embedded-postgres/linux-ia32",
+      "@embedded-postgres/linux-ppc64",
+      "@embedded-postgres/linux-x64",
+      "@embedded-postgres/windows-x64"
+    ],
+    "overrides": {
+      "zod": "4.6.5"
+    },
+    "patchedDependencies": {
+      "@openrouter/ai-sdk-provider@3.1.0": "patches/@openrouter__ai-sdk-provider@3.1.0.patch"
+    }
+  },
+  "cloudflare": {
+    "bindings": {
+      "DB": {
+        "description": "A new dedicated Seller Desk database. Never select another application database."
+      },
+      "SIMULATIONS": {
+        "description": "Isolated fictional shops for seller tests; live shop records stay in D1."
+      },
+      "INSTALL_TOKEN": {
+        "description": "A separate random secret of at least 32 characters. Enter it once at /owner/start, then remove it after creating your owner account."
+      },
+      "BETTER_AUTH_SECRET": {
+        "description": "A random secret of at least 32 characters for owner sessions. Must differ from JOBS_SECRET and INSTALL_TOKEN."
+      },
+      "JOBS_SECRET": {
+        "description": "A different random secret of at least 32 characters for recovery tasks."
+      }
+    }
+  }
+}

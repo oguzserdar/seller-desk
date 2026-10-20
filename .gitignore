@@ -1,0 +1,36 @@
+# dependencies and builds
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# local runtime data: databases, secrets, proofs with customer details
+.env
+.env.local
+.env.*.local
+.seller-desk/
+*.dump
+*.sql.gz
+release/
+
+# test and browser artifacts
+test-results/
+playwright-report/
+blob-report/
+
+# editors and OS
+.DS_Store
+.idea/
+.vscode/
+
+# design process logs (prompts and renders are kept; tool logs are not)
+design/**/codex.log
+.vinext/
+.cloudflare/
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example

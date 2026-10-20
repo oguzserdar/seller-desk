@@ -1,0 +1,91 @@
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index 9e6850cc5fc3d9a03f5a5f6f0347c86504800da2..4dca0ca7e82dda9ceb58c9af10056c7daae44b80 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,3 +1,4 @@
++// Modified by Seller Desk: align decision models with AI SDK 7.0.141.
+ import * as _ai_sdk_provider from '@ai-sdk/provider';
+ import { LanguageModelV4, LanguageModelV4CallOptions, LanguageModelV4Content, LanguageModelV4FinishReason, LanguageModelV4Usage, SharedV4Warning, LanguageModelV4ResponseMetadata, SharedV4Headers, LanguageModelV4StreamPart, EmbeddingModelV4, SharedV4ProviderMetadata, JSONObject, JSONValue, SharedV4ProviderOptions, ImageModelV4, ImageModelV4CallOptions, ImageModelV4ProviderMetadata, ImageModelV4Usage, Experimental_VideoModelV4, Experimental_VideoModelV4CallOptions, Experimental_VideoModelV4VideoData, ProviderV4 } from '@ai-sdk/provider';
+ export { LanguageModelV4, LanguageModelV4Prompt } from '@ai-sdk/provider';
+@@ -800,7 +801,7 @@ type EvaluationModelV4Question = {
+ };
+ type EvaluationModelV4CallOptions = {
+     /** One shared state, even when the value is an array. */
+-    state: EvaluationModelV4Input;
++    state: _ai_sdk_provider.Experimental_DecisionModelV4State;
+     questions: Readonly<Record<string, EvaluationModelV4Question>>;
+     abortSignal?: AbortSignal;
+     headers?: SharedV4Headers;
+@@ -859,7 +860,7 @@ type EvaluationModelV4 = {
+     /** Supported question types, used to reject unsupported calls before any I/O. */
+     readonly supportedQuestionTypes: readonly EvaluationModelV4Question['type'][];
+     /** Evaluate every question against the same state. No partial results. */
+-    doEvaluate(options: EvaluationModelV4CallOptions): PromiseLike<EvaluationModelV4Result>;
++    doDecide(options: EvaluationModelV4CallOptions): PromiseLike<EvaluationModelV4Result>;
+ };
+ 
+ type OpenRouterEvaluationConfig = {
+@@ -885,7 +886,7 @@ declare class OpenRouterEvaluationModel implements EvaluationModelV4 {
+     readonly supportedQuestionTypes: readonly ["choice", "score", "boolean"];
+     private readonly config;
+     constructor(modelId: OpenRouterEvaluationModelId, settings: OpenRouterEvaluationSettings, config: OpenRouterEvaluationConfig);
+-    doEvaluate(options: EvaluationModelV4CallOptions): Promise<EvaluationModelV4Result>;
++    doDecide(options: EvaluationModelV4CallOptions): Promise<EvaluationModelV4Result>;
+ }
+ 
+ type OpenRouterImageConfig = {
+@@ -996,7 +997,7 @@ interface OpenRouterProvider extends ProviderV4 {
+     /**
+   Creates an OpenRouter evaluation model backed by the Decisions API, for use with `experimental_evaluate`.
+      */
+-    evaluationModel(modelId: OpenRouterEvaluationModelId, settings?: OpenRouterEvaluationSettings): OpenRouterEvaluationModel;
++    decisionModel(modelId: OpenRouterEvaluationModelId, settings?: OpenRouterEvaluationSettings): OpenRouterEvaluationModel;
+     /**
+      * Provider-defined tools for OpenRouter server tools.
+      */
+@@ -1019,7 +1020,7 @@ interface OpenRouterProviderSettings {
+        */
+     baseUrl?: string;
+     /**
+-  Base URL for the Decisions API used by `evaluationModel()`. Defaults to
++  Base URL for the Decisions API used by `decisionModel()`. Defaults to
+   `https://openrouter.ai/api/alpha`; when `baseURL` ends in `/v1` it defaults
+   to the same URL with `/alpha` in place of `/v1`. Required when `baseURL`
+   points at a proxy path that does not end in `/v1`.
+diff --git a/dist/index.js b/dist/index.js
+index 00ced03ce48e0a77fff23e5969cf3b92c4e107f7..c3577ae5897ca16cfc4085229746021874afd093 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,3 +1,4 @@
++// Modified by Seller Desk: align decision models with AI SDK 7.0.141.
+ var __defProp = Object.defineProperty;
+ var __defProps = Object.defineProperties;
+ var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+@@ -5706,9 +5707,16 @@ var OpenRouterEvaluationModel = class {
+     this.settings = settings;
+     this.config = config;
+   }
+-  async doEvaluate(options) {
++  async doDecide(options) {
+     var _a18;
+-    const { state, questions, abortSignal, headers, providerOptions } = options;
++    const { state: parts, questions, abortSignal, headers, providerOptions } = options;
++    const values = parts.map((part) => {
++      if (part.type === "file") {
++        throw new InvalidArgumentError({ argument: "state", message: "OpenRouter decisions support text and JSON state only." });
++      }
++      return part.type === "json" ? part.value : part.text;
++    });
++    const state = values.length === 1 ? values[0] : values;
+     const decisionsQuestions = Object.fromEntries(
+       Object.entries(questions).map(([id, question]) => [
+         id,
+@@ -6305,7 +6313,7 @@ function createOpenRouter(options = {}) {
+   provider.embedding = createEmbeddingModel;
+   provider.imageModel = createImageModel;
+   provider.videoModel = createVideoModel;
+-  provider.evaluationModel = createEvaluationModel;
++  provider.decisionModel = createEvaluationModel;
+   provider.tools = {
+     webSearch
+   };

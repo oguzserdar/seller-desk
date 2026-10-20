@@ -1,0 +1,8 @@
+# Required private secrets for a new Cloudflare installation.
+# Three DIFFERENT random values, at least 32 characters each.
+BETTER_AUTH_SECRET=
+JOBS_SECRET=
+INSTALL_TOKEN=
+# APP_URL is recorded automatically from the actual deployment address.
+# Optional: add your selected AI and PayPal sandbox secrets later in host settings.
+# See docs/ai-activation.md and docs/deploy-cloudflare.md.
