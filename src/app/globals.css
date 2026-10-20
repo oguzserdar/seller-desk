@@ -1,0 +1,325 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, Menlo, Consolas, monospace;
+
+  /* Neutrals carry a trace of the band hue so greys read as one family (Arc foundation, re-tuned). */
+  --color-canvas: oklch(97.6% 0.003 258);
+  --color-surface: #ffffff;
+  --color-sunken: oklch(95.8% 0.004 258);
+  --color-photo: oklch(94% 0.005 258);
+  --color-ink: oklch(18% 0.012 258);
+  --color-ink-2: oklch(42% 0.012 258);
+  --color-ink-3: oklch(52% 0.01 258); /* at least 4.6:1 on surface and sunken */
+  --color-line: oklch(92.5% 0.005 258);
+  --color-line-strong: oklch(85% 0.007 258);
+
+  /* Actions. */
+  --color-brand: oklch(45% 0.14 262);
+  --color-brand-strong: oklch(38% 0.14 262);
+  --color-brand-soft: oklch(95.6% 0.025 262);
+  --color-on-brand: #fff;
+
+  /* The shop's band: identity only. It never means success. */
+  --color-band: oklch(27% 0.045 258);
+  --color-band-ink: oklch(97% 0.008 258);
+  --color-band-ink-2: oklch(82% 0.02 258);
+  --color-band-line: oklch(40% 0.04 258);
+
+  /* Meaning. Green is reserved for records that are verified as done. */
+  --color-success: oklch(47% 0.12 152);
+  --color-success-soft: oklch(95.8% 0.035 152);
+  --color-success-line: oklch(87% 0.06 152);
+  --color-attention: oklch(50% 0.11 62);
+  --color-attention-soft: oklch(96.4% 0.035 78);
+  --color-danger: oklch(50% 0.17 27);
+  --color-danger-soft: oklch(95.8% 0.03 27);
+  --color-fixture: oklch(40% 0.02 258);
+  --color-fixture-soft: oklch(95.4% 0.006 258);
+
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --radius-surface: 24px;
+  --shadow-card: 0 1px 0 rgb(27 29 33 / 0.04), 0 1px 3px rgb(27 29 33 / 0.06);
+  --shadow-lift: 0 1px 2px rgb(22 24 29 / 0.06), 0 8px 24px -12px rgb(22 24 29 / 0.16);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Arc reads its own token names. Point them at Seller Desk's tokens (unlayered, after Arc's foundation)
+   so every Arc component follows the shop palette. Repeated on .buyer-page and .desk-theme because a palette
+   is set there, and a custom property that references another is resolved where it is declared. */
+:root, .buyer-page, .desk-theme {
+  --background: var(--color-canvas);
+  --surface: var(--color-surface);
+  --surface-raised: var(--color-surface);
+  --surface-muted: var(--color-sunken);
+  --foreground: var(--color-ink);
+  --text-secondary: var(--color-ink-2);
+  --text-muted: var(--color-ink-3);
+  --border: var(--color-line);
+  --border-subtle: var(--color-line);
+  --border-strong: var(--color-line-strong);
+  --accent: var(--color-brand);
+  --accent-strong: var(--color-brand-strong);
+  --accent-subtle: var(--color-brand-soft);
+  --accent-foreground: var(--color-on-brand);
+  --control-on: var(--color-brand);
+  --control-fill: var(--color-brand);
+  --control-thumb-on: var(--color-on-brand);
+  --control-glyph: var(--color-on-brand);
+  --success: var(--color-success);
+  --warning: var(--color-attention);
+  --danger: var(--color-danger);
+  /* Arc's foundation is unlayered, so it would beat Tailwind's layered theme values for these names. */
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --radius-control: 10px;
+  --radius-surface: 24px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: var(--color-brand-soft);
+  }
+  h1,
+  h2,
+  h3 {
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* New content settles in from just below; transitions stay interruptible. */
+.enter {
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 220ms var(--ease-out);
+  @starting-style {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* The buyer conversation fills the available viewport below the runtime notice. */
+body:has(.shop-active) {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+body:has(.shop-active) > [role="note"] { flex: none; }
+.buyer-page:has(.shop-active) { display: flex; flex: 1; min-height: 0; }
+/* The shop's band carries its identity; the conversation sheet and purchase panel rise over it. */
+.shop-shell { width: 100%; background: var(--color-canvas); }
+.shop-active { flex: 1; overflow: hidden; }
+.shop-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  flex-shrink: 0; width: 100%; padding: 24px max(32px, calc((100% - 1240px) / 2 + 32px)) 28px;
+  background: var(--color-band); color: var(--color-band-ink);
+}
+.shop-header :is(a, button) { color: var(--color-band-ink-2); }
+.shop-header :is(a, button):hover { color: var(--color-band-ink); background: transparent; }
+.shop-header .shop-tagline { color: var(--color-band-ink-2); }
+.shop-wordmark { font-family: var(--font-display); font-size: 28px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.shop-active .shop-header { padding-bottom: 72px; }
+.shop-workspace {
+  display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start;
+  width: 100%; max-width: 1240px; margin: -48px auto 0; padding: 0 32px 24px; flex: 1; min-height: 0;
+}
+.shop-workspace > main {
+  height: 100%; background: var(--color-surface); border-radius: var(--radius-surface);
+  box-shadow: 0 0 0 1px var(--color-line), 0 20px 48px oklch(0% 0 0 / 0.08), 0 3px 10px oklch(0% 0 0 / 0.04); overflow: hidden;
+}
+.conversation-scroll { min-height: 0; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--color-line-strong) transparent; }
+/* Bottom room keeps the "Latest reply" button off the last line; the top fade stops text sitting under the sheet's rounded edge. */
+.conversation-content { display: flex; flex-direction: column; gap: 24px; width: 100%; max-width: 780px; padding: 32px 32px 72px; margin: 0 auto; }
+.shop-workspace .conversation-scroll { mask-image: linear-gradient(to bottom, transparent 0, #000 24px); }
+.conversation-latest { position: absolute; bottom: 12px; right: 12px; }
+.shop-composer-dock { flex: none; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 780px; margin: 0 auto; padding: 12px 32px max(24px, env(safe-area-inset-bottom)); background: var(--color-surface); }
+.shop-quote-rail {
+  max-height: 100%; overflow-y: auto; padding: 24px; scrollbar-width: thin;
+  background: var(--color-surface); border-radius: var(--radius-surface);
+  box-shadow: 0 0 0 1px var(--color-line), 0 6px 18px oklch(0% 0 0 / 0.05);
+}
+.shop-quote-rail .quote-summary { padding: 0; }
+.shop-quote-rail .quote-summary > * { padding-left: 0; padding-right: 0; }
+.assistant-receipt { font-size: 13px; line-height: 1.5; color: var(--color-ink-3); }
+.assistant-prose { min-width: 0; max-width: 620px; font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+.assistant-prose > * + * { margin-top: 12px; }
+.assistant-prose :is(h1,h2,h3,h4,h5,h6) { font-size: 17px; line-height: 1.5; font-weight: 600; margin-top: 18px; }
+.assistant-prose :is(p,ul,ol,blockquote) { margin-bottom: 0; }
+.assistant-prose :is(ul,ol) { padding-left: 22px; }
+.assistant-prose ul { list-style: disc; }
+.assistant-prose ol { list-style: decimal; }
+.assistant-prose li + li { margin-top: 5px; }
+.assistant-prose strong { font-weight: 600; }
+.assistant-prose code { overflow-wrap: anywhere; white-space: pre-wrap; font-size: 0.9em; background: var(--color-sunken); border-radius: 3px; padding: 1px 3px; }
+.assistant-prose pre { max-width: 100%; overflow-x: auto; padding: 12px; background: var(--color-sunken); border-radius: 8px; }
+.assistant-prose blockquote { border-left: 2px solid var(--color-line-strong); padding-left: 16px; color: var(--color-ink-2); }
+.response-table { max-width: 100%; overflow-x: auto; }
+.response-table table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.response-table :is(th,td) { padding: 8px; border-bottom: 1px solid var(--color-line); }
+@media (max-width: 1023px) {
+  .shop-header, .shop-active .shop-header { padding: 16px 20px; gap: 12px; }
+  .shop-wordmark { font-size: 20px; }
+  .shop-header .shop-tagline { display: none; }
+  .shop-workspace { grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; gap: 0; }
+  .shop-workspace > main { border-radius: 0; box-shadow: none; }
+  .shop-quote-rail { display: none; }
+  .conversation-content { padding: 24px 20px 72px; }
+  .shop-composer-dock { padding: 10px 16px max(12px, env(safe-area-inset-bottom)); }
+}
+@media (max-width: 480px) {
+  .shop-header { padding-inline: 16px; }
+  .conversation-content { padding-inline: 16px; }
+}
+
+/* AI Elements picker, restyled for the owner desk. Radix manages focus and dismissal. */
+.ai-picker-trigger { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 72px; padding: 14px 16px; border: 1px solid var(--color-line-strong); border-radius: 12px; background: var(--color-surface); transition: background-color 150ms; }
+.ai-picker-trigger:hover { background: var(--color-canvas); }
+.ai-picker-popover { z-index: 81; display: flex; flex-direction: column; width: min(380px, calc(100vw - 24px)); max-height: var(--radix-popover-content-available-height); overflow: hidden; border: 1px solid var(--color-line); border-radius: 14px; background: var(--color-surface); box-shadow: 0 8px 32px rgb(22 24 29 / 0.14); }
+.ai-picker-list { max-height: min(400px, 52dvh); min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px; scroll-padding: 8px; }
+.ai-picker-list [cmdk-group-heading] { color: var(--color-ink-3); font-size: 12px; font-weight: 500; padding: 12px 12px 6px; }
+.ai-picker-option { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 12px; border-radius: 9px; cursor: pointer; }
+.ai-picker-option[data-selected=true] { background: var(--color-sunken); }
+
+
+/* Desk toolbar: Arc's select with its label beside it, not above. */
+.desk-views > div { display: flex; align-items: center; gap: 8px; }
+.desk-views label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.desk-views button { min-width: 200px; min-height: 44px; }
+@media (max-width: 639px) { .desk-views, .desk-views > div { width: 100%; } .desk-views > div > div, .desk-views button { flex: 1; min-width: 0; } }
+
+/* Order page: the same band, with the order on a sheet that rises over it. */
+.order-page { min-height: 100dvh; background: var(--color-canvas); }
+.order-page .shop-header { padding-bottom: 72px; }
+.order-page .shop-header a { color: var(--color-band-ink); }
+.order-sheet {
+  width: calc(100% - 32px); max-width: 640px; margin: -48px auto 48px; padding: 32px;
+  background: var(--color-surface); border-radius: var(--radius-surface);
+  box-shadow: 0 0 0 1px var(--color-line), 0 20px 48px oklch(0% 0 0 / 0.08), 0 3px 10px oklch(0% 0 0 / 0.04);
+}
+@media (max-width: 640px) {
+  .order-page .shop-header { padding-bottom: 16px; }
+  .order-sheet { width: 100%; margin: 0; padding: 24px 16px 40px; border-radius: 0; box-shadow: none; }
+}
+
+/* Keyboard focus that stays visible. Arc's ring is a dark accent drawn 2px outside the box:
+   on the dark band it needs a light colour, and inside clipping scrollers it is drawn inset. */
+.shop-header { --focus-outline: var(--color-band-ink); }
+.shop-workspace .conversation-scroll:focus-visible { --focus-outline-offset: -3px; mask-image: none; }
+
+/* Form-control edges need 3:1 against their surface (WCAG 1.4.11); decorative lines stay lighter. */
+:root { --color-control-edge: oklch(62% 0.01 258); }
+
+/* Owner pages: the demo-mode banner sits above the layout, so the sticky sidebar subtracts it. */
+body:has(> [role="note"]) { --banner-h: 33px; }
+
+/* Very short screens (phone landscape): keep the reading area usable. */
+@media (max-height: 520px) {
+  .shop-header, .shop-active .shop-header { padding-block: 8px; }
+  .shop-header .shop-tagline { display: none; }
+  .shop-composer-dock { padding-block: 6px; }
+}
+
+/* Scrollers that keyboard focus moves through keep room for the 4px focus ring at their edges. */
+.shop-quote-rail { scroll-padding-block: 8px; }
+
+/* Arc's select trigger is a form control: its edge follows the 3:1 control colour. */
+.desk-views button, .choice-field button { border-color: var(--color-control-edge); }
+
+/* One surface and one page title for every screen. */
+.surface {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--color-line), var(--shadow-card);
+}
+.page-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* The owner's desk theme colours its primary buttons with the theme's action colour. */
+.desk-theme {
+  --action: var(--color-brand);
+  --on-action: var(--color-on-brand);
+}
+
+/* Native form choices share a size and remain native keyboard controls. */
+.desk-theme input:is([type="checkbox"], [type="radio"]):not(.sr-only) { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--color-brand); }
+
+/* Official shadcn semantic tokens mapped to the existing saved desk palette. */
+@theme inline {
+  --color-background: var(--background);
+  --color-popover: var(--surface-raised);
+  --color-popover-foreground: var(--foreground);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--foreground);
+  --color-primary-foreground: var(--background);
+  --color-secondary: var(--surface-muted);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--surface-muted);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--surface-muted);
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: var(--danger);
+  --color-border: var(--border);
+  --color-input: var(--border-strong);
+  --color-ring: var(--foreground);
+  --color-sidebar: var(--surface);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-primary: var(--foreground);
+  --color-sidebar-primary-foreground: var(--background);
+  --color-sidebar-accent: var(--surface-muted);
+  --color-sidebar-accent-foreground: var(--foreground);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--foreground);
+}
+
+/* shadcn's default border token, scoped to the owner shell. */
+@layer base {
+  .desk-theme *, .desk-theme ::before, .desk-theme ::after { border-color: var(--border); }
+}
