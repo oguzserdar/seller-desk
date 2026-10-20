@@ -21,7 +21,7 @@ export default async function SimulationPage() {
     <LinkButton href="/owner/knowledge" variant="ghost" className="mb-4 -ml-4">Back to shop knowledge</LinkButton>
     <h1 className="page-title">Test your assistant</h1>
     <p className="text-ink-2 mt-3 max-w-2xl text-[16px] leading-relaxed">Try a customer request before it happens. Read what your assistant says, which actions it takes and where it asks for help.</p>
-    <SimulationWorkspace connected={getAssistantModel().ok} reports={reports}
+    <SimulationWorkspace connected={(await getAssistantModel()).ok} reports={reports}
       offers={offers.filter(({ row }) => row.published).map(({ row }) => ({ id: row.id, title: row.title, kind: row.kind, unitAmountMinor: row.unitAmountMinor, currency: row.currency }))}
       instructions={instructions.filter(row => !row.archived).map(row => ({ id: row.id, title: row.content.title, revision: row.revision }))} />
   </section>;

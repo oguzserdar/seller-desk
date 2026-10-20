@@ -7,7 +7,8 @@ import { createDb, getDb } from "@/server/db/client";
 import { installation, seller } from "@/server/db/schema";
 import { notFound } from "@/server/domain/errors";
 import type { OwnerPrincipal } from "@/server/domain/principal";
-import { getServerConfig, type ServerConfig } from "@/server/env";
+import { getEffectiveConfig } from "@/server/effective-config";
+import type { ServerConfig } from "@/server/env";
 import { getRequestScope, withSimulationScope } from "@/server/request-scope";
 import type { D1Binding } from "@/server/storage/d1/client";
 import { withD1Simulation } from "@/server/storage/d1/simulation-scope";
@@ -47,7 +48,7 @@ export async function withIsolatedSimulation<T>(
       and(eq(seller.id, owner.sellerId), eq(seller.ownerUserId, owner.userId)),
     );
   if (!shop) throw notFound("shop");
-  const base = getServerConfig();
+  const { settingsKey: _withheld, ...base } = await getEffectiveConfig();
   const target = new URL(databaseUrl);
   const name = target.pathname.slice(1);
   if (

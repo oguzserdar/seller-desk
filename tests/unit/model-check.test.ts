@@ -1,7 +1,7 @@
 import { APICallError } from "@ai-sdk/provider";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { verifyAssistantModel } from "../../src/server/ai/registry";
-import { resetServerConfigForTests } from "../../src/server/env";
+import { getServerConfig, resetServerConfigForTests } from "../../src/server/env";
 import { aiSetupKey } from "../../src/server/ai/setup-check";
 
 const { generateText } = vi.hoisted(() => ({ generateText: vi.fn() }));
@@ -66,7 +66,7 @@ describe("AI connection capability check (SDK boundary controls, not live-model 
   });
 
   it("does not reuse the old text-only proof", () => {
-    expect(aiSetupKey()).not.toBe("openai:test-model");
+    expect(aiSetupKey(getServerConfig())).not.toBe("openai:test-model");
   });
 
   it("leaves an unconfigured installation disconnected without making a model request", async () => {

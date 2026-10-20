@@ -8,7 +8,7 @@ import { getAssistantModel } from "./registry";
 
 /** Two sequential real-model replies using frozen facts and directions; no publication or action tools. */
 export async function runProcedurePreview(owner: OwnerPrincipal, input: ProcedurePreviewInput) {
-  const assistant = getAssistantModel();
+  const assistant = await getAssistantModel();
   if (!assistant.ok) throw new DomainError("unavailable", "Connect an AI model before comparing replies. Your saved instruction is unchanged.");
   const run = await claimProcedurePreview(owner, input, `${assistant.provider}:${assistant.modelId}`);
   if (!run.created) return procedurePreviewView(run.row);

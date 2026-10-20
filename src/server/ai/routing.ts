@@ -1,3 +1,4 @@
+import { getEffectiveConfig } from "@/server/effective-config";
 import { getDb } from "@/server/db/client";
 import { recordAudit } from "@/server/domain/audit";
 import { DomainError } from "@/server/domain/errors";
@@ -161,13 +162,13 @@ export async function routeAssistantTurn(input: {
   signal?: AbortSignal;
   forceMain?: boolean;
 }) {
-  const main = getAssistantModel();
+  const main = await getAssistantModel();
   if (!main.ok)
     throw new DomainError(
       "unavailable",
       "The assistant is not connected. Add its provider key in Setup.",
     );
-  const config = getServerConfig();
+  const config = await getEffectiveConfig();
   const trace = await decideHandling(
     config.routing,
     routingState(input.role, input.messages, input.currentState),

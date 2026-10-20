@@ -51,7 +51,7 @@ process.env.APP_URL = "http://localhost:4310";
 process.env.BETTER_AUTH_URL = "http://localhost:4310";
 process.env.WOO_STORE_URL = "";
 resetServerConfigForTests();
-const assistant = getAssistantModel();
+const assistant = await getAssistantModel();
 if (!assistant.ok) throw new Error("Configure a real AI provider before --run. There is no simulated reply mode.");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const out = `.seller-desk/evals/${stamp}`;

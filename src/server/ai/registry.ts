@@ -8,6 +8,7 @@
  *   2. add `mistral: (apiKey, modelId) => createMistral({ apiKey })(modelId)` below
  *   3. add "mistral" to AI_PROVIDERS and its key name to PROVIDER_KEY_ENV in env.ts
  */
+import { getEffectiveConfig } from "@/server/effective-config";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -32,8 +33,8 @@ export type AssistantModel =
   | { ok: false; problem: string };
 
 /** Builds the configured model per request; provider objects are cheap and hold no connection. */
-export function getAssistantModel(): AssistantModel {
-  const ai = getServerConfig().ai;
+export async function getAssistantModel(): Promise<AssistantModel> {
+  const ai = (await getEffectiveConfig()).ai;
   if (ai.status !== "ready") return { ok: false, problem: ai.problem };
   return { ok: true, model: PROVIDER_FACTORIES[ai.provider](ai.apiKey, ai.modelId), provider: ai.provider, modelId: ai.modelId };
 }

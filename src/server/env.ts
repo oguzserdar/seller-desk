@@ -95,6 +95,13 @@ const EnvSchema = z.object({
     origin("BETTER_AUTH_URL").optional(),
   ),
   JOBS_SECRET: z.string().min(32, "JOBS_SECRET must be at least 32 characters"),
+  SETTINGS_ENCRYPTION_KEY: z.preprocess(
+    blankToUndefined,
+    z
+      .string()
+      .regex(/^[0-9a-fA-F]{64}$/, "SETTINGS_ENCRYPTION_KEY must be 64 hex characters (openssl rand -hex 32)")
+      .optional(),
+  ),
   AI_PROVIDER: z.preprocess(blankToUndefined, z.enum(AI_PROVIDERS).optional()),
   AI_MODEL_ID: optionalText,
   AI_ROUTING_PROVIDER: z.preprocess(
@@ -192,6 +199,8 @@ export type ServerConfig = {
   databasePoolMax: number;
   authSecret: string;
   jobsSecret: string;
+  /** Host key that encrypts credentials saved in Setup; absent means saving is unavailable. */
+  settingsKey?: string;
   ai: AiConfig;
   routing: RoutingConfig;
   routineAi: AiConfig | null;
@@ -375,6 +384,7 @@ export function parseServerConfig(
     databasePoolMax: env.DATABASE_POOL_MAX,
     authSecret: env.BETTER_AUTH_SECRET,
     jobsSecret: env.JOBS_SECRET,
+    ...(env.SETTINGS_ENCRYPTION_KEY ? { settingsKey: env.SETTINGS_ENCRYPTION_KEY } : {}),
     ai: resolveAi(env),
     routing: resolveRouting(env),
     routineAi:

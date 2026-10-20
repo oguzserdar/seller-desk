@@ -10,7 +10,7 @@ import { ok, route } from "@/server/http/respond";
 export const GET = route(async (request, requestId) => {
   const buyer = await buyerFrom(request);
   const snapshot = await readBuyerConversation(buyer, await ensureConversation(buyer));
-  const assistant = getAssistantModel();
+  const assistant = await getAssistantModel();
   const question = await latestQuestion(buyer);
   return ok(requestId, {
     ...snapshot,

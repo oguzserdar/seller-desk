@@ -232,7 +232,7 @@ export async function draftFromBusinessText(
     throw invalid(
       `Keep it under ${MAX_SOURCE_CHARS.toLocaleString("en-US")} characters, or draft in parts.`,
     );
-  const assistant = getAssistantModel();
+  const assistant = await getAssistantModel();
   if (!assistant.ok)
     throw new DomainError(
       "unavailable",

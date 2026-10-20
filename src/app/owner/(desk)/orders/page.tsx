@@ -72,7 +72,7 @@ export default async function DeskPage({
       (item) => item.buyerSessionId === row.buyerSessionId,
     )?.id,
   }));
-  const assistantOn = getAssistantModel().ok;
+  const assistantOn = (await getAssistantModel()).ok;
   const ordersNeedingYou: NeedsYouOrder[] = attention.rows.map((row) => ({
     id: row.id,
     ref: row.ref,

@@ -51,7 +51,7 @@ export async function executeSimulation(
   targets?: SimulationTargets,
 ) {
   const input = SimulationInput.parse(raw);
-  const assistant = getAssistantModel();
+  const assistant = await getAssistantModel();
   if (!assistant.ok)
     throw new DomainError(
       "unavailable",

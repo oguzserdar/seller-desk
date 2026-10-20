@@ -44,7 +44,7 @@ export async function respondToBuyer(request: Request): Promise<Response> {
 
     const shop = await getSeller();
     if (!shop || shop.id !== buyer.sellerId) throw new DomainError("unavailable", "This shop is not open right now.");
-    const assistant = getAssistantModel();
+    const assistant = await getAssistantModel();
     const conversationId = await ensureConversation(buyer);
     await requireUsage("buyer_chat", buyer.buyerSessionId, 600, shop.buyerTurnsPer10Min, "You are sending messages quickly.");
     const received = await receiveBuyerMessage(buyer, conversationId, { id: message.id, text }, assistant.ok);

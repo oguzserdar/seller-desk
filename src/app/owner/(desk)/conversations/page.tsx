@@ -1,7 +1,7 @@
 import { MessageSquare } from "lucide-react";
 import { EmptyState } from "@/components/arc/empty-state/empty-state";
 import { Button } from "@/components/shadcn/button";
-import { getServerConfig } from "@/server/env";
+import { getEffectiveConfig } from "@/server/effective-config";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -28,6 +28,7 @@ export default async function ConversationsPage({
   const requested = (await searchParams).conversation;
   if (requested && !z.uuid().safeParse(requested).success) notFound();
   const items = await listSellerConversations(owner);
+  const aiStatus = (await getEffectiveConfig()).ai.status;
   let selected = null;
   if (requested) {
     try {
@@ -51,7 +52,7 @@ export default async function ConversationsPage({
           <EmptyState
             title="Your customer conversations start here"
             description={
-              getServerConfig().ai.status === "ready"
+              aiStatus === "ready"
                 ? "New customer messages will appear here. Open your shop to try the buyer experience."
                 : "Connect your assistant so customers can ask questions. Their conversations and requests will appear here."
             }
@@ -61,12 +62,12 @@ export default async function ConversationsPage({
                 <Button asChild>
                   <Link
                     href={
-                      getServerConfig().ai.status === "ready"
+                      aiStatus === "ready"
                         ? "/buy"
                         : "/owner/setup#assistant"
                     }
                   >
-                    {getServerConfig().ai.status === "ready"
+                    {aiStatus === "ready"
                       ? "Open customer shop"
                       : "Connect assistant"}
                   </Link>

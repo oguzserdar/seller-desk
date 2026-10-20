@@ -27,7 +27,7 @@ const INSTRUCTIONS = [
 
 /** Generates bounded review findings with the configured real model and verifies every evidence quote. */
 export async function analyzeLearningSource(source: LearningSource): Promise<{ analysis: LearningAnalysis; generator: string; latencyMs: number }> {
-  const assistant = getAssistantModel();
+  const assistant = await getAssistantModel();
   if (!assistant.ok) throw new DomainError("unavailable", "Reviewing answers needs a connected AI model.");
   const started = Date.now();
   try {
@@ -45,7 +45,7 @@ export async function draftLearningReview(owner: OwnerPrincipal, questionId: str
   const run = await claimLearningReview(owner, source);
   if (run.state === "ready") return run.review;
   try {
-    if (!getAssistantModel().ok) throw new DomainError("unavailable", "Reviewing answers needs a connected AI model.");
+    if (!(await getAssistantModel()).ok) throw new DomainError("unavailable", "Reviewing answers needs a connected AI model.");
     await requireUsage("seller_ai_day", owner.sellerId, 86_400, run.dailyLimit, "The shop assistant has reached its daily limit.");
     await requireUsage("learning_review", owner.sellerId, 600, 10, "Wait before reviewing more answers.");
     const result = await analyzeLearningSource(source);

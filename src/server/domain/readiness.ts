@@ -1,3 +1,4 @@
+import { getEffectiveConfig } from "@/server/effective-config";
 import { getStorage } from "@/server/storage";
 import type { ReadinessFacts } from "@/server/storage/readiness";
 /**
@@ -52,7 +53,7 @@ const CHECKED = new Intl.DateTimeFormat("en-US", {
 
 /** Reads setup evidence for the authenticated owner's shop. */
 export async function getReadiness(sellerRow: SellerRow): Promise<Readiness> {
-  const config = getServerConfig();
+  const config = await getEffectiveConfig();
   const { installed, published, paid, databaseLabel } = await readinessFacts(
     sellerRow.id,
   );
@@ -241,7 +242,7 @@ export async function getReadiness(sellerRow: SellerRow): Promise<Readiness> {
 }
 
 async function readinessFacts(sellerId: string): Promise<ReadinessFacts> {
-  const config = getServerConfig();
+  const config = await getEffectiveConfig();
   const backend = getStorage();
   if (backend.kind === "d1")
     return backend.setup.readinessFacts(sellerId, config.mode);

@@ -55,7 +55,7 @@ assertEvalDatabase(evalUrl);
 assert.notEqual(evalUrl, process.env.DATABASE_URL, "Use a database separate from the app");
 Object.assign(process.env, { DATABASE_URL: evalUrl, APP_MODE: "fixture", APP_URL: "http://localhost:4310", BETTER_AUTH_URL: "http://localhost:4310", WOO_STORE_URL: "", BETTER_AUTH_SECRET: randomBytes(32).toString("hex") });
 resetServerConfigForTests();
-const model = getAssistantModel();
+const model = await getAssistantModel();
 if (!model.ok) throw new Error("Connect a real AI provider before running; there is no simulated answer mode.");
 const out = `.seller-desk/evals/journey-${kind}-${new Date().toISOString().replace(/[:.]/g, "-")}`;
 await mkdir(out, { recursive: true, mode: 0o700 });

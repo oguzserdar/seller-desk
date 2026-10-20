@@ -56,7 +56,7 @@ export async function generatePreviewAnswer(model: LanguageModel, facts: Preview
 
 /** Runs both versions sequentially, saves partial failures, and never publishes the tested wording. */
 export async function runLearningPreview(owner: OwnerPrincipal, input: LearningPreviewInput) {
-  const assistant = getAssistantModel();
+  const assistant = await getAssistantModel();
   if (!assistant.ok) throw new DomainError("unavailable", "Connect an AI model before trying an answer. Your saved draft is unchanged.");
   const run = await claimLearningPreview(owner, input, `${assistant.provider}:${assistant.modelId}`);
   if (!run.created) return learningPreviewView(run.row);

@@ -8,7 +8,8 @@ vi.mock("@/server/auth/owner", () => ({ readOwner: async () => null }));
 vi.mock("@/server/domain/seller", () => ({
   getSeller: async () => ({ displayName: "Sample shop" }),
 }));
-vi.mock("@/server/env", () => ({
+vi.mock("@/server/env", async (original) => ({
+  ...(await original<typeof import("@/server/env")>()),
   getServerConfig: () => ({ mode: state.mode }),
 }));
 vi.mock("../../src/app/owner/login/login-form", () => ({

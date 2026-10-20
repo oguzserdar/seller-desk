@@ -2,7 +2,7 @@
 import { getSeller } from "@/server/domain/seller";
 import { notFound } from "@/server/domain/errors";
 import type { OwnerPrincipal } from "@/server/domain/principal";
-import { getServerConfig } from "@/server/env";
+import { getEffectiveConfig } from "@/server/effective-config";
 import { getRequestScope, withSimulationScope } from "@/server/request-scope";
 import { createD1Db, type D1Binding } from "@/server/storage/d1/client";
 import { createD1FixtureTransport } from "@/server/storage/d1/fixture-paypal";
@@ -30,7 +30,7 @@ export async function withFreshSimulation<T>(owner: OwnerPrincipal, operation: (
     const db = createD1Db(isolated.binding);
     const { installation } = await import("@/server/db/sqlite/schema");
     await db.insert(installation).values({ environment: "fixture" });
-    const base = getServerConfig();
+    const { settingsKey: _withheld, ...base } = await getEffectiveConfig();
     const config = { ...base, mode: "fixture" as const, databaseKind: "d1" as const, databaseUrl: null,
       authSecret: crypto.randomUUID() + crypto.randomUUID(), jobsSecret: crypto.randomUUID() + crypto.randomUUID(),
       paypal: { status: "fixture" as const }, store: null };

@@ -1,11 +1,12 @@
+import { getEffectiveConfig } from "@/server/effective-config";
 import { createHmac } from "node:crypto";
 import { experimental_decide } from "ai";
-import { getServerConfig, type ServerConfig } from "@/server/env";
+import type { ServerConfig } from "@/server/env";
 import { DECISION_FACTORIES } from "./routing";
 import { verifyAssistantModel } from "./registry";
 
 /** Credential-bound proof for the complete configured AI stack, without storing any key. */
-export function aiSetupKey(config: ServerConfig = getServerConfig()): string {
+export function aiSetupKey(config: ServerConfig): string {
   const endpoints = { openai: process.env.OPENAI_BASE_URL ?? null };
   const input = JSON.stringify({ ai: config.ai, routing: config.routing, routine: config.routineAi, endpoints });
   return `ai-stack-v3:${createHmac("sha256", config.authSecret).update(input).digest("hex")}`;
@@ -16,7 +17,7 @@ export type AiSetupCheck = { ok: boolean; proofKey: string; latencyMs: number; d
 
 /** Checks configured reply and decision models sequentially, without commerce data or side effects. */
 export async function verifyAiSetup(): Promise<AiSetupCheck> {
-  const config = getServerConfig();
+  const config = await getEffectiveConfig();
   const proofKey = aiSetupKey(config);
   const started = Date.now();
   const fail = (problem: string): AiSetupCheck => ({ ok: false, proofKey, latencyMs: Date.now() - started, detail: problem, problem });

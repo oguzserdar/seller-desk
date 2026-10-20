@@ -21,6 +21,6 @@ export default async function InstructionsPage() {
     <LinkButton href="/owner/knowledge" variant="ghost" className="mb-4 -ml-4">Back to shop knowledge</LinkButton>
     <h1 className="page-title">How your assistant helps</h1>
     <p className="text-ink-2 mt-3 max-w-2xl text-[16px] leading-relaxed">Tell it what to ask, what to check and when to bring a decision to you. Save your wording privately, then publish it when ready.</p>
-    <InstructionWorkspace entries={entries.map(procedureEditorValue)} previews={previews} modelConnected={getAssistantModel().ok} />
+    <InstructionWorkspace entries={entries.map(procedureEditorValue)} previews={previews} modelConnected={(await getAssistantModel()).ok} />
   </section>;
 }

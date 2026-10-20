@@ -48,7 +48,7 @@ export async function resumeAfterAnswer(
   let watcher: ReturnType<typeof watchTurn> | undefined;
   try {
     signal?.throwIfAborted();
-    const assistant = getAssistantModel();
+    const assistant = await getAssistantModel();
     if (!assistant.ok) throw new Error(assistant.problem);
     const shop = await getSeller();
     if (!shop || shop.id !== question.sellerId)

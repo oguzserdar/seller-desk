@@ -29,7 +29,7 @@ export async function POST(request: Request): Promise<Response> {
     const text = message.parts.map((part) => part.text).join("\n").trim();
     if (!text) throw invalid("Type a question about your desk.");
     if (text.length > ASSISTANT_LIMITS.maxInputChars) throw invalid("That message is too long. Keep it under 4,000 characters.");
-    const assistant = getAssistantModel();
+    const assistant = await getAssistantModel();
     if (!assistant.ok) throw new DomainError("unavailable", "The desk assistant is off: no AI provider is configured.");
     await requireUsage("owner_chat", owner.userId, 600, 60, "You are asking quickly.");
     await requireUsage("seller_ai_day", seller.id, 86_400, seller.sellerDailyAiTurns, "The assistant has reached today's limit.");

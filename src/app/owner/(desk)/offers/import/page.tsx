@@ -18,7 +18,7 @@ export default async function ImportPage() {
       </Link>
       <h1 className="page-title mt-2">Add your offers</h1>
       <p className="text-ink-2 mt-2 text-[17px]">Every offer starts as an unpublished draft. You check it, finish it and publish it.</p>
-      <AiDraftForm modelReady={getAssistantModel().ok} currency={seller.currency} />
+      <AiDraftForm modelReady={(await getAssistantModel()).ok} currency={seller.currency} />
       <section aria-labelledby="list-heading" className="border-line mt-12 border-t pt-8">
         <h2 id="list-heading" className="text-[22px] font-semibold tracking-[-0.015em]">
           Bring your existing catalog

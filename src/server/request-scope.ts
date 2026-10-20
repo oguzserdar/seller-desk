@@ -17,6 +17,8 @@ export type RequestScope = (
   paypal?: TransportResolution;
   frameOrigins?: Promise<string[]>;
   simulation?: { config: ServerConfig };
+  /** This request's settings with any connection saved in Setup applied; read once per request. */
+  effectiveConfig?: Promise<ServerConfig>;
 };
 
 const storage = new AsyncLocalStorage<RequestScope>();
