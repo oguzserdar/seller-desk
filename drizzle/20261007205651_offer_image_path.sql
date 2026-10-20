@@ -1,0 +1,2 @@
+ALTER TABLE "offer" ADD COLUMN "image_path" text;--> statement-breakpoint
+ALTER TABLE "offer" ADD CONSTRAINT "offer_image_path_local" CHECK ("offer"."image_path" is null or "offer"."image_path" ~ '^/shop/[a-z0-9-]{1,60}\.(webp|png|jpg)$');

@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1792063202986,
+      "tag": "0000_seller_desk",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1792064033505,
+      "tag": "0001_native_identities",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792068180104,
+      "tag": "0002_isolated_identity",
+      "breakpoints": true
+    }
+  ]
+}

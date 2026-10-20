@@ -1,0 +1,2 @@
+ALTER TABLE "fulfillment_task" DROP CONSTRAINT "fulfillment_task_type_valid";--> statement-breakpoint
+ALTER TABLE "fulfillment_task" ADD CONSTRAINT "fulfillment_task_type_valid" CHECK (type in ('pickup', 'service_followup', 'service_work', 'digital_access'));

@@ -1,0 +1,1 @@
+ALTER TABLE "seller_question" ADD COLUMN "resume_claim_id" uuid;

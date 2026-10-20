@@ -1,0 +1,2 @@
+ALTER TABLE "seller" ADD COLUMN "theme" text DEFAULT 'slate' NOT NULL;--> statement-breakpoint
+ALTER TABLE "seller" ADD CONSTRAINT "seller_theme_known" CHECK ("seller"."theme" in ('slate', 'spruce', 'brick', 'ink', 'plum'));
