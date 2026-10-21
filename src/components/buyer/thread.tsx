@@ -102,6 +102,17 @@ function Receipt({ children }: { children: ReactNode }) {
   return <p className="assistant-receipt">{children}</p>;
 }
 
+/**
+ * Text written before a later tool step is a preview the steps and final answer
+ * already cover. It is hidden once a final answer follows, or while the reply is
+ * still streaming; if no answer ever follows, it stays so nothing is lost.
+ */
+function interimText(parts: UIMessage["parts"], index: number, streaming: boolean): boolean {
+  const toolAfter = parts.findIndex((part, at) => at > index && isToolUIPart(part));
+  if (toolAfter === -1) return false;
+  return streaming || parts.some((part, at) => at > toolAfter && part.type === "text" && part.text.trim().length > 0);
+}
+
 /** Folds back-to-back receipts into one quiet line, so finished steps read as one fact rather than a tool log. */
 function joinReceipts(nodes: ReactNode[]): ReactNode[] {
   const out: ReactNode[] = [];
@@ -191,7 +202,7 @@ export function Thread({
             {joinReceipts(
               message.parts.map((part, index) => {
                 if (part.type === "text")
-                  return part.text.trim() ? (
+                  return part.text.trim() && !interimText(message.parts, index, status === "streaming" && message === last) ? (
                     <AssistantAnswer
                       key={index}
                       text={part.text}
