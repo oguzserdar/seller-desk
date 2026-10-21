@@ -8,7 +8,7 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isToolUIPart, type UIMessage } from "ai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import { ShopConversation } from "@/components/assistant/conversation";
 import { Button } from "@/components/arc/button/button";
 import { Alert } from "@/components/arc/alert/alert";
@@ -328,7 +328,7 @@ export function ShopAssistant({
     <div
       className={`shop-shell flex min-h-0 flex-col ${conversation || browsing ? "shop-active" : ""}`}
     >
-      <header className="shop-header">
+      <header className={widget ? "shop-header shop-header-compact" : "shop-header"}>
         <div className="min-w-0">
           <p className="shop-wordmark">{shopName}</p>
           <p className="shop-tagline mt-1 text-[14px]">
@@ -341,9 +341,11 @@ export function ShopAssistant({
               href="/buy"
               target="_blank"
               rel="noopener"
-              className="text-ink-2 hover:text-ink"
+              aria-label="Open full page"
+              title="Open full page"
+              className="text-ink-2 hover:text-ink inline-flex size-9 items-center justify-center"
             >
-              Open full page
+              <ArrowUpRight aria-hidden size={18} />
             </a>
           ) : null}
           {conversation || quote.quote ? (

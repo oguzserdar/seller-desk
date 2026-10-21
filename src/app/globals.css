@@ -162,6 +162,9 @@ body:has(.shop-active) > [role="note"] { flex: none; }
 .shop-header .shop-tagline { color: var(--color-band-ink-2); }
 .shop-wordmark { font-family: var(--font-display); font-size: 28px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; overflow-wrap: anywhere; }
 .shop-active .shop-header { padding-bottom: 72px; }
+/* Inside the 420px widget the header stays one line: the name is cut with an ellipsis rather than wrapping. */
+.shop-header-compact .shop-wordmark { font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
+.shop-header-compact > div:last-child { flex: none; gap: 8px; }
 .shop-workspace {
   display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start;
   width: 100%; max-width: 1240px; margin: -48px auto 0; padding: 0 32px 24px; flex: 1; min-height: 0;
