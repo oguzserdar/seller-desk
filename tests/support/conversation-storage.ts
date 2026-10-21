@@ -40,6 +40,7 @@ export function conversationStorage(f: StorageFixture) {
     ) => conversation.saveMessages(id, messages),
     claimTurn: turns.claimTurn,
     releaseTurn: turns.releaseTurn,
+    stopTurn: turns.stopTurn,
     completeTurn: (
       claim: turns.TurnClaim,
       messages: Parameters<typeof turns.completeTurn>[1],

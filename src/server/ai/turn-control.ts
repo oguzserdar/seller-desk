@@ -40,6 +40,28 @@ export async function claimTurn(
   return rows.length ? { conversationId, id } : undefined;
 }
 
+/**
+ * Ends this buyer's running turn when they press Stop. The worker that held it
+ * can no longer commit (completeTurn needs its own live claim), and the buyer
+ * can send again at once instead of waiting out the lease.
+ */
+export async function stopTurn(buyer: BuyerPrincipal, conversationId: string): Promise<void> {
+  const backend = getStorage();
+  if (backend.kind === "d1") return backend.conversations.stopTurn(buyer, conversationId);
+
+  await getDb()
+    .update(conversation)
+    .set({ activeTurnId: null, activeTurnExpiresAt: null })
+    .where(
+      and(
+        eq(conversation.id, conversationId),
+        eq(conversation.sellerId, buyer.sellerId),
+        eq(conversation.buyerSessionId, buyer.buyerSessionId),
+        eq(conversation.handler, "assistant"),
+      ),
+    );
+}
+
 /** Frees only this claim, including failures and cancelled streams. */
 export async function releaseTurn(claim: TurnClaim): Promise<void> {
   const backend = getStorage();

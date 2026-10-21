@@ -111,6 +111,20 @@ export function createD1ConversationStorage(db: D1Db) {
         .returning({ id: conversation.id });
       return rows.length ? { conversationId, id } : undefined;
     },
+    async stopTurn(buyer: BuyerPrincipal, conversationId: string): Promise<void> {
+      await db
+        .update(conversation)
+        .set({ activeTurnId: null, activeTurnExpiresAt: null })
+        .where(
+          and(
+            eq(conversation.id, conversationId),
+            eq(conversation.sellerId, buyer.sellerId),
+            eq(conversation.buyerSessionId, buyer.buyerSessionId),
+            eq(conversation.handler, "assistant"),
+            buyerScope(buyer),
+          ),
+        );
+    },
     async releaseTurn(claim: TurnClaim): Promise<void> {
       await db
         .update(conversation)
