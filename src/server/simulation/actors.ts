@@ -31,7 +31,7 @@ export async function executeSimulationActor(input: {
     throw new Error("Fictional actors require an isolated simulation.");
   const step = SimulationStep.parse(input.step);
   const { installed, buyer, conversationId, approvals } = input;
-  if (step.kind === "customer")
+  if (step.kind === "customer" || step.kind === "simulated_customer")
     throw new Error("Customer turns must run through the real assistant.");
   if (step.kind === "seller_reply") {
     const current = await readOwnerConversationControl(

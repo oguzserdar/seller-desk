@@ -5,6 +5,7 @@ import {
   type SimulationStep,
 } from "@/lib/simulation";
 import { ensureConversation, loadMessages } from "@/server/ai/conversation";
+import type { LanguageModel } from "ai";
 import { getAssistantModel } from "@/server/ai/registry";
 import { getDb } from "@/server/db/client";
 import { resolveBuyer, startBuyerSession } from "@/server/domain/buyer-session";
@@ -29,6 +30,7 @@ import {
 } from "./runs";
 import { withIsolatedSimulation, type SimulationTarget } from "./scope";
 import { executeSimulationTurn } from "./turn";
+import { nextCustomerMessage } from "./simulated-customer";
 import { withFreshSimulation } from "./trial-database";
 
 /** Trusted operator configuration only. Never accept database destinations from an HTTP body or model. */
@@ -114,10 +116,10 @@ export async function executeSimulation(
       : (["current"] as const);
     for (const side of sides) {
       const operation = async () => {
-          const installed = await installSimulationShop(
-            simulationSnapshotForSide(row, side),
-          );
-          return executeScenario(input, installed, reserveTurn);
+          const snapshot = simulationSnapshotForSide(row, side);
+          const installed = await installSimulationShop(snapshot);
+          const titles = snapshot.products.map((product) => product.title);
+          return executeScenario(input, installed, reserveTurn, { model: assistant.model, titles });
         };
       const observed = targets
         ? await withIsolatedSimulation(owner, targets[side]!, operation)
@@ -147,6 +149,7 @@ export async function executeSimulation(
 const STEP_NAME: Record<SimulationStep["kind"], string> = {
   customer: "customer message",
   seller_reply: "seller reply",
+  simulated_customer: "simulated customer",
   approve_scope: "seller scope approval",
   pay_quote: "fictional payment",
 };
@@ -156,6 +159,7 @@ async function executeScenario(
   input: SimulationInput,
   installed: Awaited<ReturnType<typeof installSimulationShop>>,
   reserveTurn: () => Promise<void>,
+  simulator: { model: LanguageModel; titles: string[] },
 ) {
   if (!getRequestScope()?.simulation)
     throw new Error("Scenario execution requires simulation isolation.");
@@ -163,7 +167,8 @@ async function executeScenario(
     buyer = await resolveBuyer(issued.token);
   const conversationId = await ensureConversation(buyer);
   const approvals: SimulationSideResult["approvals"] = [];
-  let result: SimulationSideResult | null = null;
+  // Assigned inside customerTurn, so the declared type is kept wide on purpose.
+  let result = null as SimulationSideResult | null;
   let turns = 0,
     elapsed = 0;
   const checks: SimulationSideResult["checks"] = [];
@@ -172,32 +177,31 @@ async function executeScenario(
     ...(input.steps ?? []),
   ];
   let stepNumber = 0;
+  /** Runs one real assistant turn; returns the stopped result when the reply did not finish. */
+  const customerTurn = async (text: string) => {
+    await reserveTurn();
+    const turn = await executeSimulationTurn(text, issued, buyer, conversationId, approvals);
+    turns++;
+    elapsed += turn.result.latencyMs;
+    result = turn.result;
+    checks.push(...result.checks.map((check) => ({ ...check, label: `Turn ${turns}: ${check.label}` })));
+    return turn.finished ? null : { result: { ...result, checks, latencyMs: elapsed }, finished: false as const };
+  };
   try {
     for (const step of plan) {
       stepNumber++;
       if (step.kind === "customer") {
-        await reserveTurn();
-        const turn = await executeSimulationTurn(
-          step.text,
-          issued,
-          buyer,
-          conversationId,
-          approvals,
-        );
-        turns++;
-        elapsed += turn.result.latencyMs;
-        result = turn.result;
-        checks.push(
-          ...result.checks.map((check) => ({
-            ...check,
-            label: `Turn ${turns}: ${check.label}`,
-          })),
-        );
-        if (!turn.finished)
-          return {
-            result: { ...result, checks, latencyMs: elapsed },
-            finished: false,
-          };
+        const stopped = await customerTurn(step.text);
+        if (stopped) return stopped;
+      } else if (step.kind === "simulated_customer") {
+        for (let turn = 0; turn < step.turns; turn++) {
+          // Writing the customer's message is a model call too, so it counts against the same daily limit.
+          await reserveTurn();
+          const { transcript } = simulationTranscript(await loadMessages(conversationId), issued.token);
+          const text = await nextCustomerMessage(simulator.model, step.persona, simulator.titles, transcript, turn === step.turns - 1);
+          const stopped = await customerTurn(text);
+          if (stopped) return stopped;
+        }
       } else {
         await executeSimulationActor({
           step,
