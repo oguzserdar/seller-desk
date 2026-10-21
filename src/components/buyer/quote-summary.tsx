@@ -31,6 +31,8 @@ type Props = {
   standing?: ReactNode;
   /** False inside a sheet whose own title already names the quote. */
   titled?: boolean;
+  /** The assistant collects the job details in the chat, so the panel shows them instead of a form. */
+  describeInChat?: boolean;
 };
 
 function Stepper({
@@ -95,6 +97,7 @@ export function QuoteSummary({
   className,
   standing,
   titled = true,
+  describeInChat = false,
 }: Props) {
   const detailsId = useId();
   if (!quote) {
@@ -339,9 +342,24 @@ export function QuoteSummary({
             {formatQuoteAmount(quote.totalMinor, quote.currency)}
           </Button>
         ) : null}
-        {open && kinds.has("service") && !priced ? serviceEditor : null}
+        {open && kinds.has("service") && !priced ? (
+          describeInChat ? (
+            <div className="text-[14px]">
+              {quote.buyerNote ? (
+                <>
+                  <p className="text-ink-3 text-[13px] font-medium">Sent to the shop</p>
+                  <p className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">{quote.buyerNote}</p>
+                </>
+              ) : (
+                <p className="text-ink-2">Tell the assistant about the job. It sends the request to the shop.</p>
+              )}
+            </div>
+          ) : (
+            serviceEditor
+          )
+        ) : null}
         {quote.status === "seller_review" ? (
-          <Alert tone="warning" title="The shop confirms the work first">
+          <Alert tone="info" title="The shop prices this work first">
             {quote.reviewReason} You will see the confirmed quote here. Nothing
             is charged before you approve it.
           </Alert>
@@ -395,7 +413,7 @@ export function QuoteSummary({
             </p>
           </div>
         ) : null}
-        {open && kinds.has("service") && priced ? (
+        {open && kinds.has("service") && priced && !describeInChat ? (
           <details className="text-[14px]">
             <summary className="text-ink-2 hover:text-ink min-h-11 cursor-pointer py-2.5 font-medium select-none">
               Change the work

@@ -287,6 +287,7 @@ export function ShopAssistant({
   const summary = (titled: boolean) => (
     <QuoteSummary
       titled={titled}
+      describeInChat={assistant === "on"}
       quote={quote.quote}
       imageFor={imageFor}
       limitFor={limitFor}
