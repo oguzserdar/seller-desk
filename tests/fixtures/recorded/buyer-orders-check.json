@@ -1,0 +1,87 @@
+[
+ {
+  "type": "step-start"
+ },
+ {
+  "type": "custom",
+  "kind": "anthropic.message_start",
+  "providerMetadata": {
+   "anthropic": {
+    "id": "msg_011CgFfAsxw6xYidDYnFzr3G",
+    "model": "claude-sonnet-5-5",
+    "usage": {
+     "input_tokens": 7869,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "output_tokens": 16,
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    }
+   }
+  }
+ },
+ {
+  "type": "tool-my_orders",
+  "toolCallId": "toolu_01RvqRTmMQZnLD77XjPFj6sq",
+  "state": "output-available",
+  "input": {},
+  "output": {
+   "recordLimits": {
+    "customerAcceptance": "not_collected",
+    "appointmentDateTime": "not_shared"
+   },
+   "orders": [],
+   "otherPayments": []
+  },
+  "callProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  },
+  "resultProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  }
+ },
+ {
+  "type": "step-start"
+ },
+ {
+  "type": "custom",
+  "kind": "anthropic.message_start",
+  "providerMetadata": {
+   "anthropic": {
+    "id": "msg_011CgFfB1BGLu9xPiSwpk1Xo",
+    "model": "claude-sonnet-5-5",
+    "usage": {
+     "input_tokens": 7991,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "output_tokens": 106,
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    }
+   }
+  }
+ },
+ {
+  "type": "text",
+  "text": "I can't find any order or payment under your account, including one that's still waiting for confirmation. So I can't confirm that your payment went through.\n\nPlease don't pay again yet. Check your PayPal activity to see whether a charge appears. If you paid while signed in as someone else, or from a different browser session, that payment wouldn't show up here.",
+  "state": "done"
+ }
+]

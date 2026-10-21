@@ -1,0 +1,320 @@
+[
+ {
+  "type": "step-start"
+ },
+ {
+  "type": "custom",
+  "kind": "anthropic.message_start",
+  "providerMetadata": {
+   "anthropic": {
+    "id": "msg_011CgFqHCjPAQ7e4psQHMtcn",
+    "model": "claude-sonnet-5-5",
+    "usage": {
+     "input_tokens": 7874,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "output_tokens": 24,
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    }
+   }
+  }
+ },
+ {
+  "type": "tool-browse_catalog",
+  "toolCallId": "toolu_01MyyUg3DyhAySVaDMch13uj",
+  "state": "output-available",
+  "input": {
+   "request": "wheel truing service",
+   "maxPriceMinor": null,
+   "kind": "service"
+  },
+  "output": {
+   "totalPublished": 6,
+   "matchingFilters": 2,
+   "narrowedBySearch": false,
+   "offers": [
+    {
+     "offerId": "a3581cb3-38d2-486d-b56e-e2d1c83489c5",
+     "title": "Brake service",
+     "kind": "service",
+     "price": "$120.00",
+     "unitAmountMinor": 12000,
+     "currency": "USD",
+     "stock": "no stock limit",
+     "maxPerOrder": 2,
+     "description": "Full brake service for one bike: inspection, new pads, rotor or rim truing, cable or hose adjustment, and a test ride. Anything beyond that is quoted before extra work.",
+     "fulfillment": "Drop off at the shop. We confirm a time with you after payment.",
+     "approvedScope": "Inspect both brakes, replace pads (standard pads included), true rotors or rims, adjust cables or hoses, test ride. Other parts are quoted separately before any work.",
+     "sellerConfirmsBeforePayment": false,
+     "downloadAccessDays": null
+    },
+    {
+     "offerId": "799a32e4-f466-410e-a295-03d6d026b721",
+     "title": "Brake check",
+     "kind": "service",
+     "price": "$40.00",
+     "unitAmountMinor": 4000,
+     "currency": "USD",
+     "stock": "no stock limit",
+     "maxPerOrder": 2,
+     "description": "Twenty-minute inspection of both brakes with a written note of what needs work. No parts or repairs included.",
+     "fulfillment": "Drop off at the shop. We confirm a time with you after payment.",
+     "approvedScope": "Inspect both brakes and write down what needs work. No parts or repairs.",
+     "sellerConfirmsBeforePayment": false,
+     "downloadAccessDays": null
+    }
+   ],
+   "note": null,
+   "sources": [
+    {
+     "id": "f348250d-1a1e-4a8a-a254-f07a66a3cda7",
+     "revision": 1,
+     "title": "Collecting your order",
+     "topic": "general",
+     "body": "Fictional demo shop. Pick up at 88 Mill Road, Tuesday to Saturday, 10:00 to 17:00. Bring your order number. Paid orders are held for 30 days.",
+     "updatedAt": "2026-10-15T22:23:39.862Z",
+     "hasNextStep": false,
+     "productId": null,
+     "validUntil": null
+    },
+    {
+     "id": "33243297-cd3c-4ecf-8a30-d75071de9594",
+     "revision": 1,
+     "title": "Repair requests and timing",
+     "topic": "booking",
+     "body": "Fictional demo shop. Paying sends a service request, not a booked time. We confirm a drop-off time with you within one business day. If we cannot fit you in within 7 days, ask us to cancel and we refund you through PayPal.",
+     "updatedAt": "2026-10-15T22:23:40.140Z",
+     "hasNextStep": false,
+     "productId": null,
+     "validUntil": null
+    },
+    {
+     "id": "48cbc145-fd3b-4f14-a834-e5f89617ae35",
+     "revision": 1,
+     "title": "Using your download",
+     "topic": "downloads",
+     "body": "Fictional demo shop. Your download link works for 30 days after payment. The files are yours to use for personal and commercial projects; do not resell the files themselves.",
+     "updatedAt": "2026-10-15T22:23:40.445Z",
+     "hasNextStep": false,
+     "productId": null,
+     "validUntil": null
+    }
+   ],
+   "taxPolicy": "Prices include all applicable sales tax."
+  },
+  "callProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  },
+  "resultProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  }
+ },
+ {
+  "type": "tool-read_shop_guide",
+  "toolCallId": "toolu_01QeZZBfQBGLbxWrqNB7YdU1",
+  "state": "output-available",
+  "input": {
+   "productId": null
+  },
+  "output": {
+   "sources": [
+    {
+     "id": "f348250d-1a1e-4a8a-a254-f07a66a3cda7",
+     "revision": 1,
+     "title": "Collecting your order",
+     "topic": "general",
+     "body": "Fictional demo shop. Pick up at 88 Mill Road, Tuesday to Saturday, 10:00 to 17:00. Bring your order number. Paid orders are held for 30 days.",
+     "updatedAt": "2026-10-15T22:23:39.862Z",
+     "hasNextStep": false,
+     "productId": null,
+     "validUntil": null
+    },
+    {
+     "id": "33243297-cd3c-4ecf-8a30-d75071de9594",
+     "revision": 1,
+     "title": "Repair requests and timing",
+     "topic": "booking",
+     "body": "Fictional demo shop. Paying sends a service request, not a booked time. We confirm a drop-off time with you within one business day. If we cannot fit you in within 7 days, ask us to cancel and we refund you through PayPal.",
+     "updatedAt": "2026-10-15T22:23:40.140Z",
+     "hasNextStep": false,
+     "productId": null,
+     "validUntil": null
+    },
+    {
+     "id": "48cbc145-fd3b-4f14-a834-e5f89617ae35",
+     "revision": 1,
+     "title": "Using your download",
+     "topic": "downloads",
+     "body": "Fictional demo shop. Your download link works for 30 days after payment. The files are yours to use for personal and commercial projects; do not resell the files themselves.",
+     "updatedAt": "2026-10-15T22:23:40.445Z",
+     "hasNextStep": false,
+     "productId": null,
+     "validUntil": null
+    }
+   ]
+  },
+  "callProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  },
+  "resultProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  }
+ },
+ {
+  "type": "tool-shop_terms",
+  "toolCallId": "toolu_01W6zpWQMZkaN3FuBVApFDc1",
+  "state": "output-available",
+  "input": {
+   "topic": "service"
+  },
+  "output": {
+   "terms": [
+    {
+     "key": "service",
+     "label": "Service requests",
+     "text": "Paying sends a service request, not a booked time. We confirm a drop-off time with you within one business day. If we cannot fit you in within 7 days, ask us to cancel and we refund you through PayPal."
+    }
+   ]
+  },
+  "callProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  },
+  "resultProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  }
+ },
+ {
+  "type": "step-start"
+ },
+ {
+  "type": "custom",
+  "kind": "anthropic.message_start",
+  "providerMetadata": {
+   "anthropic": {
+    "id": "msg_011CgFqHRcXarB23ie1mkVrF",
+    "model": "claude-sonnet-5-5",
+    "usage": {
+     "input_tokens": 9495,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "output_tokens": 8,
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    }
+   }
+  }
+ },
+ {
+  "type": "reasoning",
+  "id": "0",
+  "text": "",
+  "providerMetadata": {
+   "anthropic": {
+    "signature": "CAQSwAcKEAgTGAI4AUIIdGhpbmtpbmcSDFoAiflNuVoIJrzN3hoMvTtThQvNizxOmkYNIjBt2rMaLdHN5LtBiltZEg7IA+8AVEtJdmMe7tvONXSb7ahzA2jPsY6XU49T+BxAp68q3QasZHsaSMg4URF3GX49HDQwavvmRUCrAcTtTYPF+lfzKQtg6zn0CWWnYKPshCv+YiXMNEnWw1QloVdH1PE7g0t6EQLNC91drkNepZ5W1m6tAVNjYfdZ/ovbxvzdXXwSJsOA0TJVrkL95iFwGEv7N8L4KPBczePFZQ7ncGpxG06JYBjZzy9eK4EbaeRL2yffrcIBbGbUkAa73eg9/ovrcmZCRymPWNyGJ+WB50lkpqHsF5leLsRjoeF7v59E0qxT8Jct94k1jto+rhtjNFd4/vTQkbJuYQVtwKOT2ryGiD4SeiC7kpQyGzATg/rLhnXqsfGEfqhRKQhyu47U50y6eYpgG/zfkvfHGzEL+m28sySD0fjkUOuAAkbGPRTqKNJPrSaokhnha7o/z/UCEH5uIOi0kL0k5SEgQ6ecqp5ZbfJXvSDWuLCY8rkMnXmkQ3s9k7aLUU+QJ86d5r6okVrR0xe1n5pD9IwwsgtRrASdjUl/23nykqvb2DrKYntVPuNzw1mZnOUHdhZRAT4pP7iShBlL7pKBVTgw1yT8UxuNxz6/CrXAFQ0FW95PMuHbn7ThXpiBBQCBx/GIdtV1ve/Hm3UuRUgiIJU8mx/jBgdIJu4ozKOvXll3rgzA2VBmGpp3uh5u1y7W4jWORqOM78/Q1ezCVo4FBUFv4xCQxl0MDL3afnpvb0h14ise0GyVCZFyCFerVA6G1xZNR6QWzfP1C6C2J+AOv2eTuwaMHDl9QHy1wYRr5oBRUi2LnB/IkHzwcnbcZ11kRWOOdlXa9WoT+oAB1+QTLw+hugkB/H5MvsED+QmwaJr0eDLG+hOFq34UpglL7pLWE+4TfsuXhkA9yOybhtAx1B32GoX4VpZM/jffnecy+uwD7ohWni2GNOgp+8lTmXuzqig5iQOgmLCrZBeYgrmKsQXe2i++OMKUqlJF/vrPqd2qZmNRgwIwRluu0cfGsAq87tW7QH+NeNV/HOqTQ45L2+7i0TipycRB+ciWnM6mEgdWljJL4ry5CkMrN6b0L4WdnZtLtPp9RskwIPro7oyBHyzw9mcOCMG6x4sMeQXUuSlzdfSBMgd9sBhSvcfkTh+uFXcwTLMmWACfY18oOni52VNMdWHDxbYFe7AHyoqUETr3xiJ1qyTX/TQYAQ=="
+   }
+  },
+  "state": "done"
+ },
+ {
+  "type": "tool-ask_seller",
+  "toolCallId": "toolu_01S6Jo1gJvUK7fDXHjKmZNz2",
+  "state": "output-available",
+  "input": {
+   "question": "Do you offer wheel truing, and could you do it this Thursday? If so, what would you charge for one wobbly wheel?",
+   "customerGoal": "Get a wobbling bike wheel trued this Thursday.",
+   "knownFacts": [
+    "No wheel truing offer in the catalog",
+    "Brake service only covers rotor or rim truing as part of a brake job",
+    "Customer says the wheel wobbles a bit",
+    "Wanted day: this Thursday"
+   ],
+   "replacePending": false
+  },
+  "output": {
+   "status": "waiting",
+   "alreadyWaiting": false,
+   "updated": false,
+   "question": "Do you offer wheel truing, and could you do it this Thursday? If so, what would you charge for one wobbly wheel?"
+  },
+  "callProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  },
+  "resultProviderMetadata": {
+   "anthropic": {
+    "caller": {
+     "type": "direct"
+    }
+   }
+  }
+ },
+ {
+  "type": "step-start"
+ },
+ {
+  "type": "custom",
+  "kind": "anthropic.message_start",
+  "providerMetadata": {
+   "anthropic": {
+    "id": "msg_011CgFqHiZFQwd323nF587SF",
+    "model": "claude-sonnet-5-5",
+    "usage": {
+     "input_tokens": 10118,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "output_tokens": 87,
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    }
+   }
+  }
+ },
+ {
+  "type": "text",
+  "text": "Wheel truing isn't in our catalog, and our brake service only covers truing rotors or rims as part of a brake job. So the owner needs to say whether they can true your wheel, what it would cost, and whether Thursday is possible. None of that is confirmed yet.",
+  "state": "done"
+ }
+]
