@@ -284,8 +284,9 @@ export function ShopAssistant({
       <PurchaseLadder steps={purchaseSteps(quote.quote)} className="mt-1" />
     </section>
   ) : null;
-  const summary = (
+  const summary = (titled: boolean) => (
     <QuoteSummary
+      titled={titled}
       quote={quote.quote}
       imageFor={imageFor}
       limitFor={limitFor}
@@ -490,7 +491,7 @@ export function ShopAssistant({
             </div>
           </main>
           <aside className="shop-quote-rail">
-            {summary}
+            {summary(true)}
             {assistant === "on" && offers.length > 0 ? (
               <section
                 className="border-line mt-6 border-t pt-5"
@@ -532,9 +533,9 @@ export function ShopAssistant({
           <QuoteSheet
             open={sheetOpen}
             onClose={() => setSheetOpen(false)}
-            label={quote.quote?.order ? "Your purchase" : "Your quote"}
+            label={quote.quote?.order ? `Order #${quote.quote.order.number}` : "Your quote"}
           >
-            {summary}
+            {summary(false)}
           </QuoteSheet>
         </div>
       ) : (

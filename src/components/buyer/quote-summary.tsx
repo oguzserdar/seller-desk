@@ -29,6 +29,8 @@ type Props = {
   className?: string;
   /** Where the purchase stands, shown right after the total. */
   standing?: ReactNode;
+  /** False inside a sheet whose own title already names the quote. */
+  titled?: boolean;
 };
 
 function Stepper({
@@ -92,6 +94,7 @@ export function QuoteSummary({
   onStartOver,
   className,
   standing,
+  titled = true,
 }: Props) {
   const detailsId = useId();
   if (!quote) {
@@ -100,8 +103,8 @@ export function QuoteSummary({
         aria-label="Your quote"
         className={cx("quote-summary bg-surface p-5", className)}
       >
-        <h2 className="text-[17px] font-semibold">Your quote</h2>
-        <p className="border-line-strong text-ink-2 mt-3 rounded-[10px] border border-dashed px-4 py-5 text-center text-[14px]">
+        {titled ? <h2 className="mb-3 text-[17px] font-semibold">Your quote</h2> : null}
+        <p className="border-line-strong text-ink-2 rounded-[10px] border border-dashed px-4 py-5 text-center text-[14px]">
           Your quote is empty. Items you add appear here, with the total before
           you pay.
         </p>
@@ -174,9 +177,11 @@ export function QuoteSummary({
       className={cx("quote-summary bg-surface", className)}
     >
       <div className="flex items-baseline justify-between gap-3 px-5 pt-4 pb-1">
-        <h2 className="text-[17px] font-semibold">
-          {quote.order ? `Order #${quote.order.number}` : "Your quote"}
-        </h2>
+        {titled ? (
+          <h2 className="text-[17px] font-semibold">
+            {quote.order ? `Order #${quote.order.number}` : "Your quote"}
+          </h2>
+        ) : null}
         {quote.order ? (
           <span
             role="status"
@@ -376,7 +381,7 @@ export function QuoteSummary({
         ) : null}
         {error ? <Alert tone="danger" title={error} /> : null}
         {payable ? (
-          <div className="flex flex-col gap-2">
+          <div className="quote-pay flex flex-col gap-2">
             <Button
               className="min-h-12 w-full text-[16px]"
               onClick={onPay}
