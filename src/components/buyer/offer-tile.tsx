@@ -152,7 +152,7 @@ export function OfferCard({
     <li className="offer-card">
       <OfferPhoto offer={offer} sizes="176px" className="aspect-[4/3] w-full rounded-[10px]" />
       <h3 className="mt-2 line-clamp-2 text-[14px] leading-snug font-semibold">{offer.title}</h3>
-      <p className="text-ink-3 mt-0.5 line-clamp-2 text-[12px] leading-snug">
+      <p className="text-ink-3 mt-0.5 line-clamp-2 min-h-[2lh] text-[12px] leading-snug">
         {stock ? `${stock.text}. ${fulfilmentText(offer)}` : fulfilmentText(offer)}
       </p>
       <p className="tabular mt-1 mb-2 text-[14px]">

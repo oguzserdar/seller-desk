@@ -382,7 +382,7 @@ export function Thread({
                           />
                           Waiting for {shopName}
                         </p>
-                        <p className="text-ink-2 mt-1.5 line-clamp-3 text-[14px] leading-snug">
+                        <p className="text-ink-2 mt-1.5 text-[14px] [overflow-wrap:anywhere] leading-snug">
                           {out.question}
                         </p>
                         <p className="text-ink-3 mt-2 text-[13px]">
