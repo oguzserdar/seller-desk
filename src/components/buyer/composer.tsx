@@ -32,7 +32,9 @@ export function Composer({
         maxLength={4000}
         ariaLabel={`Ask ${shopName}`}
         autoFocus={autoFocus}
-        disabled={disabled || streaming}
+        disabled={disabled}
+        // A disabled box drops keyboard focus; while streaming it stays editable and only sending waits.
+        holdSend={streaming}
         placeholder={placeholder}
       />
       {streaming ? (
