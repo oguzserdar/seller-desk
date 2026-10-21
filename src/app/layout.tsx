@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 // Arc's pairing: Geist for headings and figures, Inter for reading, Geist Mono for record lines.
 const display = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
 const body = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
+// Record lines appear only on owner screens; the face downloads when used instead of preloading on every page.
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap", preload: false });
 
 export const metadata: Metadata = {
   title: { default: "Seller Desk", template: "%s · Seller Desk" },
