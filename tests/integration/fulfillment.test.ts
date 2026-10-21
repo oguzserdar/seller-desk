@@ -8,7 +8,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import { armFault } from "@/fixtures/paypal-fixture";
 import { getDb } from "@/server/db/client";
-import { accessGrant, fulfillmentTask, job, orders } from "@/server/db/schema";
+import { accessGrant, fulfillmentTask, job, offer as offerTable, orders } from "@/server/db/schema";
 import { downloadWithGrant, retryAccess } from "@/server/domain/digital";
 import { queryDesk } from "@/server/domain/desk";
 import type { DomainError } from "@/server/domain/errors";
@@ -17,7 +17,7 @@ import type { BuyerPrincipal, OwnerPrincipal } from "@/server/domain/principal";
 import { approveQuoteScope, declineQuote, getBuyerQuote } from "@/server/domain/quotes";
 import { runDueWork } from "@/server/jobs/run";
 import { reconcilePayment, startCheckout } from "@/server/payments/engine";
-import { approveAtPayPal, checkoutFor, newBuyer, quoteFor, resetShop, tally } from "../support/shop";
+import { approveAtPayPal, checkoutFor, newBuyer, quoteFor, resetShop, tally, quoteEachJob, offerId } from "../support/shop";
 
 let owner: OwnerPrincipal;
 
@@ -120,21 +120,22 @@ describe("owner task actions", () => {
   });
 });
 
-describe("service scope review", () => {
+describe("custom-price service review", () => {
   beforeEach(async () => {
     ({ owner } = await resetShop());
   });
 
   it("the owner's approval is a new quote version; the old one cannot be paid", async () => {
+    const service = await quoteEachJob("Brake service");
     const buyer = await newBuyer();
     const asked = await quoteFor(buyer, "Brake service");
     expect(asked.status).toBe("seller_review");
     expect(await code(startCheckout(buyer, { quoteId: asked.id, revision: asked.revision }))).toBe("conflict");
 
-    const approved = await approveQuoteScope(owner, { quoteId: asked.id, expectedRevision: asked.revision, prices: [], approvedScope: "Front and rear brake pads replaced; cables adjusted." });
+    const approved = await approveQuoteScope(owner, { quoteId: asked.id, expectedRevision: asked.revision, prices: [{ offerId: service, unitAmountMinor: 12000 }], approvedScope: "Front and rear brake pads replaced; cables adjusted." });
     expect(approved.revision).toBe(asked.revision + 1);
     expect(approved.status).toBe("review_ready");
-    expect(await code(approveQuoteScope(owner, { quoteId: asked.id, expectedRevision: asked.revision, prices: [], approvedScope: "Again" }))).toBe("conflict");
+    expect(await code(approveQuoteScope(owner, { quoteId: asked.id, expectedRevision: asked.revision, prices: [{ offerId: service, unitAmountMinor: 12000 }], approvedScope: "Again" }))).toBe("conflict");
 
     const latest = await getBuyerQuote(buyer, approved.id);
     expect(latest.approvedScope).toContain("brake pads");
@@ -143,7 +144,19 @@ describe("service scope review", () => {
     expect(view.state).toBe("order_created");
   });
 
+  it("a published-price service is payable at once, even when the seller checks the job", async () => {
+    const service = await offerId("Brake service");
+    await getDb().update(offerTable).set({ requiresScopeReview: true }).where(eq(offerTable.id, service));
+    const buyer = await newBuyer();
+    const asked = await quoteFor(buyer, "Brake service");
+    expect(asked.status).toBe("review_ready");
+    expect(asked.totalMinor).toBe(12000);
+    const view = await startCheckout(buyer, { quoteId: asked.id, revision: asked.revision });
+    expect(view.state).toBe("order_created");
+  });
+
   it("a declined quote cannot be paid and the buyer sees why", async () => {
+    await quoteEachJob("Brake service");
     const buyer = await newBuyer();
     const asked = await quoteFor(buyer, "Brake service");
     await declineQuote(owner, { quoteId: asked.id, expectedRevision: asked.revision, reason: "We are fully booked this month." });

@@ -12,7 +12,6 @@ import {
   type FileUploadItem,
 } from "@/components/arc/file-upload/file-upload";
 import { RadioGroup } from "@/components/arc/radio-group/radio-group";
-import { Checkbox } from "@/components/arc/checkbox/checkbox";
 import { formatMoney, parsePriceInput } from "@/lib/money";
 import type { OfferKind } from "@/server/db/types";
 import { saveOfferAction, uploadAssetAction } from "./actions";
@@ -96,7 +95,6 @@ export function OfferForm({
   const [stock, setStock] = useState(
     initial.stockTotal === null ? "" : String(initial.stockTotal),
   );
-  const [scopeReview, setScopeReview] = useState(initial.requiresScopeReview);
   const [scope, setScope] = useState(initial.serviceScope);
   const [accessDays, setAccessDays] = useState(
     initial.accessDays === null ? "30" : String(initial.accessDays),
@@ -186,7 +184,7 @@ export function OfferForm({
       unitAmountMinor,
       fulfillmentNote: note,
       requiresScopeReview:
-        kind === "service" ? quotedPerRequest || scopeReview : false,
+        kind === "service" ? quotedPerRequest : false,
       serviceScope: kind === "service" ? scope : null,
       accessDays:
         kind === "digital" ? Number.parseInt(accessDays, 10) || null : null,
@@ -304,19 +302,12 @@ export function OfferForm({
           <>
             <Textarea
               label="What the service includes"
-              description="Buyers see this before paying. Do not promise a time here."
+              description="Buyers see this before paying, and the assistant matches their job to it. Work outside it is quoted separately. Do not promise a time here."
               id="scope"
               rows={3}
               value={scope}
               onChange={(e) => setScope(e.target.value)}
               maxLength={1000}
-            />
-            <Checkbox
-              label="I confirm the scope before the buyer pays"
-              description="For work that depends on the buyer’s details. You approve or decline each request on the desk."
-              disabled={quotedPerRequest}
-              checked={quotedPerRequest || scopeReview}
-              onCheckedChange={(checked) => setScopeReview(checked === true)}
             />
           </>
         ) : null}

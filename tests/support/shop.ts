@@ -32,6 +32,13 @@ export async function newBuyer(entry: "page" | "widget" = "page"): Promise<Buyer
   return { ...(await resolveBuyer(issued.token)), token: issued.token };
 }
 
+/** Turns a showcase service into a custom-price job, the kind the seller quotes before payment. */
+export async function quoteEachJob(titlePrefix: string): Promise<string> {
+  const id = await offerId(titlePrefix);
+  await getDb().update(offer).set({ unitAmountMinor: null, requiresScopeReview: true }).where(eq(offer.id, id));
+  return id;
+}
+
 export async function offerId(titlePrefix: string): Promise<string> {
   const [row] = await getDb().select({ id: offer.id }).from(offer).where(like(offer.title, `${titlePrefix}%`));
   if (!row) throw new Error(`no offer starting with ${titlePrefix}`);

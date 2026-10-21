@@ -24,12 +24,12 @@ export type TileOffer = {
 
 /** What happens after payment, in a few words. */
 export function fulfilmentText(
-  offer: Pick<TileOffer, "kind" | "requiresScopeReview">,
+  offer: Pick<TileOffer, "kind" | "unitAmountMinor">,
 ): string {
   if (offer.kind === "digital") return "Download after payment";
   if (offer.kind === "service")
-    return offer.requiresScopeReview
-      ? "Shop confirms the work first"
+    return offer.unitAmountMinor === null
+      ? "Shop quotes the work first"
       : "Shop books a time after payment";
   return "Pickup at the shop";
 }

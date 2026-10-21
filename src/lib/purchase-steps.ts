@@ -57,7 +57,7 @@ export function purchaseSteps(quote: PurchaseStepsInput): PurchaseStep[] {
       ? { key: "priced", label: quote.approvedScope ? "Priced by the shop" : "Priced", detail: quote.approvedScope ? "Work and price confirmed" : null, state: "done", value: null }
       : quote.status === "needs_information"
         ? { key: "priced", label: "Needs a change", detail: "Something in the request has to change before it can be priced", state: "stopped", value: null }
-        : { key: "priced", label: "Shop is checking", detail: "The shop confirms the work and price first", state: "waiting", value: null },
+        : { key: "priced", label: "Shop is checking", detail: "The shop prices the work first", state: "waiting", value: null },
   );
 
   steps.push(

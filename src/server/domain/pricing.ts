@@ -79,7 +79,9 @@ export function priceQuote(input: PricingInput): PricedQuote {
         });
       }
     }
-    if (offer.kind === "service" && offer.requiresScopeReview && (!input.scopeApproved || unitAmountMinor === null)) needsScopeReview = true;
+    // A published price is payable at once, as in booking apps; the shop checks the job at drop-off and
+    // quotes anything extra separately. Only a service without a price waits for the seller's quote.
+    if (offer.kind === "service" && offer.requiresScopeReview && unitAmountMinor === null) needsScopeReview = true;
   }
 
   if (lines.some((line) => line.unitAmountMinor === null) && (input.buyerNote?.trim().length ?? 0) < 3) {

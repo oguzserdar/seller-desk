@@ -89,11 +89,11 @@ const BRAKE_SERVICE: PresetOffer = {
   title: "Brake service",
   imagePath: "/shop/brake-service.webp",
   description:
-    "Full brake service for one bike: inspection, new pads, rotor or rim truing, cable or hose adjustment, and a test ride. We confirm the exact scope before you pay.",
+    "Full brake service for one bike: inspection, new pads, rotor or rim truing, cable or hose adjustment, and a test ride. Anything beyond that is quoted before extra work.",
   unitAmountMinor: 12000,
   fulfillmentNote: "Drop off at the shop. We confirm a time with you after payment.",
   maxQuantity: 2,
-  requiresScopeReview: true,
+  requiresScopeReview: false,
   serviceScope:
     "Inspect both brakes, replace pads (standard pads included), true rotors or rims, adjust cables or hoses, test ride. Other parts are quoted separately before any work.",
 };

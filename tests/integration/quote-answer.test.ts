@@ -7,16 +7,16 @@ import { quote, sellerQuestion } from "@/server/db/schema";
 import type { OwnerPrincipal } from "@/server/domain/principal";
 import { approveQuoteScope, proposeQuote } from "@/server/domain/quotes";
 import { askSeller } from "@/server/domain/seller-questions";
-import { newBuyer, offerId, resetShop, tally } from "../support/shop";
+import { newBuyer, quoteEachJob, resetShop, tally } from "../support/shop";
 
 let owner: OwnerPrincipal;
 beforeEach(async () => { ({ owner } = await resetShop()); });
 async function request() {
   const buyer = await newBuyer(); await ensureConversation(buyer);
-  const offer = await offerId("Brake service");
+  const offer = await quoteEachJob("Brake service");
   const asked = await proposeQuote(buyer, { lines: [{ offerId: offer, quantity: 1 }], buyerNote: "Front brake repair; no rear work. Tuesday deadline requested.", budgetMinor: 12500 });
   const { question } = await askSeller(buyer, { question: "Can you finish by Tuesday?", customerGoal: "Repair within USD 125 and keep Tuesday deadline separate from payment.", knownFacts: ["No rear work"] });
-  const input = { quoteId: asked.id, expectedRevision: asked.revision, approvedScope: "Front brake service only; no rear work.", prices: [], answer: { questionId: question.id, expectedRevision: question.revision, answer: "The price covers front work only. Tuesday completion is not confirmed; arrange drop-off after payment." } };
+  const input = { quoteId: asked.id, expectedRevision: asked.revision, approvedScope: "Front brake service only; no rear work.", prices: [{ offerId: offer, unitAmountMinor: 12000 }], answer: { questionId: question.id, expectedRevision: question.revision, answer: "The price covers front work only. Tuesday completion is not confirmed; arrange drop-off after payment." } };
   return { buyer, asked, question, input, offer };
 }
 
