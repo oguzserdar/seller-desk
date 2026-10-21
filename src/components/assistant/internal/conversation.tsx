@@ -47,13 +47,16 @@ export function ConversationContent({ children }: { children: ReactNode }) {
 export function ConversationScrollButton() {
   const { isAtBottom, scrollToBottom } = useStickToBottomContext();
   return !isAtBottom ? (
-    <Button
-      type="button"
-      variant="secondary"
-      onClick={() => void scrollToBottom({ animation: "instant" })}
-      className="conversation-latest"
-    >
-      <ArrowDown aria-hidden size={15} /> Latest reply
-    </Button>
+    <div className="conversation-latest">
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        className="shadow-md"
+        onClick={() => void scrollToBottom({ animation: "instant" })}
+      >
+        <ArrowDown aria-hidden size={15} /> Latest reply
+      </Button>
+    </div>
   ) : null;
 }
