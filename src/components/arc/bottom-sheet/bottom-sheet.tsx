@@ -31,6 +31,8 @@ export interface BottomSheetProps {
   children: ReactNode;
   /** Keep a portal under the shop or desk palette that opened it. */
   portalContainer?: HTMLElement | null;
+  /** Where focus goes after an externally opened sheet closes; the opener when this returns null. */
+  returnFocus?: () => HTMLElement | null;
 }
 
 type Stop = number | "closed";
@@ -67,7 +69,7 @@ function velocityOf(samples: Drag["samples"], now: number) {
   return (last.y - first.y) / ((last.t - first.t) / 1000);
 }
 
-export function BottomSheet({ trigger, open: openProp, defaultOpen = false, onOpenChange, portalContainer, ...props }: BottomSheetProps) {
+export function BottomSheet({ trigger, open: openProp, defaultOpen = false, onOpenChange, portalContainer, returnFocus, ...props }: BottomSheetProps) {
   const opener = useRef<HTMLElement | null>(null);
   const [uncontrolled, setUncontrolled] = useState(defaultOpen);
   const open = openProp ?? uncontrolled;
@@ -79,7 +81,7 @@ export function BottomSheet({ trigger, open: openProp, defaultOpen = false, onOp
   return <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
     {trigger ? <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger> : null}
     {/* The sheet stays mounted while it leaves, so a close can be caught and reversed mid-flight. */}
-    <AnimatePresence>{open && <DialogPrimitive.Portal key="sheet" forceMount container={portalContainer}><Sheet {...props} onDismiss={dismiss} onRememberOpener={trigger ? undefined : () => { opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null; }} onCloseAutoFocus={trigger ? undefined : event => { event.preventDefault(); opener.current?.focus({ preventScroll: true }); }} /></DialogPrimitive.Portal>}</AnimatePresence>
+    <AnimatePresence>{open && <DialogPrimitive.Portal key="sheet" forceMount container={portalContainer}><Sheet {...props} onDismiss={dismiss} onRememberOpener={trigger ? undefined : () => { opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null; }} onCloseAutoFocus={trigger ? undefined : event => { event.preventDefault(); (returnFocus?.() ?? opener.current)?.focus({ preventScroll: true }); }} /></DialogPrimitive.Portal>}</AnimatePresence>
   </DialogPrimitive.Root>;
 }
 

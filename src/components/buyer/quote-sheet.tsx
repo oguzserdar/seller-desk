@@ -43,11 +43,14 @@ export function QuoteSheet({
   onClose,
   children,
   label = "Your quote",
+  returnFocus,
 }: {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   label?: string;
+  /** Where focus goes on close instead of the button that opened the sheet. */
+  returnFocus?: () => HTMLElement | null;
 }) {
   const anchor = useRef<HTMLSpanElement>(null);
   const [container, setContainer] = useState<HTMLElement | null>(null);
@@ -66,6 +69,7 @@ export function QuoteSheet({
         closeLabel={`Close ${label.toLowerCase()}`}
         detents={[0.88]}
         portalContainer={container}
+        returnFocus={returnFocus}
       >
         {children}
       </BottomSheet>
