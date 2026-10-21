@@ -78,6 +78,25 @@ type ThreadProps = {
 };
 
 /** A quiet line saying what the assistant just checked, so its work is visible. */
+/**
+ * The shop notes behind one answer. Several tools can attach the same notes, so
+ * they are merged and shown once, where they first appear, as one sources entry
+ * per answer.
+ */
+function answerKnowledge(parts: UIMessage["parts"]): { at: number; sources: GuideSource[] } | null {
+  let at = -1;
+  const byId = new Map<string, GuideSource>();
+  parts.forEach((part, index) => {
+    if (!isToolUIPart(part) || part.state !== "output-available") return;
+    const name = part.type.slice("tool-".length);
+    if (name !== "read_shop_guide" && name !== "browse_catalog") return;
+    const sources = (part.output as { sources?: GuideSource[] }).sources ?? [];
+    if (sources.length && at < 0) at = index;
+    for (const source of sources) byId.set(source.id, source);
+  });
+  return at < 0 ? null : { at, sources: [...byId.values()] };
+}
+
 function Receipt({ children }: { children: ReactNode }) {
   return <p className="assistant-receipt">{children}</p>;
 }
@@ -223,10 +242,12 @@ export function Thread({
                       error?: string;
                     };
                     // No matching notes is nothing to show; returning null keeps neighbouring receipts on one line.
-                    if (out.sources)
-                      return out.sources.length ? (
-                        <KnowledgeSources key={index} sources={out.sources} />
+                    if (out.sources) {
+                      const knowledge = answerKnowledge(message.parts);
+                      return knowledge?.at === index ? (
+                        <KnowledgeSources key={index} sources={knowledge.sources} />
                       ) : null;
+                    }
                     return (
                       <Receipt key={index}>
                         {out.error ??
@@ -277,10 +298,11 @@ export function Thread({
                       </Receipt>
                     );
                     // A bare receipt can join its neighbours on one line; knowledge sources keep their own block.
-                    return look.sources?.length ? (
+                    const knowledge = answerKnowledge(message.parts);
+                    return knowledge?.at === index ? (
                       <div key={index}>
                         {receipt}
-                        <KnowledgeSources sources={look.sources} />
+                        <KnowledgeSources sources={knowledge.sources} />
                       </div>
                     ) : (
                       receipt
