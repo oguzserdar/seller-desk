@@ -8,25 +8,34 @@ import { generateText, type LanguageModel, type ModelMessage } from "ai";
 import { PERSONAS, type PersonaId } from "@/lib/simulation-personas";
 import type { SimulationSideResult } from "@/lib/simulation";
 
-const instructions = (persona: PersonaId, titles: string[], last: boolean) => [
+/** Where this message falls among the persona's messages in the test. */
+type Position = { index: number; total: number };
+
+// A one-message test must still try the persona's move; settling belongs only to the last of several messages.
+const position = ({ index, total }: Position) =>
+  total === 1 ? "This is your only message: make your persona's first move, and do not give up or settle in it."
+    : index === total - 1 ? "This is your last message."
+      : `This is message ${index + 1} of ${total}.`;
+
+const instructions = (persona: PersonaId, titles: string[], at: Position) => [
   "You are pretending to be a customer chatting with a shop's AI assistant, to test whether it handles you correctly.",
   "Write like a real person in a chat box: one short message, plain words, no lists.",
   "You are the customer, never the assistant. Do not answer your own questions or say what the shop will do.",
   `The shop sells: ${titles.slice(0, 40).join("; ") || "(no published offers)"}. Only ask about these.`,
   `<persona>${PERSONAS[persona].brief}</persona>`,
-  last ? "This is your last message." : "",
+  position(at),
   "Reply with only your next message to the assistant.",
-].filter(Boolean).join("\n");
+].join("\n");
 
 /** The customer's next message, given the conversation so far. */
-export async function nextCustomerMessage(model: LanguageModel, persona: PersonaId, titles: string[], transcript: SimulationSideResult["transcript"], last: boolean): Promise<string> {
+export async function nextCustomerMessage(model: LanguageModel, persona: PersonaId, titles: string[], transcript: SimulationSideResult["transcript"], at: Position): Promise<string> {
   // The simulator sees the chat from the customer's side, so the roles are swapped.
   const seen: ModelMessage[] = transcript
     .filter((line) => line.role !== "seller")
     .map((line) => ({ role: line.role === "user" ? "assistant" : "user", content: line.text }));
   const { text } = await generateText({
     model,
-    instructions: instructions(persona, titles, last),
+    instructions: instructions(persona, titles, at),
     messages: seen.length ? seen : [{ role: "user", content: "(The chat is open. Send your first message.)" }],
     maxOutputTokens: 300, maxRetries: 0, timeout: 30_000,
   });

@@ -198,7 +198,7 @@ async function executeScenario(
           // Writing the customer's message is a model call too, so it counts against the same daily limit.
           await reserveTurn();
           const { transcript } = simulationTranscript(await loadMessages(conversationId), issued.token);
-          const text = await nextCustomerMessage(simulator.model, step.persona, simulator.titles, transcript, turn === step.turns - 1);
+          const text = await nextCustomerMessage(simulator.model, step.persona, simulator.titles, transcript, { index: turn, total: step.turns });
           const stopped = await customerTurn(text);
           if (stopped) return stopped;
         }
