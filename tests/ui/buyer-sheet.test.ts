@@ -5,6 +5,15 @@ import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
 import { QuoteSheet } from "../../src/components/buyer/quote-sheet";
 
+/** Polls inside act until the condition holds, failing after the timeout. */
+async function waitUntil(condition: () => boolean, timeoutMs = 2000) {
+  const started = Date.now();
+  while (!condition()) {
+    if (Date.now() - started > timeoutMs) return;
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 25)); });
+  }
+}
+
 it("the externally opened library sheet is named, themed and returns focus after closing", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   const host = document.createElement("div");
@@ -39,12 +48,10 @@ it("the externally opened library sheet is named, themed and returns focus after
       dialog
         .querySelector<HTMLButtonElement>('[aria-label="Close your quote"]')!
         .click();
-      await new Promise((resolve) => setTimeout(resolve, 60));
     });
-    // Radix restores focus on the tick after the presence unmount commits.
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 20));
-    });
+    // The sheet stays mounted for its exit spring (about 300 ms) and Radix restores
+    // focus after the unmount, so wait for that state instead of a fixed delay.
+    await waitUntil(() => document.querySelector('[role="dialog"]') === null && document.activeElement === trigger);
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
   } finally {
