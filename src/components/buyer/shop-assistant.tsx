@@ -225,8 +225,11 @@ export function ShopAssistant({
     }
   }, [chatError?.expired, quote.reset, restart, setMessages]);
 
+  // The first message swaps the welcome composer for the conversation one; carry the cursor across.
+  const [carryFocus, setCarryFocus] = useState(false);
   const ask = (text: string) => {
     clearError();
+    if (messages.length === 0) setCarryFocus(true);
     void sendMessage({ text });
   };
 
@@ -313,6 +316,7 @@ export function ShopAssistant({
   const composer = (large: boolean) => (
     <>
       <Composer
+        autoFocus={!large && carryFocus}
         shopName={shopName}
         onSend={ask}
         onStop={stop}
