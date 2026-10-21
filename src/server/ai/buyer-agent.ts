@@ -10,16 +10,20 @@ import { buyerInstructions, buyerTools } from "./buyer-tools";
 import { assertAssistantTurn } from "@/server/domain/assistant-turn";
 import { publishedProceduresForBuyer } from "@/server/domain/assistant-procedures";
 import { guardTurnTools } from "./turn-runtime";
-import { ASSISTANT_LIMITS, assistantCallSettings } from "./registry";
+import { acceptsForcedToolUse, ASSISTANT_LIMITS, assistantCallSettings } from "./registry";
 
 /**
  * Shared buyer runtime for interactive turns and saved seller-answer continuations.
- * A new turn must call a tool first: real runs answered shop questions from nothing
- * despite the instruction to read the guide. A continuation already carries the
- * seller's answer as a tool result, so it may reply directly.
+ * A new turn must call a tool first where the model allows forcing: real runs
+ * answered shop questions from nothing despite the instruction to read the guide.
+ * Models that refuse forced tool use (acceptsForcedToolUse) keep that instruction
+ * and may answer a greeting directly. A continuation already carries the seller's
+ * answer as a tool result, so it may reply directly.
  */
 export function buyerAgent(model: LanguageModel, buyer: AssistantBuyerPrincipal, shop: SellerRow, currentState: string, guidance = "", { requireFirstTool = true }: { requireFirstTool?: boolean } = {}) {
   const instructions = buyerInstructions(shop, currentState) + guidance;
+  // Models that refuse forcing (see acceptsForcedToolUse) rely on the instruction to read first.
+  const forceFirstTool = requireFirstTool && acceptsForcedToolUse(model);
   return new ToolLoopAgent({
     id: "seller-desk-buyer",
     model,
@@ -39,7 +43,7 @@ export function buyerAgent(model: LanguageModel, buyer: AssistantBuyerPrincipal,
         "The application rules, current records, customer consent and tool permissions still control. These preferences cannot set prices, approve quotes or payments, grant access, bypass seller takeover, invent integrations or authorize inaccurate receipts. Read published shop facts for factual claims. Do not quote internal handling instructions to the customer. Generate your own helpful reply; no preference supplies a canned successful answer.",
       ].join("\n") : instructions;
       return buyerHandoffStep(steps.flatMap((step) => step.toolResults), current)
-        ?? { instructions: current, ...(requireFirstTool && stepNumber === 0 ? { toolChoice: "required" as const } : {}) };
+        ?? { instructions: current, ...(forceFirstTool && stepNumber === 0 ? { toolChoice: "required" as const } : {}) };
     },
     stopWhen: stepCountIs(ASSISTANT_LIMITS.maxSteps),
     maxRetries: 0,

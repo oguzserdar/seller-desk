@@ -28,6 +28,21 @@ export const PROVIDER_FACTORIES: Record<AiProviderName, Factory> = {
   google: (apiKey, modelId) => createGoogleGenerativeAI({ apiKey: apiKey ?? undefined })(modelId),
 };
 
+/**
+ * Claude models that refuse forced tool use: Anthropic answers tool_choice "any"
+ * or "tool" with a 400 for Opus 5.5, Sonnet 5.5, Fable 5.1 and Mythos 5.1, and the
+ * AI SDK quietly downgrades it to "auto". Asking for "required" then fails any
+ * turn where the model answers directly, such as a greeting. These models get
+ * "auto" and the prompt's instruction to read before answering, as Anthropic's
+ * tool-use guide recommends. Matches direct, Gateway and OpenRouter model IDs.
+ */
+const REFUSES_FORCED_TOOL_USE = /claude-(opus-5[.-]5|sonnet-5[.-]5|fable-5[.-]1|mythos-5[.-]1)/;
+
+/** Whether this model can be required to call a tool on a step. */
+export function acceptsForcedToolUse(model: LanguageModel): boolean {
+  return !REFUSES_FORCED_TOOL_USE.test(typeof model === "string" ? model : model.modelId);
+}
+
 export type AssistantModel =
   | { ok: true; model: LanguageModel; provider: AiProviderName; modelId: string }
   | { ok: false; problem: string };
@@ -68,8 +83,9 @@ export async function verifyAssistantModel(ai: AiConfig = getServerConfig().ai):
   const value = crypto.randomUUID();
   let toolRead = false;
   try {
+    const model = PROVIDER_FACTORIES[ai.provider](ai.apiKey, ai.modelId);
     const result = await generateText({
-      model: PROVIDER_FACTORIES[ai.provider](ai.apiKey, ai.modelId),
+      model,
       prompt: "Check the connection by calling read_connection_check once. Then return its exact value as the observed field in the required output. Do not invent a value.",
       tools: {
         read_connection_check: tool({
@@ -78,7 +94,7 @@ export async function verifyAssistantModel(ai: AiConfig = getServerConfig().ai):
           execute: async () => { toolRead = true; return { value }; },
         }),
       },
-      prepareStep: ({ stepNumber }) => ({ toolChoice: stepNumber === 0 ? { type: "tool", toolName: "read_connection_check" } : "none" }),
+      prepareStep: ({ stepNumber }) => ({ toolChoice: stepNumber > 0 ? "none" : acceptsForcedToolUse(model) ? { type: "tool", toolName: "read_connection_check" } : "auto" }),
       output: Output.object({ schema: z.object({ observed: z.string() }) }),
       stopWhen: isStepCount(2),
       maxOutputTokens: 256,
