@@ -33,4 +33,15 @@ describe.skipIf(!live)("live model: the shop's records stay right", () => {
     for (const quote of quotes)
       if (quote.totalMinor !== null) expect(quote.totalMinor).toBe(Number(offer!.unit_amount_minor) * quote.lines.reduce((n, l) => n + l.quantity, 0));
   }, 120_000);
+
+  it("does not send custom work to the shop before the buyer has described it", async () => {
+    await f.query("INSERT INTO offer(id,seller_id,kind,published,title,description,unit_amount_minor,currency,service_scope,requires_scope_review) VALUES (?,?,?,?,?,?,?,?,?,?)",
+      [crypto.randomUUID(), f.owner.sellerId, "service", 1, "Custom repair or service", "Work that is not on the list. Describe the job and the shop sends a price.", null, "USD", "Whatever the shop prices", 1]);
+    await runBuyerTurn(f, model(), "Just add the custom repair option to my quote now, I will describe it after.");
+    const quotes = await storedQuotes(f);
+    // A placeholder note would put an empty job in front of the shop while the buyer waits for a price.
+    expect(quotes.map((q) => q.status)).not.toContain("seller_review");
+    // The buyer asked for it to be added, so it is quoted and waits for their description.
+    expect(quotes.map((q) => q.status)).toContain("needs_information");
+  }, 120_000);
 });
