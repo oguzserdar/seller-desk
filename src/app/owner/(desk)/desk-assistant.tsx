@@ -167,6 +167,11 @@ export function DeskAssistant({
   const { messages, sendMessage, status, stop, error, clearError } = useChat({
     chat,
   });
+  // Stopping the stream alone leaves the server's turn claimed until its lease ends; release it too.
+  const stopReply = () => {
+    void stop();
+    void fetch("/api/owner/chat/stop", { method: "POST" });
+  };
   const endRef = useRef<HTMLDivElement>(null);
   const streaming = status === "submitted" || status === "streaming";
   const ask = (text: string) => {
@@ -302,7 +307,7 @@ export function DeskAssistant({
         <Composer
           shopName="your desk"
           onSend={ask}
-          onStop={stop}
+          onStop={stopReply}
           streaming={streaming}
           disabled={!assistantOn || Boolean(history.busyUntil)}
           placeholder="Ask about your orders"
