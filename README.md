@@ -90,7 +90,10 @@ publish them and roll back to an earlier version.
 In your desk, open **Knowledge → Test your assistant**. Try a product question,
 an impossible deadline or a longer conversation. Add a seller reply, approve a
 service scope or authorize an exact fictional purchase. Ask it to recover a lost
-payment response, then check that there is one payment and one order.
+payment response, then check that there is one payment and one order. Or let a
+simulated customer play a part: a haggler, a buyer pasting fake system text, a
+firm budget and more, written by your model from your own offers. Every test
+then checks that quotes kept your published prices and stayed within stock.
 
 The test uses your real connected model and published shop facts in a separate
 fictional shop. Compare published instructions with a saved change before you
