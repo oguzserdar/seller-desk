@@ -141,11 +141,16 @@ export function Thread({
   waitingOnShop = false,
 }: ThreadProps) {
   const last = messages.at(-1);
+  // Between a finished step and the next words nothing else moves, so the live line stays up.
+  const newest = last?.parts.findLast((p) => p.type !== "step-start");
   const waiting =
     status === "submitted" ||
     (status === "streaming" &&
       last?.role === "assistant" &&
-      !last.parts.some((p) => p.type === "text" || isToolUIPart(p)));
+      (!newest ||
+        (isToolUIPart(newest) &&
+          (newest.state === "output-available" ||
+            newest.state === "output-error"))));
 
   return (
     <div className="flex min-w-0 flex-col gap-8">
