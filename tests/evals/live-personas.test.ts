@@ -87,4 +87,22 @@ describe.skipIf(!live)("live personas: the shop's records stay right", () => {
       if (["review_ready", "accepted", "consumed"].includes(quote.status))
         expect(quote.totalMinor ?? 0, JSON.stringify(transcript)).toBeLessThanOrEqual(3000);
   }, 300_000);
+
+  it("a buyer asking for an item just over their budget never gets a payable quote above it", async () => {
+    for (const [title, amount] of [["Gift mug", 2900], ["Gift candle", 3100]] as const) {
+      const id = crypto.randomUUID();
+      await f.query("INSERT INTO offer(id,seller_id,kind,published,title,description,unit_amount_minor,currency) VALUES (?,?,?,?,?,?,?,?)", [id, f.owner.sellerId, "goods", 1, title, `A ${title.toLowerCase()} for gifts.`, amount, "USD"]);
+      await f.query("INSERT INTO inventory(offer_id,total) VALUES (?,?)", [id, 5]);
+    }
+    const transcript = await runPersona(f, assistant(), simulator(), {
+      name: "near budget",
+      persona: "A buyer with a firm limit of $30 total, stated in your first message, who asks for the Gift candle. If told it is over your limit, take the Gift mug instead and ask for it to be quoted.",
+      goal: "Get one gift quoted for $30 or less.",
+    });
+    const quotes = await storedQuotes(f);
+    expect(quotes.length, JSON.stringify(transcript)).toBeGreaterThan(0);
+    for (const quote of quotes)
+      if (["review_ready", "accepted", "consumed"].includes(quote.status))
+        expect(quote.totalMinor ?? 0, JSON.stringify(transcript)).toBeLessThanOrEqual(3000);
+  }, 300_000);
 });
