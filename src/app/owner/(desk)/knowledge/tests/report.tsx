@@ -2,6 +2,7 @@ import type { SimulationSideResult, SimulationView } from "@/lib/simulation";
 import { Alert } from "@/components/arc/alert/alert";
 import { Accordion } from "@/components/arc/accordion/accordion";
 import { formatMoney } from "@/lib/money";
+import { PERSONAS } from "@/lib/simulation-personas";
 
 const timestamp = (value: string) => new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value)) + " UTC";
 
@@ -18,7 +19,7 @@ export function SimulationReport({ report }: { report: SimulationView }) {
     {report.failure ? <Alert tone="warning" className="mt-4" title={report.failure} /> : null}
     <div className="mt-4"><Accordion defaultOpen={-1} items={[{ title: "Test conditions and authorized actions", content: <>
       <p className="break-all">Model: {report.generator}</p><p className="mt-2">Published facts captured {timestamp(report.capturedAt)}. Shop facts may since have changed.</p>
-      {report.steps.length ? <ol className="mt-3 list-inside list-decimal space-y-2">{report.steps.map((step, i) => <li key={i}>{step.kind === "customer" ? `Customer: ${step.text}` : step.kind === "seller_reply" ? `Seller: ${step.text}` : <>{step.expected.lines.map(line => `${line.quantity} × ${report.products.find(product => product.id === line.sourceOfferId)?.title ?? "Captured offer"}`).join(", ")} · {formatMoney(step.expected.totalMinor, step.expected.currency)}. {step.kind === "approve_scope" ? `Seller approves: ${step.scope}` : `Fictional payer approves this exact purchase. ${step.fault === "none" ? "Ordinary payment." : "Lost capture and delivery retry."}`}</>}</li>)}</ol> : <p className="mt-2">No seller approval or fictional payment was authorized.</p>}
+      {report.steps.length ? <ol className="mt-3 list-inside list-decimal space-y-2">{report.steps.map((step, i) => <li key={i}>{step.kind === "customer" ? `Customer: ${step.text}` : step.kind === "seller_reply" ? `Seller: ${step.text}` : step.kind === "simulated_customer" ? `Simulated customer · ${PERSONAS[step.persona].label}, ${step.turns} ${step.turns === 1 ? "turn" : "turns"}` : <>{step.expected.lines.map(line => `${line.quantity} × ${report.products.find(product => product.id === line.sourceOfferId)?.title ?? "Captured offer"}`).join(", ")} · {formatMoney(step.expected.totalMinor, step.expected.currency)}. {step.kind === "approve_scope" ? `Seller approves: ${step.scope}` : `Fictional payer approves this exact purchase. ${step.fault === "none" ? "Ordinary payment." : "Lost capture and delivery retry."}`}</>}</li>)}</ol> : <p className="mt-2">No seller approval or fictional payment was authorized.</p>}
       {report.change ? <div className="mt-3"><p className="font-semibold">Saved wording tested</p><p>{report.change.content.whenToUse}</p><p className="mt-2 whitespace-pre-wrap">{report.change.content.steps}</p></div> : null}
       <ul className="mt-3 list-inside list-disc space-y-1">{report.limitations.map(item => <li key={item}>{item}</li>)}<li>Commerce is fictional; this does not verify PayPal sandbox or live payments.</li><li>Trials use isolated SQLite on both hosts. Results stay in the original shop; temporary trial databases are discarded.</li></ul>
     </> }]} /></div>

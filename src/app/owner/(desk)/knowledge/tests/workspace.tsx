@@ -10,7 +10,8 @@ import { Select } from "@/components/arc/select/select";
 import { Checkbox } from "@/components/arc/checkbox/checkbox";
 import { Accordion } from "@/components/arc/accordion/accordion";
 import { LinkButton } from "@/components/link-button";
-import { SimulationInput, type SimulationStep, type SimulationView } from "@/lib/simulation";
+import { SimulationInput, customerTurns, type SimulationStep, type SimulationView } from "@/lib/simulation";
+import { PERSONAS, PERSONA_IDS, type PersonaId } from "@/lib/simulation-personas";
 import { formatMoney, parsePriceInput } from "@/lib/money";
 import { SimulationReport } from "./report";
 import { runSimulationAction } from "./actions";
@@ -19,6 +20,7 @@ import { runSimulationAction } from "./actions";
 export type TrialOffer = { id: string; title: string; kind: string; unitAmountMinor: number | null; currency: string };
 const ACTORS = [
   { value: "customer", label: "Customer follows up" },
+  { value: "simulated_customer", label: "Simulated customer plays a part" },
   { value: "seller_reply", label: "Seller answers a question" },
   { value: "approve_scope", label: "Seller approves service scope" },
   { value: "pay_quote", label: "Customer pays the exact quote (fictional)" },
@@ -73,13 +75,19 @@ export function SimulationWorkspace({ connected, reports, offers, instructions }
           <legend className="pt-3 text-[14px] font-semibold">{index + 2}. {ACTORS.find(item => item.value === step.kind)?.label}</legend>
           {step.kind === "customer" || step.kind === "seller_reply"
             ? <Textarea label={step.kind === "customer" ? "Customer message" : "Seller reply"} value={step.text} onChange={e => update(index, { ...step, text: e.target.value })} rows={2} maxLength={step.kind === "customer" ? 2000 : 1000} />
-            : <PurchaseStep step={step} offers={offers} onChange={next => update(index, next)} />}
+            : step.kind === "simulated_customer"
+              ? <div className="mt-3 space-y-4">
+                  <Select label="Who the customer is" value={step.persona} onValueChange={persona => update(index, { ...step, persona: persona as PersonaId })} options={PERSONA_IDS.map(id => ({ value: id, label: PERSONAS[id].label }))} description={`${PERSONAS[step.persona].description} The AI writes their messages from your published offers.`} />
+                  <Select label="Messages they send" value={String(step.turns)} onValueChange={turns => update(index, { ...step, turns: Number(turns) })} options={[1, 2, 3].map(n => ({ value: String(n), label: String(n), disabled: customerTurns(steps) - step.turns + n > 3 }))} />
+                </div>
+              : <PurchaseStep step={step} offers={offers} onChange={next => update(index, next)} />}
           <Button type="button" variant="ghost" className="mt-2" onClick={() => setPlan(old => old.filter((_, i) => i !== index))}>Remove step</Button>
         </fieldset>)}</div>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <Select label="Next step" value={actor} onValueChange={setActor} disabled={busy || steps.length >= 6} options={ACTORS.map(item => ({ ...item, disabled: (item.value === "customer" && steps.filter(s => s.kind === "customer").length >= 3) || (item.value === "pay_quote" && !offers.length) || (item.value === "approve_scope" && !offers.some(offer => offer.kind === "service")) }))} />
+          <Select label="Next step" value={actor} onValueChange={setActor} disabled={busy || steps.length >= 6} options={ACTORS.map(item => ({ ...item, disabled: ((item.value === "customer" || item.value === "simulated_customer") && customerTurns(steps) >= 3) || (item.value === "pay_quote" && !offers.length) || (item.value === "approve_scope" && !offers.some(offer => offer.kind === "service")) }))} />
           <Button type="button" variant="secondary" disabled={busy || steps.length >= 6} onClick={() => {
-            if (actor === "customer" || actor === "seller_reply") { if (actor === "customer" && steps.filter(s => s.kind === "customer").length >= 3) return; setPlan(old => [...old, { id: crypto.randomUUID(), step: { kind: actor, text: "" } }]); return; }
+            if (actor === "customer" || actor === "seller_reply") { if (actor === "customer" && customerTurns(steps) >= 3) return; setPlan(old => [...old, { id: crypto.randomUUID(), step: { kind: actor, text: "" } }]); return; }
+            if (actor === "simulated_customer") { const left = 3 - customerTurns(steps); if (left < 1) return; setPlan(old => [...old, { id: crypto.randomUUID(), step: { kind: "simulated_customer", persona: "haggler", turns: Math.min(2, left) } }]); return; }
             const offer = actor === "approve_scope" ? offers.find(offer => offer.kind === "service") : offers[0]; if (!offer) return;
             const expected = { lines: [{ sourceOfferId: offer.id, quantity: 1 }], totalMinor: offer.unitAmountMinor ?? 0, currency: offer.currency };
             setPlan(old => [...old, { id: crypto.randomUUID(), step: actor === "approve_scope" ? { kind: "approve_scope", expected, scope: "", prices: [] } : { kind: "pay_quote", expected, fault: "none" } }]);
