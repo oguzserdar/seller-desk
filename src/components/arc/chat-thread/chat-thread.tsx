@@ -280,12 +280,14 @@ export interface ChatComposerProps {
   maxLength?: number;
   ariaLabel?: string;
   autoFocus?: boolean;
+  /** Keeps the box editable and focused but not sendable, for example while a reply streams. */
+  holdSend?: boolean;
 }
 
 export interface ChatComposerHandle { focus: () => void }
 
 /** The message box on its own: autosizing text, attachments by button, paste, or drop, and a send button that morphs when there is something to send. */
-export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function ChatComposer({ onSend, placeholder = "Message", allowAttachments = true, accept, disabled, labels, className, maxLength, ariaLabel, autoFocus }, ref) {
+export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function ChatComposer({ onSend, placeholder = "Message", allowAttachments = true, accept, disabled, labels, className, maxLength, ariaLabel, autoFocus, holdSend = false }, ref) {
   const t = withDefaults(COMPOSER_LABELS, labels);
   const reduced = !!useReducedMotion();
   const [text, setText] = useState("");
@@ -296,7 +298,7 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
   const pickerRef = useRef<HTMLInputElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
   const height = useAutoHeight(mirrorRef, 6 * 22 + 18, reduced);
-  const ready = !disabled && (text.trim().length > 0 || files.length > 0);
+  const ready = !disabled && !holdSend && (text.trim().length > 0 || files.length > 0);
   const counter = useRef(0);
 
   useImperativeHandle(ref, () => ({ focus: () => areaRef.current?.focus() }), []);
