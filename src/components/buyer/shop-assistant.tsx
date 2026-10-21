@@ -234,6 +234,9 @@ export function ShopAssistant({
   };
 
   const [confirmingEnd, setConfirmingEnd] = useState(false);
+  // Keep chatting hands focus back to End chat, the control that opened the question.
+  const endButton = useRef<HTMLButtonElement>(null);
+  const keepChatting = () => { setConfirmingEnd(false); requestAnimationFrame(() => endButton.current?.focus()); };
   const endChat = async () => {
     stop();
     await api("/api/buyer/session/end", { method: "POST", json: {} });
@@ -369,12 +372,13 @@ export function ShopAssistant({
               <Button type="button" variant="ghost" onClick={() => { setConfirmingEnd(false); void endChat(); }}>
                 End chat
               </Button>
-              <Button type="button" variant="ghost" autoFocus onClick={() => setConfirmingEnd(false)}>
+              <Button type="button" variant="ghost" autoFocus onClick={keepChatting}>
                 Keep chatting
               </Button>
             </span>
           ) : conversation || quote.quote ? (
             <Button
+              ref={endButton}
               type="button"
               variant="ghost"
               onClick={() => setConfirmingEnd(true)}
