@@ -9,6 +9,9 @@ import { verifyAiSetup } from "@/server/ai/setup-check";
 import { requireUsage } from "@/server/domain/usage";
 import { recordModelCheck } from "@/server/domain/model-check";
 import { AiConnectionInput, removeAiConnection, saveAiConnection } from "@/server/domain/ai-settings";
+import { listProviderModels } from "@/server/ai/provider-models";
+import { getEffectiveConfig } from "@/server/effective-config";
+import { AI_PROVIDERS } from "@/server/env";
 import { SellerProfileInput, updateSellerProfile } from "@/server/domain/seller";
 import { getServerConfig } from "@/server/env";
 import { checkPayPalConnection } from "@/server/paypal/connection-check";
@@ -34,6 +37,23 @@ export const saveAiConnectionAction = ownerAction.inputSchema(AiConnectionInput)
   if (result.ok) revalidatePath("/owner", "layout");
   return result;
 });
+
+/**
+ * Lists the provider's chat models for the pasted key, or for the connected key
+ * when none is pasted. The key is used for this one request and not stored.
+ */
+export const listAiModelsAction = ownerAction
+  .inputSchema(z.object({ provider: z.enum(AI_PROVIDERS), apiKey: AiConnectionInput.shape.apiKey.optional() }))
+  .action(async ({ parsedInput, ctx }) => {
+    await requireUsage("ai_model_list", ctx.owner.userId, 600, 20, "Wait a few minutes before loading models again.");
+    let apiKey = parsedInput.apiKey;
+    if (!apiKey) {
+      const ai = (await getEffectiveConfig()).ai;
+      if (ai.status === "ready" && ai.provider === parsedInput.provider && ai.apiKey) apiKey = ai.apiKey;
+    }
+    if (!apiKey) return { ok: false as const, problem: "Paste a key first." };
+    return listProviderModels(parsedInput.provider, apiKey);
+  });
 
 /** Deletes the saved key; host settings apply again. */
 export const removeAiConnectionAction = ownerAction.action(async ({ ctx }) => {

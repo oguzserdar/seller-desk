@@ -1,14 +1,17 @@
 "use client";
 
 import { ArrowUpRight, ChevronRight } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import {
   ModelSelector,
   type ModelChoice,
 } from "@/components/assistant/internal/model-selector";
+import { Button } from "@/components/arc/button/button";
 import { Input } from "@/components/arc/input/input";
 import type { AiConnectionView } from "@/server/domain/ai-settings";
 import { CopyField } from "../install/copy-field";
+import { listAiModelsAction } from "./actions";
 import { AiKeyForm } from "./ai-key-form";
 
 const PROVIDERS = {
@@ -118,16 +121,28 @@ export function AiSettings({ connection }: { connection: AiConnectionView }) {
   const [model, setModel] = useState<string>(connection.modelId ?? PROVIDERS[start].model);
   const [routing, setRouting] =
     useState<keyof typeof ROUTING_CONNECTIONS>("off");
+  const [apiKey, setApiKey] = useState("");
+  const [models, setModels] = useState<ModelChoice[] | null>(null);
+  const listing = useAction(listAiModelsAction, {
+    onSuccess: ({ data }) => {
+      if (data?.ok)
+        setModels(data.models.map((m) => ({ id: m.id, label: m.label, description: m.id, group: `From ${PROVIDERS[provider].label}` })));
+    },
+  });
+  const listed = listing.result.data;
+  const canList = apiKey.trim().length >= 20 || connection.provider === provider;
   const decision = ROUTING_CONNECTIONS[routing];
   const selected = PROVIDERS[provider];
   const safeModel = model.trim().replace(/[\r\n"'$`\\#]/g, "");
   const choices: ModelChoice[] = [
-    {
-      id: selected.model,
-      label: selected.name,
-      description: "Starting model for this connection",
-      group: "Reply model",
-    },
+    ...(models ?? [
+      {
+        id: selected.model,
+        label: selected.name,
+        description: "Load models to see everything this key can use",
+        group: "Reply model",
+      },
+    ]),
     {
       id: "custom",
       label: "Use another model",
@@ -166,15 +181,51 @@ export function AiSettings({ connection }: { connection: AiConnectionView }) {
               setProvider(next);
               setModel(PROVIDERS[next].model);
               setCustomModel(false);
+              setModels(null);
+              setApiKey("");
+              listing.reset();
             }}
           />
         </div>
         <div className="space-y-2">
+          <Input
+            label={`${selected.label} key`}
+            id="ai-key"
+            type="password"
+            value={apiKey}
+            maxLength={400}
+            autoComplete="off"
+            spellCheck={false}
+            onChange={(event) => setApiKey(event.target.value)}
+          />
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <Button
+          variant="secondary"
+          loading={listing.isPending}
+          disabled={!canList}
+          onClick={() => listing.execute({ provider, ...(apiKey.trim() ? { apiKey: apiKey.trim() } : {}) })}
+        >
+          Load models from {selected.label}
+        </Button>
+        <p role="status" className="text-ink-3 text-[13px]">
+          {listing.isPending
+            ? "Asking the provider…"
+            : listed?.ok
+              ? `${listed.models.length} chat models available to this key.`
+              : listed && !listed.ok
+                ? listed.problem
+                : listing.result.serverError ?? "The list comes from the provider, for this key."}
+        </p>
+      </div>
+      <div className="mt-4 grid gap-5 sm:grid-cols-2">
+        <div className="space-y-2 sm:col-span-2">
           <p className="text-ink-2 text-[13px] font-medium">Replies</p>
           <ModelSelector
             title="Choose a reply model"
             value={customModel ? "custom" : model}
-            label={customModel ? model || "Your model" : selected.name}
+            label={customModel ? model || "Your model" : (models?.find((m) => m.id === model)?.label ?? (model || selected.name))}
             description={
               customModel
                 ? "Custom model ID"
@@ -202,7 +253,7 @@ export function AiSettings({ connection }: { connection: AiConnectionView }) {
           />
         </div>
       ) : null}
-      <AiKeyForm connection={connection} provider={provider} providerLabel={selected.label} modelId={safeModel} />
+      <AiKeyForm connection={connection} provider={provider} modelId={safeModel} apiKey={apiKey.trim()} onSaved={() => setApiKey("")} />
       <div className="border-line mt-6 space-y-3 border-y py-5">
         <p className="text-[15px] font-semibold">
           Guide conversations before replying
