@@ -82,3 +82,14 @@ export function useShopReplyAlert({ shopName, state, answer }: { shopName: strin
     }
   }, [shopName, state, answer]);
 }
+
+/** Counts questions that went from waiting to answered, so the thread can bring each answer into view. */
+export function useAnswersArrived(state?: string): number {
+  const [arrived, setArrived] = useState(0);
+  const last = useRef(state);
+  useEffect(() => {
+    if (last.current === "open" && state && state !== "open") setArrived((n) => n + 1);
+    last.current = state;
+  }, [state]);
+  return arrived;
+}

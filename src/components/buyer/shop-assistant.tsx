@@ -27,7 +27,7 @@ import { QuoteBar, QuoteSheet } from "./quote-sheet";
 import { PurchaseLadder } from "./purchase-ladder";
 import { QuoteSummary } from "./quote-summary";
 import { purchaseSteps } from "@/lib/purchase-steps";
-import { useShopReplyAlert } from "./shop-handoff";
+import { useShopReplyAlert, useAnswersArrived } from "./shop-handoff";
 import { ShopWindow } from "./shop-window";
 import { Thread } from "./thread";
 import { useBuyerQuote } from "./use-buyer-quote";
@@ -122,13 +122,7 @@ export function ShopAssistant({
   });
   const withSeller = control?.handler === "seller";
   useShopReplyAlert({ shopName, state: handoff?.state, answer: handoff?.answer });
-  // Counts answers that arrived while the buyer waited, so the thread can bring each one into view.
-  const [answersArrived, setAnswersArrived] = useState(0);
-  const lastHandoffState = useRef(handoff?.state);
-  useEffect(() => {
-    if (lastHandoffState.current === "open" && handoff?.state && handoff.state !== "open") setAnswersArrived((n) => n + 1);
-    lastHandoffState.current = handoff?.state;
-  }, [handoff?.state]);
+  const answersArrived = useAnswersArrived(handoff?.state);
   const canChat = assistant === "on" || withSeller;
 
   const load = useCallback(async () => {
