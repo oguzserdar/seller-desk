@@ -26,6 +26,8 @@ type Props = {
   onReviewPayment: () => void;
   onFix: (fix: QuoteFix) => void;
   onStartOver: () => void;
+  /** Restores a quote the buyer just emptied, for a few seconds after Start over. */
+  onUndoStartOver?: (() => void) | null;
   className?: string;
   /** Where the purchase stands, shown right after the total. */
   standing?: ReactNode;
@@ -94,6 +96,7 @@ export function QuoteSummary({
   onReviewPayment,
   onFix,
   onStartOver,
+  onUndoStartOver,
   className,
   standing,
   titled = true,
@@ -107,10 +110,17 @@ export function QuoteSummary({
         className={cx("quote-summary bg-surface p-5", className)}
       >
         {titled ? <h2 className="mb-3 text-[17px] font-semibold">Your quote</h2> : null}
-        <p className="border-line-strong text-ink-2 rounded-[10px] border border-dashed px-4 py-5 text-center text-[14px]">
-          Your quote is empty. Items you add appear here, with the total before
-          you pay.
-        </p>
+        {onUndoStartOver ? (
+          <p role="status" className="border-line-strong text-ink-2 flex items-center justify-between gap-3 rounded-[10px] border border-dashed px-4 py-3 text-[14px]">
+            Quote emptied.
+            <Button type="button" variant="secondary" size="sm" onClick={onUndoStartOver}>Undo</Button>
+          </p>
+        ) : (
+          <p className="border-line-strong text-ink-2 rounded-[10px] border border-dashed px-4 py-5 text-center text-[14px]">
+            Your quote is empty. Items you add appear here, with the total before
+            you pay.
+          </p>
+        )}
         {error ? <Alert tone="danger" className="mt-3" title={error} /> : null}
       </section>
     );

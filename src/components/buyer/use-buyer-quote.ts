@@ -215,7 +215,23 @@ export function useBuyerQuote({ widget, onSessionLost }: { widget: boolean; onSe
     router.push(`/quote/${quote.id}`);
   }, [openReview, loadQuote, quote, router, widget]);
 
-  const startOver = useCallback(() => void send([]), [send]);
+  // Emptying is reversible: the cleared lines and note are kept briefly so Undo can send them again.
+  const [cleared, setCleared] = useState<{ lines: { offerId: string; quantity: number }[]; buyerNote?: string } | null>(null);
+  useEffect(() => {
+    if (!cleared) return;
+    const timer = setTimeout(() => setCleared(null), 10_000);
+    return () => clearTimeout(timer);
+  }, [cleared]);
+  const startOver = useCallback(() => {
+    const lines = currentLines();
+    if (lines.length) setCleared({ lines, buyerNote: quote?.buyerNote ?? undefined });
+    void send([]);
+  }, [currentLines, quote, send]);
+  const undoStartOver = useCallback(() => {
+    if (!cleared) return;
+    setCleared(null);
+    void send(cleared.lines, cleared.buyerNote ? { buyerNote: cleared.buyerNote } : {});
+  }, [cleared, send]);
 
   const reset = useCallback(() => {
     pendingQuoteRequest.current = null;
@@ -224,5 +240,5 @@ export function useBuyerQuote({ widget, onSessionLost }: { widget: boolean; onSe
     setBusy(null);
   }, [restoreQuote]);
 
-  return { quote, restoreQuote, busy, error, payReady: !widget || Boolean(handoffHref), loadQuote, addOffer, setQuantity, fix, pay, openReview, startOver, reset };
+  return { quote, restoreQuote, busy, error, payReady: !widget || Boolean(handoffHref), loadQuote, addOffer, setQuantity, fix, pay, openReview, startOver, undoStartOver: cleared ? undoStartOver : null, reset };
 }

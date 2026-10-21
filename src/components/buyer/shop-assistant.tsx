@@ -306,6 +306,7 @@ export function ShopAssistant({
       onReviewPayment={quote.openReview}
       onFix={quote.fix}
       onStartOver={quote.startOver}
+      onUndoStartOver={quote.undoStartOver}
       standing={standing}
     />
   );
