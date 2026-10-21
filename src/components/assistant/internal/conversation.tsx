@@ -62,10 +62,14 @@ export function ConversationScrollButton() {
 }
 
 /** Sending a message returns the reader to the newest reply and resumes following it, as chat apps do. */
-export function ConversationFollowOnSend({ sending }: { sending: boolean }) {
+export function ConversationFollowOnSend({ sending, follow = 0 }: { sending: boolean; follow?: number }) {
   const { scrollToBottom } = useStickToBottomContext();
   useEffect(() => {
     if (sending) void scrollToBottom({ animation: "instant" });
   }, [sending, scrollToBottom]);
+  // A reply the reader was waiting for (for example the shop's answer) also brings the thread to it.
+  useEffect(() => {
+    if (follow > 0) void scrollToBottom({ animation: "instant" });
+  }, [follow, scrollToBottom]);
   return null;
 }

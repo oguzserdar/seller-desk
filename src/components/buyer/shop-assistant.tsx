@@ -122,6 +122,13 @@ export function ShopAssistant({
   });
   const withSeller = control?.handler === "seller";
   useShopReplyAlert({ shopName, state: handoff?.state, answer: handoff?.answer });
+  // Counts answers that arrived while the buyer waited, so the thread can bring each one into view.
+  const [answersArrived, setAnswersArrived] = useState(0);
+  const lastHandoffState = useRef(handoff?.state);
+  useEffect(() => {
+    if (lastHandoffState.current === "open" && handoff?.state && handoff.state !== "open") setAnswersArrived((n) => n + 1);
+    lastHandoffState.current = handoff?.state;
+  }, [handoff?.state]);
   const canChat = assistant === "on" || withSeller;
 
   const load = useCallback(async () => {
@@ -440,7 +447,7 @@ export function ShopAssistant({
         <div className="shop-workspace">
           <main className="flex min-h-0 min-w-0 flex-col">
             <h1 className="sr-only">Shopping with {shopName}</h1>
-            <ShopConversation shopName={shopName} sending={status === "submitted"}>
+            <ShopConversation shopName={shopName} sending={status === "submitted"} follow={answersArrived}>
               {withSeller ? (
                 <p role="status" className="mb-5 text-[14px] text-ink-2">
                   The shop owner is handling this conversation. Your messages go

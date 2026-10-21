@@ -9,12 +9,12 @@ const loadResponse = () => import("./internal/message-response");
 const MessageResponse = lazy(() => loadResponse().then((module) => ({ default: module.MessageResponse })));
 
 /** Seller Desk's bounded conversation surface, independent of the underlying component library. */
-export function ShopConversation({ children, shopName, sending = false }: { children: ReactNode; shopName: string; sending?: boolean }) {
+export function ShopConversation({ children, shopName, sending = false, follow = 0 }: { children: ReactNode; shopName: string; sending?: boolean; follow?: number }) {
   useEffect(() => {
     const idle = window.requestIdleCallback ?? ((run: () => void) => window.setTimeout(run, 1));
     idle(() => void loadResponse());
   }, []);
-  return <Conversation label={`Conversation with ${shopName}`}><ConversationContent>{children}</ConversationContent><ConversationScrollButton /><ConversationFollowOnSend sending={sending} /></Conversation>;
+  return <Conversation label={`Conversation with ${shopName}`}><ConversationContent>{children}</ConversationContent><ConversationScrollButton /><ConversationFollowOnSend sending={sending} follow={follow} /></Conversation>;
 }
 
 /** Seller Desk's answer typography and safe Markdown policy. */
