@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { DeskAlertsToggle, useDeskWaiting } from "./desk-alerts";
 import Link from "next/link";
 import { Store } from "lucide-react";
 import {
@@ -44,6 +45,7 @@ export function OwnerShell({
   children: ReactNode;
 }) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
+  const live = useDeskWaiting(waiting, shopName);
   return (
     <SidebarProvider
       ref={setContainer}
@@ -67,7 +69,8 @@ export function OwnerShell({
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <OwnerNav waiting={waiting} />
+          <OwnerNav waiting={live} />
+          <DeskAlertsToggle />
         </SidebarContent>
         <SidebarFooter className="hidden md:flex">
           <SidebarAccount name={name} email={email} />
