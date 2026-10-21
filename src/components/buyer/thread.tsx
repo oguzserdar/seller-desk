@@ -117,7 +117,16 @@ function joinReceipts(nodes: ReactNode[]): ReactNode[] {
   for (const node of nodes) {
     if (isValidElement<{ children: ReactNode }>(node) && node.type === Receipt)
       run.push(node.props.children);
-    else if (node !== null && node !== undefined && node !== false) {
+    else if (run.length && isValidElement(node) && node.type === KnowledgeSources) {
+      // Sources belong to the steps just above them, as with the catalog receipt.
+      const steps = run; run = [];
+      out.push(
+        <div key={`receipts-${out.length}`}>
+          <p className="assistant-receipt">{steps.flatMap((item, i) => (i ? [" · ", item] : [item]))}</p>
+          {node}
+        </div>,
+      );
+    } else if (node !== null && node !== undefined && node !== false) {
       flush();
       out.push(node);
     }

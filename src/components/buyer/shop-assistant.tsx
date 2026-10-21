@@ -518,7 +518,7 @@ export function ShopAssistant({
                           sizes="40px"
                           className="size-10 shrink-0 rounded-[8px]"
                         />
-                        <span className="min-w-0 flex-1 truncate">
+                        <span className="min-w-0 flex-1 line-clamp-2 leading-snug">
                           {offer.title}
                         </span>
                         <span className="tabular text-ink-2 shrink-0">
