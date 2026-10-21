@@ -413,7 +413,7 @@ export function ShopAssistant({
         <div className="shop-workspace">
           <main className="flex min-h-0 min-w-0 flex-col">
             <h1 className="sr-only">Shopping with {shopName}</h1>
-            <ShopConversation shopName={shopName}>
+            <ShopConversation shopName={shopName} sending={status === "submitted"}>
               {withSeller ? (
                 <p role="status" className="mb-5 text-[14px] text-ink-2">
                   The shop owner is handling this conversation. Your messages go

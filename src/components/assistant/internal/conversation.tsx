@@ -7,7 +7,7 @@
  */
 import { Button } from "@/components/arc/button/button";
 import { ArrowDown } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 
 /** Internal conversation primitive. The reader can leave bottom-follow mode by scrolling up. */
@@ -59,4 +59,13 @@ export function ConversationScrollButton() {
       </Button>
     </div>
   ) : null;
+}
+
+/** Sending a message returns the reader to the newest reply and resumes following it, as chat apps do. */
+export function ConversationFollowOnSend({ sending }: { sending: boolean }) {
+  const { scrollToBottom } = useStickToBottomContext();
+  useEffect(() => {
+    if (sending) void scrollToBottom({ animation: "instant" });
+  }, [sending, scrollToBottom]);
+  return null;
 }
