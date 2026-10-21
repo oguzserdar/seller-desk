@@ -1,4 +1,4 @@
-/** @fileoverview A preview written before a later tool step is not repeated above the final answer. */
+/** @fileoverview Text written before a later tool step stays where it was written, as a quiet step line, never as a second answer. */
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -13,10 +13,11 @@ const html = (message: UIMessage, status: ChatStatus = "ready") => renderToStati
 }));
 
 describe("interim assistant text", () => {
-  it("drops the preview once a final answer follows the tool step", () => {
+  it("keeps a preview before a later tool step as a quiet step line, not a second answer", () => {
     const out = html(reply([{ type: "text", text: "Only one exists. Showing it now." }, offers, { type: "text", text: "Only one can be sold." }]));
-    expect(out).not.toContain("Showing it now");
+    expect(out).toMatch(/class="assistant-interim"[^>]*>Only one exists. Showing it now.</);
     expect(out).toContain("Only one can be sold.");
+    expect(out.indexOf("Showing it now")).toBeLessThan(out.indexOf("Only one can be sold."));
   });
   it("keeps the text when no answer follows, so nothing is lost", () => {
     expect(html(reply([{ type: "text", text: "Here is what I found." }, offers]))).toContain("Here is what I found.");

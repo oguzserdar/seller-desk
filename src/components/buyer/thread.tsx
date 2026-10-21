@@ -103,9 +103,9 @@ function Receipt({ children }: { children: ReactNode }) {
 }
 
 /**
- * Text written before a later tool step is a preview the steps and final answer
- * already cover. It is hidden once a final answer follows, or while the reply is
- * still streaming; if no answer ever follows, it stays so nothing is lost.
+ * Text written before a later tool step, once a final answer follows (or while the
+ * reply is still streaming). It is shown in place as a step line rather than as an
+ * answer; if no answer ever follows, it is the answer.
  */
 function interimText(parts: UIMessage["parts"], index: number, streaming: boolean): boolean {
   const toolAfter = parts.findIndex((part, at) => at > index && isToolUIPart(part));
@@ -201,8 +201,12 @@ export function Thread({
             <p className="text-ink-3 text-[13px]">{shopName} assistant</p>
             {joinReceipts(
               message.parts.map((part, index) => {
-                if (part.type === "text")
-                  return part.text.trim() && !interimText(message.parts, index, status === "streaming" && message === last) ? (
+                if (part.type === "text") {
+                  if (!part.text.trim()) return null;
+                  // Text written before a later tool step stays where it was written, as a step line, so it never reads as a second answer.
+                  if (interimText(message.parts, index, status === "streaming" && message === last))
+                    return <p key={index} className="assistant-interim">{part.text}</p>;
+                  return (
                     <AssistantAnswer
                       key={index}
                       text={part.text}
@@ -210,7 +214,8 @@ export function Thread({
                         status === "streaming" && message.id === last?.id
                       }
                     />
-                  ) : null;
+                  );
+                }
                 if (!isToolUIPart(part)) return null;
                 // A step the assistant retried successfully in this turn is not news to the customer.
                 if (
