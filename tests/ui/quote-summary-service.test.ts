@@ -64,6 +64,13 @@ describe("service quote panel", () => {
     expect(pay!.compareDocumentPosition(change!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  it("a fixed-price service that needs no review goes straight to Pay, like booking apps", () => {
+    render({ ...priced, approvedScope: null, buyerNote: null });
+    expect(button("Pay with PayPal")).not.toBeNull();
+    expect(button("Send request to seller")?.closest("details:not([open])")).not.toBeNull();
+    expect(visibleField("Describe the work")).toBeNull();
+  });
+
   it("a one-off repair shows no quantity stepper; an item with stock to choose from still does", () => {
     render(priced, 1);
     expect(container.querySelector('[aria-label^="One more"]')).toBeNull();

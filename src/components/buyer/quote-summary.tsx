@@ -121,9 +121,9 @@ export function QuoteSummary({
     (item) => item.code === "over_budget",
   );
   const kinds = new Set(quote.lines.map((line) => line.kind));
-  // Once the shop has confirmed work and price, paying is the next step; describing the work again is the exception.
-  const priced =
-    quote.status === "review_ready" && quote.approvedScope !== null;
+  // "review_ready" means payable: a fixed-price service is ready at once, a scoped one only after the shop
+  // approves the work. Either way paying is the next step and changing the work is the exception.
+  const priced = quote.status === "review_ready";
   const serviceEditor = (
     <form
       key={quote.id}
