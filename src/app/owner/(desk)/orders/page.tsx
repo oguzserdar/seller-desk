@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { needsYouLabel } from "@/server/domain/desk-count";
 import { getAssistantModel } from "@/server/ai/registry";
 import { requireOwner } from "@/server/auth/owner";
 import {
@@ -94,14 +93,10 @@ export default async function DeskPage({
         }
       >
         <section className="min-w-0 px-4 pt-8 pb-28 sm:px-8 lg:pb-12">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h1 className="text-[26px] font-semibold tracking-[-0.02em]">
-              Desk
-            </h1>
-            <p className="text-ink-3 tabular font-mono text-[13px]">
-              {needsYouLabel(waiting)}
-            </p>
-          </div>
+          {/* The "Needs you" figure below carries the count; the heading does not repeat it. */}
+          <h1 className="text-[26px] font-semibold tracking-[-0.02em]">
+            Desk
+          </h1>
           {!assistantOn ? (
             <p className="text-ink-2 mt-3 text-[14px]">
               Your assistant isn&apos;t connected yet.{" "}
