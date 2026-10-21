@@ -1,6 +1,7 @@
 /** Browser-safe inputs and recorded evidence for private seller simulations. */
 import { z } from "zod";
 import type { ProcedureContent } from "./assistant-procedure";
+import { PERSONA_IDS } from "./simulation-personas";
 
 /** Matches the maximum host request lifetime; execution stops admitting AI work earlier. */
 export const SIMULATION_RUN_TTL_MS = 300_000;
@@ -14,6 +15,8 @@ const ExpectedQuote = z.object({
 export const SimulationStep = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("customer"), text: z.string().trim().min(1).max(2000) }).strict(),
   z.object({ kind: z.literal("seller_reply"), text: z.string().trim().min(1).max(1000) }).strict(),
+  // A preset customer played by a model for a few turns; it writes customer messages only, never replies or approvals.
+  z.object({ kind: z.literal("simulated_customer"), persona: z.enum(PERSONA_IDS), turns: z.number().int().min(1).max(3) }).strict(),
   // The total is the one the seller means to approve; it is checked after approval, when custom prices exist.
   z.object({ kind: z.literal("approve_scope"), expected: ExpectedQuote, scope: z.string().trim().min(3).max(1000),
     prices: z.array(z.object({ sourceOfferId: z.uuid(), unitAmountMinor: z.number().int().positive().max(10000000) }).strict()).max(10) }).strict(),
@@ -23,11 +26,16 @@ export const SimulationStep = z.discriminatedUnion("kind", [
 /** Validated fictional action in a private simulation. */
 export type SimulationStep = z.infer<typeof SimulationStep>;
 
+/** Customer follow-ups a plan will send, written or simulated; each one is a real assistant turn. */
+export function customerTurns(steps: SimulationStep[]): number {
+  return steps.reduce((sum, step) => sum + (step.kind === "customer" ? 1 : step.kind === "simulated_customer" ? step.turns : 0), 0);
+}
+
 /** A saved instruction is optional; scenario and expectations never grant approvals. */
 export const SimulationInput = z.object({
   requestId: z.uuid(), scenario: z.string().trim().min(5).max(2000),
   expectedOutcome: z.string().trim().min(5).max(1000),
-  steps: z.array(SimulationStep).max(6).refine(steps => steps.filter(step => step.kind === "customer").length <= 3, "Use at most three follow-up customer turns.").optional(),
+  steps: z.array(SimulationStep).max(6).refine(steps => customerTurns(steps) <= 3, "Use at most three follow-up customer turns.").optional(),
   change: z.discriminatedUnion("kind", [z.object({ kind: z.literal("none") }).strict(),
     z.object({ kind: z.literal("instruction"), id: z.uuid(), revision: z.number().int().positive() }).strict()]),
 }).strict();
