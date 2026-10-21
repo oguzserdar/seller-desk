@@ -67,7 +67,7 @@ export function DeskAlertsToggle() {
       <SidebarMenuItem>
         <SidebarMenuButton tooltip="Notify me about new questions" onClick={() => void Notification.requestPermission().then(setPermission)}>
           <Bell aria-hidden />
-          <span>Notify me about new questions</span>
+          <span>Turn on question alerts</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
