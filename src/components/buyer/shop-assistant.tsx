@@ -234,6 +234,22 @@ export function ShopAssistant({
     void sendMessage({ text });
   };
 
+  // "Describe the work" in the quote panel goes to the chat box, where the assistant takes the description.
+  // On a phone the quote is a sheet over the chat, so it closes first and hands focus to the box.
+  const focusChatOnClose = useRef(false);
+  const chatBox = () => document.querySelector<HTMLTextAreaElement>("[data-buyer-composer] textarea");
+  const describeWork = () => {
+    if (sheetOpen) {
+      focusChatOnClose.current = true;
+      setSheetOpen(false);
+    } else chatBox()?.focus();
+  };
+  const sheetReturnFocus = () => {
+    if (!focusChatOnClose.current) return null;
+    focusChatOnClose.current = false;
+    return chatBox();
+  };
+
   // Stopping the stream alone leaves the server's turn claimed until its lease ends; release it too.
   const stopReply = () => {
     void stop();
@@ -307,6 +323,7 @@ export function ShopAssistant({
     <QuoteSummary
       titled={titled}
       describeInChat={assistant === "on"}
+      onDescribe={describeWork}
       quote={quote.quote}
       imageFor={imageFor}
       limitFor={limitFor}
@@ -570,6 +587,7 @@ export function ShopAssistant({
           <QuoteSheet
             open={sheetOpen}
             onClose={() => setSheetOpen(false)}
+            returnFocus={sheetReturnFocus}
             label={quote.quote?.order ? `Order #${quote.quote.order.number}` : "Your quote"}
           >
             {summary(false)}

@@ -37,6 +37,8 @@ type Props = {
   titled?: boolean;
   /** The assistant collects the job details in the chat, so the panel shows them instead of a form. */
   describeInChat?: boolean;
+  /** Takes the buyer to the chat box to describe the work, when describeInChat is on. */
+  onDescribe?: () => void;
 };
 
 function Stepper({
@@ -104,6 +106,7 @@ export function QuoteSummary({
   standing,
   titled = true,
   describeInChat = false,
+  onDescribe,
 }: Props) {
   const detailsId = useId();
   if (!quote) {
@@ -136,6 +139,8 @@ export function QuoteSummary({
     );
   const payable =
     quote.status === "review_ready" && quote.isLatest && !quote.payment;
+  // Custom work without a description has not reached the shop; the buyer, not the shop, is next.
+  const needsDetails = quote.status === "needs_information" && quote.unresolved.some((item) => item.code === "details_needed");
   const overBudget = quote.unresolved.find(
     (item) => item.code === "over_budget",
   );
@@ -316,10 +321,12 @@ export function QuoteSummary({
       <div className="border-line flex items-baseline justify-between border-t px-5 py-3.5">
         <span className="text-[15px] font-semibold">Total</span>
         <span className="tabular text-[22px] font-semibold tracking-[-0.01em]">
-          {formatQuoteAmount(quote.totalMinor, quote.currency)}{" "}
-          <span className="text-ink-3 text-[13px] font-medium tracking-normal">
-            {quote.currency}
-          </span>
+          {needsDetails ? "Needs details" : formatQuoteAmount(quote.totalMinor, quote.currency)}{" "}
+          {needsDetails ? null : (
+            <span className="text-ink-3 text-[13px] font-medium tracking-normal">
+              {quote.currency}
+            </span>
+          )}
         </span>
       </div>
       <div className="flex flex-col gap-3 px-5 pb-5">
@@ -364,7 +371,14 @@ export function QuoteSummary({
                   <p className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">{quote.buyerNote}</p>
                 </>
               ) : (
-                <p className="text-ink-2">Tell the assistant about the job. It sends the request to the shop.</p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-ink-2">Tell the assistant about the job. It sends the request to the shop.</p>
+                  {onDescribe ? (
+                    <Button variant="secondary" type="button" onClick={onDescribe}>
+                      Describe the work
+                    </Button>
+                  ) : null}
+                </div>
               )}
             </div>
           ) : (
