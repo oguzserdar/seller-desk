@@ -233,6 +233,11 @@ export function ShopAssistant({
     void sendMessage({ text });
   };
 
+  // Stopping the stream alone leaves the server's turn claimed until its lease ends; release it too.
+  const stopReply = () => {
+    void stop();
+    void api("/api/buyer/chat/stop", { method: "POST", json: {} });
+  };
   const [confirmingEnd, setConfirmingEnd] = useState(false);
   // Keep chatting hands focus back to End chat, the control that opened the question.
   const endButton = useRef<HTMLButtonElement>(null);
@@ -324,7 +329,7 @@ export function ShopAssistant({
         autoFocus={!large && carryFocus}
         shopName={shopName}
         onSend={ask}
-        onStop={stop}
+        onStop={stopReply}
         streaming={streaming}
         disabled={!canChat || (!streaming && replyState === "answering")}
         placeholder={
