@@ -257,6 +257,8 @@ async function executeScenario(
 async function refreshRecords(
   result: SimulationSideResult,
 ): Promise<SimulationSideResult> {
-  const { readSimulationRecords } = await import("./records");
-  return { ...result, records: await readSimulationRecords() };
+  const { readIntegrityChecks, readSimulationRecords } = await import("./records");
+  // Checked from the shop's records, so they hold whatever the conversation said.
+  const integrity = await readIntegrityChecks();
+  return { ...result, records: await readSimulationRecords(), checks: [...result.checks, ...integrity].slice(-30) };
 }
