@@ -218,6 +218,8 @@ export function Thread({
                 if (name === "search_store_products") {
                   if (part.state === "output-available") {
                     const out = part.output as StoreResult;
+                    // No connected store is not news to the buyer.
+                    if (out.status === "disconnected") return null;
                     return (
                       <Receipt key={index}>
                         {out.status === "ok"
