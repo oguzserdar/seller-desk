@@ -227,6 +227,8 @@ export function useBuyerQuote({ widget, onSessionLost }: { widget: boolean; onSe
     if (lines.length) setCleared({ lines, buyerNote: quote?.buyerNote ?? undefined });
     void send([]);
   }, [currentLines, quote, send]);
+  // An expired quote keeps its lines; sending them again gets current prices and a new validity window.
+  const renew = useCallback(() => void send(currentLines()), [currentLines, send]);
   const undoStartOver = useCallback(() => {
     if (!cleared) return;
     setCleared(null);
@@ -240,5 +242,5 @@ export function useBuyerQuote({ widget, onSessionLost }: { widget: boolean; onSe
     setBusy(null);
   }, [restoreQuote]);
 
-  return { quote, restoreQuote, busy, error, payReady: !widget || Boolean(handoffHref), loadQuote, addOffer, setQuantity, fix, pay, openReview, startOver, undoStartOver: cleared ? undoStartOver : null, reset };
+  return { quote, restoreQuote, busy, error, payReady: !widget || Boolean(handoffHref), loadQuote, addOffer, setQuantity, fix, pay, openReview, startOver, undoStartOver: cleared ? undoStartOver : null, renew, reset };
 }

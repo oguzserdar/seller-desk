@@ -28,6 +28,8 @@ type Props = {
   onStartOver: () => void;
   /** Restores a quote the buyer just emptied, for a few seconds after Start over. */
   onUndoStartOver?: (() => void) | null;
+  /** Gets a fresh quote with the same lines after this one expired. */
+  onRenew?: () => void;
   className?: string;
   /** Where the purchase stands, shown right after the total. */
   standing?: ReactNode;
@@ -97,6 +99,7 @@ export function QuoteSummary({
   onFix,
   onStartOver,
   onUndoStartOver,
+  onRenew,
   className,
   standing,
   titled = true,
@@ -400,12 +403,14 @@ export function QuoteSummary({
           </div>
         ) : null}
         {quote.status === "expired" ? (
-          <Alert
-            tone="info"
-            title={
-              "This quote expired. Change anything to get a fresh one; prices are checked again."
-            }
-          />
+          <div className="flex flex-col gap-2">
+            <Alert tone="info" title="This quote expired. A fresh one checks prices and stock again." />
+            {onRenew ? (
+              <Button type="button" onClick={onRenew} loading={busy === "quote"}>
+                Get a fresh quote
+              </Button>
+            ) : null}
+          </div>
         ) : null}
         {error ? <Alert tone="danger" title={error} /> : null}
         {payable ? (
@@ -448,7 +453,7 @@ export function QuoteSummary({
         ) : null}
         <p className="text-ink-3 flex items-center justify-between gap-3 text-[13px]">
           <span>
-            {open || quote.status === "expired"
+            {open
               ? `Valid until ${new Date(quote.expiresAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
               : null}
           </span>

@@ -310,6 +310,7 @@ export function ShopAssistant({
       onFix={quote.fix}
       onStartOver={quote.startOver}
       onUndoStartOver={quote.undoStartOver}
+      onRenew={quote.renew}
       standing={standing}
     />
   );
