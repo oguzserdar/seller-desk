@@ -126,3 +126,49 @@ export function OfferTile({
     </li>
   );
 }
+
+/**
+ * A compact offer inside a chat reply: small photo, two-line title, price, one
+ * button. Replies show these in a sideways row, as shop assistants commonly do,
+ * so a suggestion never pushes the answer off screen. The button keeps focus
+ * once the offer is in the quote (aria-disabled, not disabled), so keyboard and
+ * screen-reader users stay where they were.
+ */
+export function OfferCard({
+  offer,
+  inQuote,
+  busy,
+  onAdd,
+}: {
+  offer: TileOffer;
+  inQuote: boolean;
+  busy: boolean;
+  onAdd: () => void;
+}) {
+  const stock = availabilityText(offer);
+  const soldOut = stock?.soldOut ?? false;
+  const blocked = soldOut || busy || inQuote;
+  return (
+    <li className="offer-card">
+      <OfferPhoto offer={offer} sizes="176px" className="aspect-[4/3] w-full rounded-[10px]" />
+      <h3 className="mt-2 line-clamp-2 text-[14px] leading-snug font-semibold">{offer.title}</h3>
+      <p className="text-ink-3 mt-0.5 truncate text-[12px]">
+        {stock ? `${stock.text}. ${fulfilmentText(offer)}` : fulfilmentText(offer)}
+      </p>
+      <p className="tabular mt-1 mb-2 text-[14px]">
+        {offer.unitAmountMinor === null ? "Price after review" : formatQuoteAmount(offer.unitAmountMinor, offer.currency)}
+      </p>
+      <Button
+        type="button"
+        size="sm"
+        variant="secondary"
+        className="mt-auto w-full"
+        aria-disabled={blocked || undefined}
+        onClick={blocked ? undefined : onAdd}
+      >
+        {inQuote ? <Check aria-hidden size={15} /> : <Plus aria-hidden size={15} />}
+        {inQuote ? "In your quote" : soldOut ? "Sold out" : offer.unitAmountMinor === null ? "Request a quote" : "Add"}
+      </Button>
+    </li>
+  );
+}

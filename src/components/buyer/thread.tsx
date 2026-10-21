@@ -9,7 +9,7 @@ import { Button } from "@/components/arc/button/button";
 import { Alert } from "@/components/arc/alert/alert";
 import { formatQuoteAmount } from "@/lib/money";
 import type { CatalogLook, ShownOffers } from "@/server/ai/catalog-search";
-import { OfferTile } from "./offer-tile";
+import { OfferCard } from "./offer-tile";
 import { KnowledgeSources, ShopNextStep } from "./shop-knowledge";
 import type { GuideSource, ShopStep } from "@/lib/shop-guide";
 import type { StoreResult } from "@/lib/connected-store";
@@ -303,10 +303,10 @@ export function Thread({
                     <ul
                       key={index}
                       aria-label="Offers the assistant suggests"
-                      className="flex flex-col gap-3"
+                      className="offer-row"
                     >
-                      {shown.offers.map((offer, i) => (
-                        <OfferTile
+                      {shown.offers.map((offer) => (
+                        <OfferCard
                           key={offer.id}
                           offer={offer}
                           inQuote={inQuote(offer.id)}
