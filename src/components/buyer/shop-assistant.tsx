@@ -233,6 +233,7 @@ export function ShopAssistant({
     void sendMessage({ text });
   };
 
+  const [confirmingEnd, setConfirmingEnd] = useState(false);
   const endChat = async () => {
     stop();
     await api("/api/buyer/session/end", { method: "POST", json: {} });
@@ -361,11 +362,22 @@ export function ShopAssistant({
               <ArrowUpRight aria-hidden size={18} />
             </a>
           ) : null}
-          {conversation || quote.quote ? (
+          {(conversation || quote.quote) && confirmingEnd ? (
+            // Ending also ends the buyer's session and quote, so it cannot be undone: ask once, in place.
+            <span role="group" aria-label="End this chat?" className="flex items-center gap-2">
+              <span className="hidden sm:inline">End chat? Your quote clears too.</span>
+              <Button type="button" variant="ghost" onClick={() => { setConfirmingEnd(false); void endChat(); }}>
+                End chat
+              </Button>
+              <Button type="button" variant="ghost" autoFocus onClick={() => setConfirmingEnd(false)}>
+                Keep chatting
+              </Button>
+            </span>
+          ) : conversation || quote.quote ? (
             <Button
               type="button"
               variant="ghost"
-              onClick={() => void endChat()}
+              onClick={() => setConfirmingEnd(true)}
             >
               End chat
             </Button>
