@@ -74,4 +74,17 @@ describe.skipIf(!live)("live personas: the shop's records stay right", () => {
     const quotes = await storedQuotes(f);
     expect(quotes.some((q) => q.lines.length === 1 && q.lines[0]!.offerId === f.goodsId && q.lines[0]!.quantity === 1 && q.totalMinor === Number(offer!.unit_amount_minor)), JSON.stringify(transcript)).toBe(true);
   }, 300_000);
+
+  it("a gift buyer with a firm budget never gets a payable quote above it", async () => {
+    const transcript = await runPersona(f, assistant(), simulator(), {
+      name: "gift budget",
+      persona: "A buyer in a hurry looking for any gift, with a firm limit of $30 total that you state in your first message. Do not ask about details. As soon as anything that fits is offered, say yes and ask for it to be quoted.",
+      goal: "Get one gift quoted for $30 or less.",
+    });
+    const quotes = await storedQuotes(f);
+    expect(quotes.length, JSON.stringify(transcript)).toBeGreaterThan(0);
+    for (const quote of quotes)
+      if (["review_ready", "accepted", "consumed"].includes(quote.status))
+        expect(quote.totalMinor ?? 0, JSON.stringify(transcript)).toBeLessThanOrEqual(3000);
+  }, 300_000);
 });
