@@ -29,7 +29,6 @@ import {
 } from "./runs";
 import { withIsolatedSimulation, type SimulationTarget } from "./scope";
 import { executeSimulationTurn } from "./turn";
-import { judgeOutcome } from "./judge";
 import { withFreshSimulation } from "./trial-database";
 
 /** Trusted operator configuration only. Never accept database destinations from an HTTP body or model. */
@@ -239,18 +238,14 @@ async function executeScenario(
     return { result: await refreshRecords(result), finished: false };
   }
   if (!result) throw new Error("No real turn was executed.");
-  const final = await refreshRecords({
-    ...result,
-    ...simulationTranscript(await loadMessages(conversationId), issued.token),
-    approvals: [...approvals],
-    checks,
-    latencyMs: elapsed,
-  });
-  // Grade against what the seller said should happen, from the final records and conversation.
-  const grader = await getAssistantModel();
-  const verdict = grader.ok ? await judgeOutcome(grader.model, input.expectedOutcome, final) : null;
   return {
-    result: verdict ? { ...final, checks: [...final.checks, verdict].slice(-30) } : final,
+    result: await refreshRecords({
+      ...result,
+      ...simulationTranscript(await loadMessages(conversationId), issued.token),
+      approvals: [...approvals],
+      checks,
+      latencyMs: elapsed,
+    }),
     finished: true,
   };
 }
