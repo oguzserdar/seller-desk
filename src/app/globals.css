@@ -186,9 +186,13 @@ body:has(.shop-active) > [role="note"] { flex: none; }
 .shop-ask-row:not([aria-disabled="true"]):hover { background: var(--color-sunken); }
 .shop-ask-row:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
 .shop-ask-row[aria-disabled="true"] { cursor: default; color: var(--color-ink-3); }
+/* Start-page suggestions: quiet pills, as chat products show example prompts. */
+.shop-suggestion { display: inline-flex; min-height: 40px; align-items: center; padding: 0 16px; border-radius: 999px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line); font-size: 14px; color: var(--color-ink-2); cursor: pointer; transition: background-color 150ms ease, color 150ms ease; }
+.shop-suggestion:hover { background: var(--color-sunken); color: var(--color-ink); }
+.shop-suggestion:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
 /* Pay stays in view at the bottom of the quote panel or sheet while the items above it scroll. */
 .quote-pay { position: sticky; bottom: 0; z-index: 1; margin: 0 -20px; padding: 12px 20px; background: var(--color-surface); box-shadow: 0 -1px 0 var(--color-line); }
-.offer-card { flex: 0 0 176px; display: flex; flex-direction: column; padding: 10px; scroll-snap-align: start; background: var(--color-surface); border-radius: 14px; box-shadow: 0 0 0 1px var(--color-line); }
+.offer-card { flex: 0 0 176px; width: 176px; min-width: 0; overflow: hidden; display: flex; flex-direction: column; padding: 10px; scroll-snap-align: start; background: var(--color-surface); border-radius: 14px; box-shadow: 0 0 0 1px var(--color-line); }
 .shop-composer-dock { flex: none; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 780px; margin: 0 auto; padding: 12px 32px max(24px, env(safe-area-inset-bottom)); background: var(--color-surface); }
 .shop-quote-rail {
   max-height: 100%; overflow-y: auto; padding: 24px; scrollbar-width: thin;

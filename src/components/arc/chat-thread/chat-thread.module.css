@@ -180,7 +180,7 @@
 .pill:active { scale: .97; }
 
 /* Composer. */
-.composer { display: grid; padding: 10px 12px 12px; border-top: 1px solid var(--border-subtle); transition: background-color var(--duration-fast) var(--ease-standard); }
+.composer { display: grid; padding: 10px 12px 12px; transition: background-color var(--duration-fast) var(--ease-standard); }
 .composer[data-dragging] { background: var(--accent-subtle); }
 .trayClip { overflow: hidden; }
 .tray { display: flex; gap: 8px; margin: 0; padding: 8px 8px 10px 4px; overflow-x: auto; list-style: none; scrollbar-width: none; }
@@ -205,18 +205,20 @@
 .attach:active { transform: scale(.94); }
 @media (hover: hover) and (pointer: fine) { .attach:hover { background: var(--surface-muted); color: var(--foreground); } }
 
-/* The field and the send button share one rounded box; the button rides the bottom edge as the text grows. */
+/* One soft rounded box for the field and the send button, lifted by a light shadow rather than a hard outline,
+   as ChatGPT-style composers do; the button rides the bottom edge as the text grows. */
 .box {
   position: relative; display: flex; min-width: 0; flex: 1; align-items: flex-end;
-  border: 1px solid var(--border); border-radius: 21px; background: var(--surface);
-  transition: border-color var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard);
+  border: 1px solid var(--border); border-radius: 24px; background: var(--surface);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / .04), 0 8px 24px -10px oklch(0% 0 0 / .14);
+  transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
 }
-.box:focus-within { border-color: var(--border-strong); }
+.box:focus-within { border-color: var(--border-strong); box-shadow: 0 1px 2px oklch(0% 0 0 / .05), 0 10px 28px -10px oklch(0% 0 0 / .20); }
 .composer[data-dragging] .box { border-color: var(--accent); border-style: dashed; }
-.field { position: relative; min-width: 0; flex: 1; overflow: hidden; border-radius: 20px; }
+.field { position: relative; min-width: 0; min-height: 54px; flex: 1; overflow: hidden; border-radius: 23px; }
 .mirror,
 .textarea {
-  box-sizing: border-box; width: 100%; margin: 0; padding: 9px 6px 9px 16px; border: 0;
+  box-sizing: border-box; width: 100%; margin: 0; padding: 16px 8px 16px 20px; border: 0;
   font: inherit; font-size: var(--text-base); letter-spacing: var(--tracking-body); line-height: 22px;
   overflow-wrap: break-word; white-space: pre-wrap; word-break: break-word;
 }
@@ -225,12 +227,12 @@
 .textarea::placeholder { color: var(--text-muted); }
 
 .send {
-  position: relative; display: grid; width: 32px; height: 32px; flex: none; place-items: center; margin: 0 4px 4px 0; overflow: hidden; padding: 0;
-  border: 0; border-radius: 50%; background: transparent; color: var(--text-muted); cursor: default;
+  position: relative; display: grid; width: 36px; height: 36px; flex: none; place-items: center; margin: 0 9px 9px 0; overflow: hidden; padding: 0;
+  border: 0; border-radius: 50%; background: var(--surface-muted); color: var(--text-muted); cursor: default;
   -webkit-tap-highlight-color: transparent;
   transition: background-color var(--duration-standard) var(--ease-standard), color var(--duration-standard) var(--ease-standard), transform var(--duration-instant) var(--ease-standard);
 }
-.send[data-ready] { background: var(--accent); color: var(--accent-foreground); cursor: pointer; }
+.send[data-ready] { background: var(--foreground); color: var(--background); cursor: pointer; }
 .send[data-ready]:active { transform: scale(.92); }
 .sendIcon { display: grid; grid-area: 1 / 1; place-items: center; }
 

@@ -117,13 +117,13 @@ export function ShopWindow({
               <ul className="mt-3 flex flex-wrap gap-2" aria-label="Try asking">
                 {suggestions.map((text) => (
                   <li key={text}>
-                    <Button
+                    <button
                       type="button"
-                      variant="secondary"
+                      className="shop-suggestion"
                       onClick={() => onSuggestion(text)}
                     >
                       {text}
-                    </Button>
+                    </button>
                   </li>
                 ))}
               </ul>
