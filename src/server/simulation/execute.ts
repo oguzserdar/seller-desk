@@ -6,6 +6,7 @@ import {
 } from "@/lib/simulation";
 import { ensureConversation, loadMessages } from "@/server/ai/conversation";
 import type { LanguageModel } from "ai";
+import { formatMoney } from "@/lib/money";
 import { getAssistantModel } from "@/server/ai/registry";
 import { getDb } from "@/server/db/client";
 import { resolveBuyer, startBuyerSession } from "@/server/domain/buyer-session";
@@ -118,7 +119,9 @@ export async function executeSimulation(
       const operation = async () => {
           const snapshot = simulationSnapshotForSide(row, side);
           const installed = await installSimulationShop(snapshot);
-          const titles = snapshot.products.map((product) => product.title);
+          // Published names with their listed prices, so a simulated customer can, for example, set a budget that bites.
+          const titles = snapshot.products.map((product) =>
+            product.unitAmountMinor === null ? `${product.title} (priced by the shop)` : `${product.title} (${formatMoney(product.unitAmountMinor, product.currency)})`);
           return executeScenario(input, installed, reserveTurn, { model: assistant.model, titles });
         };
       const observed = targets
