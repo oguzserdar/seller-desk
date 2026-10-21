@@ -9,7 +9,8 @@ import { SimulationInput, customerTurns } from "@/lib/simulation";
 import { nextCustomerMessage } from "@/server/simulation/simulated-customer";
 
 const usage = { inputTokens: { total: 1, noCache: 1, cacheRead: 0, cacheWrite: 0 }, outputTokens: { total: 1, text: 1, reasoning: 0 } };
-const writer = (text: string) => new MockLanguageModelV4({ doGenerate: async () => ({ content: [{ type: "text", text }], finishReason: { unified: "stop", raw: "stop" }, usage, warnings: [] }) });
+// The simulator answers in a { message } object, so its reasoning cannot leak into what the customer says.
+const writer = (message: string) => new MockLanguageModelV4({ doGenerate: async () => ({ content: [{ type: "text", text: JSON.stringify({ message }) }], finishReason: { unified: "stop", raw: "stop" }, usage, warnings: [] }) });
 const base = { requestId: crypto.randomUUID(), scenario: "Hello there", expectedOutcome: "Quote at the listed price.", change: { kind: "none" as const } };
 
 describe("simulated customer steps", () => {
@@ -43,6 +44,12 @@ describe("simulated customer steps", () => {
     const system = JSON.stringify(model.doGenerateCalls[0]!.prompt.filter((m) => m.role === "system"));
     expect(system).toContain("only message");
     expect(system).not.toContain("This is your last message.");
+  });
+
+  it("asks the model for the message as structured output, not free text", async () => {
+    const model = writer("Hi there");
+    await nextCustomerMessage(model, "haggler", ["Gift mug"], [], { index: 0, total: 2 });
+    expect(model.doGenerateCalls[0]!.responseFormat).toMatchObject({ type: "json" });
   });
 
   it("fails rather than send an empty customer message", async () => {

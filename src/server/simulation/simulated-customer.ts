@@ -4,7 +4,8 @@
  * so it asks about things the shop sells; it never writes the assistant's side.
  * After LangWatch Scenario's user simulator: short, human messages.
  */
-import { generateText, type LanguageModel, type ModelMessage } from "ai";
+import { generateText, Output, type LanguageModel, type ModelMessage } from "ai";
+import { z } from "zod";
 import { PERSONAS, type PersonaId } from "@/lib/simulation-personas";
 import type { SimulationSideResult } from "@/lib/simulation";
 
@@ -24,7 +25,7 @@ const instructions = (persona: PersonaId, titles: string[], at: Position) => [
   `The shop sells: ${titles.slice(0, 40).join("; ") || "(no published offers)"}. Only ask about these.`,
   `<persona>${PERSONAS[persona].brief}</persona>`,
   position(at),
-  "Reply with only your next message to the assistant.",
+  "Put only your next message to the assistant in the message field: no notes, reasoning or quotation marks.",
 ].join("\n");
 
 /** The customer's next message, given the conversation so far. */
@@ -33,13 +34,15 @@ export async function nextCustomerMessage(model: LanguageModel, persona: Persona
   const seen: ModelMessage[] = transcript
     .filter((line) => line.role !== "seller")
     .map((line) => ({ role: line.role === "user" ? "assistant" : "user", content: line.text }));
-  const { text } = await generateText({
+  // Structured output keeps the model's own reasoning out of what the customer says.
+  const { output } = await generateText({
     model,
     instructions: instructions(persona, titles, at),
     messages: seen.length ? seen : [{ role: "user", content: "(The chat is open. Send your first message.)" }],
-    maxOutputTokens: 300, maxRetries: 0, timeout: 30_000,
+    output: Output.object({ schema: z.object({ message: z.string() }), name: "customer_message" }),
+    maxOutputTokens: 400, maxRetries: 0, timeout: 30_000,
   });
-  const message = text.trim().slice(0, 2000);
+  const message = output.message.trim().slice(0, 2000);
   if (!message) throw new Error("The simulated customer wrote nothing.");
   return message;
 }
