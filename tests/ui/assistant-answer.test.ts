@@ -2,8 +2,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { AssistantAnswer } from "../../src/components/assistant/conversation";
+import { MessageResponse } from "../../src/components/assistant/internal/message-response";
 
-const render = (text: string, streaming = false) => renderToStaticMarkup(createElement(AssistantAnswer, { text, streaming }));
+const render = (text: string, streaming = false) => renderToStaticMarkup(createElement(MessageResponse, { text, streaming }));
 
 describe("untrusted assistant prose", () => {
   it("renders lists and emphasis without flattening the answer", () => {
@@ -32,5 +33,13 @@ describe("untrusted assistant prose", () => {
     const html = render("Here is **your answer", true);
     expect(html).toContain("your answer");
     expect(html).not.toMatch(/<script|<iframe/);
+  });
+});
+
+describe("answer before the Markdown renderer has loaded", () => {
+  it("shows the words as escaped plain text, never as links or markup", () => {
+    const html = renderToStaticMarkup(createElement(AssistantAnswer, { text: "[Pay here](https://untrusted.example/pay) <script>alert(1)</script>" }));
+    expect(html).toContain("Pay here");
+    expect(html).not.toMatch(/<a[\s>]|href=|<script/i);
   });
 });
