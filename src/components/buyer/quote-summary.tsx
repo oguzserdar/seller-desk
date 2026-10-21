@@ -221,7 +221,7 @@ export function QuoteSummary({
                 : "text-ink-3",
             )}
           >
-            {QUOTE_STATUS[quote.status]?.label ?? quote.status}
+            {needsDetails ? "Needs details" : (QUOTE_STATUS[quote.status]?.label ?? quote.status)}
           </span>
         )}
       </div>
@@ -337,6 +337,11 @@ export function QuoteSummary({
             tone="warning"
             title={item.message}
           >
+            {item.code === "details_needed" && describeInChat && onDescribe ? (
+              <Button type="button" variant="secondary" className="mt-2" onClick={onDescribe}>
+                Describe the work
+              </Button>
+            ) : null}
             {item.code === "delivery_not_offered" ? (
               <Button
                 type="button"
@@ -371,14 +376,7 @@ export function QuoteSummary({
                   <p className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">{quote.buyerNote}</p>
                 </>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <p className="text-ink-2">Tell the assistant about the job. It sends the request to the shop.</p>
-                  {onDescribe ? (
-                    <Button variant="secondary" type="button" onClick={onDescribe}>
-                      Describe the work
-                    </Button>
-                  ) : null}
-                </div>
+                needsDetails ? null : <p className="text-ink-2">Tell the assistant about the job. It sends the request to the shop.</p>
               )}
             </div>
           ) : (

@@ -27,6 +27,7 @@ it("names the missing description as the total and offers a way to give it", asy
       onQuantity: () => {}, onPay: () => {}, onReviewPayment: () => {}, onFix: () => {}, onStartOver: () => {}, describeInChat: true, onDescribe })));
     expect(container.textContent).toContain("Needs details");
     expect(container.textContent).not.toContain("Awaiting quote");
+    expect(container.textContent).not.toContain("Needs a change");
     const describe = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Describe the work");
     expect(describe).toBeDefined();
     await act(async () => describe!.click());

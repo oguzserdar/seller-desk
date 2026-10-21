@@ -24,6 +24,7 @@ type QuoteToolOutput = {
   totalMinor?: number | null;
   currency?: string;
   lines?: { quantity: number }[];
+  unresolved?: { code: string }[];
 };
 
 function Searching({ shopName }: { shopName: string }) {
@@ -540,10 +541,9 @@ export function Thread({
                         <span>
                           Quote updated: {items}{" "}
                           {items === 1 ? "item" : "items"},{" "}
-                          {formatQuoteAmount(
-                            out.totalMinor,
-                            out.currency ?? "USD",
-                          )}
+                          {out.unresolved?.some((item) => item.code === "details_needed")
+                            ? "needs your description"
+                            : formatQuoteAmount(out.totalMinor, out.currency ?? "USD")}
                         </span>
                         <Button
                           type="button"
