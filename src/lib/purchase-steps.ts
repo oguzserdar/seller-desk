@@ -22,6 +22,8 @@ export type PurchaseStepsInput = {
   policy: Pick<PolicySnapshot, "pickupPolicy" | "serviceRequestPolicy" | "digitalAccessPolicy">;
   payment: { state: string } | null;
   order: { number: number; tasks?: Task[] } | null;
+  /** Why the quote cannot be priced yet; a missing description is the buyer's next step, not the shop's. */
+  unresolved?: { code: string }[];
 };
 
 const STOPPED: Record<string, string> = { expired: "Quote expired", cancelled: "Quote cancelled", replaced: "Replaced by a newer quote" };
@@ -45,6 +47,13 @@ const TASK_STEP: Record<string, { kind: OfferKind; done: string; open: string; a
 export function purchaseSteps(quote: PurchaseStepsInput): PurchaseStep[] {
   const paid = quote.order !== null;
   const titles = quote.lines.map((line) => line.title).join(", ");
+  // Custom work goes to the shop only with a description, so until then the request is the buyer's to finish.
+  if (quote.status === "needs_information" && quote.unresolved?.some((item) => item.code === "details_needed"))
+    return [
+      { key: "request", label: "Describe the work", detail: "Tell the assistant what the job is. Then it goes to the shop.", state: "attention", value: null },
+      { key: "priced", label: "Shop prices it", detail: "You see the price before you pay", state: "todo", value: null },
+      { key: "paid", label: "Not paid yet", detail: null, state: "todo", value: null },
+    ];
   const steps: PurchaseStep[] = [{ key: "request", label: "Request sent", detail: titles || null, state: "done", value: null }];
 
   if (STOPPED[quote.status]) {

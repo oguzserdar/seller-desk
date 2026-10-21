@@ -41,6 +41,13 @@ describe("purchase steps", () => {
     expect(states({ ...repair, status: "needs_information", totalMinor: null, order: null, payment: null })[1]).toBe("priced:stopped");
   });
 
+  it("a request missing its description asks the buyer for it instead of claiming it was sent", () => {
+    const steps = purchaseSteps({ ...repair, status: "needs_information", totalMinor: null, order: null, payment: null, unresolved: [{ code: "details_needed" }] });
+    expect(steps[0]).toMatchObject({ key: "request", label: "Describe the work", state: "attention" });
+    expect(steps[1]).toMatchObject({ key: "priced", label: "Shop prices it", state: "todo" });
+    expect(steps.map((step) => step.label)).not.toContain("Request sent");
+  });
+
   it("after payment each next step follows the order's own task: a delivered download is done, not waiting", () => {
     const download: PurchaseStepsInput = { ...repair, lines: [{ kind: "digital", title: "Home brake care guide", fulfillmentNote: "" }], approvedScope: null,
       policy: { pickupPolicy: null, serviceRequestPolicy: null, digitalAccessPolicy: "Your download link works for 30 days." },
