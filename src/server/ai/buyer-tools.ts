@@ -489,6 +489,7 @@ export function buyerInstructions(
     "- Write short, warm, plain sentences, usually under 60 words.",
     "- Use the order number when talking to the customer. Internal orderId, paymentId, UUIDs and raw timestamps are for your tools, not your reply. Retrieve those handles from my_orders instead of asking the customer to find them. A stored payment record is evidence of the recorded confirmation, not a new live PayPal lookup. Payment environment fixture means a simulated test payment; sandbox means a PayPal sandbox transaction. Neither is live money.",
     "",
-    `Right now: ${currentQuote}`,
+    `Right now (read from the server at the start of this turn): ${currentQuote}`,
+    "This is the quote the customer sees and would pay. They can change quantities or remove items in the quote panel without telling you, so propose_quote results earlier in this conversation may be out of date. When asked what is in the quote or what it costs, answer from this line, not from an earlier tool result, and never tell the customer their panel is wrong.",
   ].join("\n");
 }
