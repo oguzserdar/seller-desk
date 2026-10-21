@@ -4,7 +4,7 @@ import { newStorageFixture, type StorageFixture } from "../support/storage-fixtu
 
 // Storage fixtures only. No model is invoked.
 for (const dialect of ["postgres", "d1"] as const)
-  describe(`${dialect}: Stop frees the buyer's turn`, () => {
+  describe(`${dialect}: Stop frees the running turn`, () => {
     let f: StorageFixture, p: ReturnType<typeof conversationStorage>;
     beforeEach(async () => {
       f = await newStorageFixture(dialect);
@@ -26,5 +26,17 @@ for (const dialect of ["postgres", "d1"] as const)
       expect(next).toBeTruthy();
       await p.releaseTurn(running!);
       expect(await p.claimTurn(f.buyer, id)).toBeUndefined();
+    });
+
+    it("frees the owner's desk turn on Stop, and the stopped answer cannot be saved", async () => {
+      const input = (text: string) => ({ id: crypto.randomUUID(), role: "user" as const, parts: [{ type: "text" as const, text }] });
+      const running = await p.beginOwnerTurn(f.owner, input("Show my open orders"));
+      await expect(p.beginOwnerTurn(f.owner, input("And today's payments"))).rejects.toMatchObject({ code: "conflict" });
+
+      await p.stopOwnerTurn(f.owner);
+
+      const next = await p.beginOwnerTurn(f.owner, input("And today's payments"));
+      expect(next.id).not.toBe(running.id);
+      await expect(p.completeOwnerTurn(running, [])).rejects.toThrow();
     });
   });

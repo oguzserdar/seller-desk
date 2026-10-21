@@ -215,6 +215,12 @@ export function createD1OwnerConversationStorage(db: D1Db) {
         throw error;
       }
     },
+    async stopOwnerTurn(owner: OwnerPrincipal): Promise<void> {
+      await db
+        .update(ownerConversation)
+        .set({ activeTurnId: null, activeTurnExpiresAt: null })
+        .where(scope(owner));
+    },
     async releaseOwnerTurn(claim: OwnerTurn): Promise<void> {
       await db
         .update(ownerConversation)

@@ -221,6 +221,20 @@ export async function completeOwnerTurn(
 }
 
 /** Releases failed or stopped turns without inventing a completed answer. */
+/**
+ * Ends the owner's running answer when they press Stop, so the desk chat is
+ * free at once instead of after the lease; the old worker can no longer commit.
+ */
+export async function stopOwnerTurn(owner: OwnerPrincipal): Promise<void> {
+  const backend = getStorage();
+  if (backend.kind === "d1") return backend.ownerChat.stopOwnerTurn(owner);
+
+  await getDb()
+    .update(ownerConversation)
+    .set({ activeTurnId: null, activeTurnExpiresAt: null })
+    .where(scope(owner));
+}
+
 export async function releaseOwnerTurn(claim: OwnerTurn): Promise<void> {
   const backend = getStorage();
   if (backend.kind === "d1") return backend.ownerChat.releaseOwnerTurn(claim);
