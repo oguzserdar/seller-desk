@@ -93,4 +93,18 @@ describe("server guards hold whatever the model asks for", () => {
     expect(quote!.status).toBe("seller_review");
     expect(quote!.total_minor).toBeNull();
   });
+
+  it("refuses an offer the seller has not published", async () => {
+    await f.query("UPDATE offer SET published=0 WHERE id=?", [f.goodsId]);
+    const result = await turn("Add one of these", [quoteRequest(f.goodsId, 1), { text: "Done." }]);
+    expect(toolOutputs(result)[0]?.error).toBeTruthy();
+    expect(await storedQuantities()).toEqual([]);
+  });
+
+  it("refuses two of a one-of-a-kind item", async () => {
+    await f.query("UPDATE offer SET max_quantity=1 WHERE id=?", [f.goodsId]);
+    const result = await turn("I want two of the one-of-a-kind piece", [quoteRequest(f.goodsId, 2), { text: "Done." }]);
+    expect(toolOutputs(result)[0]?.error).toMatch(/up to 1/);
+    expect(await storedQuantities()).toEqual([]);
+  });
 });
