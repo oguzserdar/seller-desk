@@ -5,13 +5,8 @@
  */
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { MockLanguageModelV4 } from "ai/test";
-import { buyerAgent } from "@/server/ai/buyer-agent";
-import { ensureConversation } from "@/server/ai/conversation";
-import { claimTurn } from "@/server/ai/turn-control";
-import { getSeller } from "@/server/domain/seller";
-import { withD1Database } from "@/server/request-scope";
-import { createD1Db } from "@/server/storage/d1/client";
 import { newStorageFixture, type StorageFixture } from "../support/storage-fixture";
+import { runBuyerTurn } from "../support/eval-shop";
 
 type Step = { tool: string; input: Record<string, unknown> } | { text: string };
 
@@ -34,15 +29,8 @@ let f: StorageFixture;
 beforeEach(async () => { f = await newStorageFixture("d1"); });
 afterEach(async () => { await f?.close(); });
 
-/** Runs one buyer turn with the stand-in inside the fixture's isolated SQLite shop. */
-async function turn(prompt: string, script: Step[]) {
-  return withD1Database(createD1Db(f.binding!), async () => {
-    const id = await ensureConversation(f.buyer);
-    const assistantTurn = (await claimTurn(f.buyer, id))!;
-    const agent = buyerAgent(standIn(script), { ...f.buyer, assistantTurn }, (await getSeller())!, "No purchase yet.", "", { requireFirstTool: false });
-    return agent.generate({ prompt });
-  });
-}
+/** Runs one buyer turn with the scripted stand-in. */
+const turn = (prompt: string, script: Step[]) => runBuyerTurn(f, standIn(script), prompt, { requireFirstTool: false });
 
 const quoteRequest = (offerId: string, quantity: number) => ({ tool: "propose_quote", input: { mode: "replace", lines: [{ offerId, quantity }], budgetMinor: null, deliveryRequested: false, buyerNote: null } });
 const toolOutputs = (result: Awaited<ReturnType<typeof turn>>) => result.steps.flatMap((step) => step.toolResults.map((r) => r.output as { error?: string }));
