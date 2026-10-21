@@ -80,7 +80,9 @@ export function OwnerShell({
       <SidebarInset
         id="main"
         tabIndex={-1}
-        className="min-w-0 overflow-hidden outline-none"
+        // clip, not hidden: a hidden frame still scrolls when a focused field is brought into view,
+        // which slid the header under the sandbox banner. Only the inner panel below scrolls.
+        className="min-w-0 overflow-clip outline-none"
       >
         <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line px-4">
           <SidebarTrigger />
