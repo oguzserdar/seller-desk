@@ -19,9 +19,11 @@ export function pollDelay(sellerOwned: boolean, idleMs: number): number {
 }
 
 /** Follows durable ownership while streaming and clears revoked, unfinished AI output. */
-export function useConversationSync({ ready, messages, status, stop, clearError, setMessages, setHandoff }: {
+export function useConversationSync({ ready, messages, status, stop, clearError, setMessages, setHandoff, waitingOnShop = false }: {
   ready: boolean; messages: UIMessage[]; status: ChatStatus; stop: () => Promise<void>; clearError: () => void;
   setMessages: (messages: UIMessage[]) => void; setHandoff: (value: SellerHandoff | null) => void;
+  /** A question is with the shop: keep checking while the page is hidden, so the reply can be announced. */
+  waitingOnShop?: boolean;
 }) {
   const [control, setControl] = useState<ConversationControl | null>(null);
   const [savedReply, setSavedReply] = useState<{ state: BuyerReplyState; messageId?: string }>({ state: "idle" });
@@ -59,12 +61,13 @@ export function useConversationSync({ ready, messages, status, stop, clearError,
   }, [ready, stop, clearError, setMessages, setHandoff]);
   const active = messages.length > 0 || control?.handler === "seller";
   const lastActivity = useRef(Date.now());
+  const waiting = useRef(waitingOnShop); waiting.current = waitingOnShop;
   useEffect(() => { lastActivity.current = Date.now(); }, [messages.length, status, control?.handler]);
   useEffect(() => {
     if (!ready || !active) return;
     let cancelled = false; let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
-      if (!cancelled && document.visibilityState === "visible") await refresh();
+      if (!cancelled && (document.visibilityState === "visible" || waiting.current)) await refresh();
       if (!cancelled) timer = setTimeout(poll, pollDelay(current.current.control?.handler === "seller", Date.now() - lastActivity.current));
     };
     const visible = () => { if (document.visibilityState === "visible") void refresh(); };

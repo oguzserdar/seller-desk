@@ -341,3 +341,11 @@ body:has(> [role="note"]) { --banner-h: 33px; }
 @layer base {
   .desk-theme *, .desk-theme ::before, .desk-theme ::after { border-color: var(--border); }
 }
+
+/* A question handed to the shop owner: a sent message with a live waiting state. */
+.shop-handoff { max-width: 620px; padding: 14px 16px; border-radius: 14px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line); }
+.shop-handoff-avatar { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 999px; background: var(--color-brand); color: var(--color-on-brand); font-size: 14px; font-weight: 600; }
+.shop-handoff-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--color-brand); animation: shop-handoff-pulse 1.6s ease-in-out infinite; }
+.shop-handoff-question { margin-top: 10px; padding-left: 12px; box-shadow: inset 2px 0 0 var(--color-line-strong); color: var(--color-ink-2); font-size: 15px; line-height: 1.45; overflow-wrap: anywhere; }
+@keyframes shop-handoff-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .shop-handoff-dot { animation: none; } }

@@ -1,7 +1,7 @@
 "use client";
 
 import { isToolUIPart, type ChatStatus, type UIMessage } from "ai";
-import { Clock, ReceiptText } from "lucide-react";
+import { ReceiptText } from "lucide-react";
 import { isValidElement, type ReactNode } from "react";
 import { sellerReplyOf } from "@/lib/conversation-messages";
 import { AssistantAnswer } from "@/components/assistant/conversation";
@@ -10,6 +10,7 @@ import { Alert } from "@/components/arc/alert/alert";
 import { formatQuoteAmount } from "@/lib/money";
 import type { CatalogLook, ShownOffers } from "@/server/ai/catalog-search";
 import { OfferCard } from "./offer-tile";
+import { ShopQuestionSent } from "./shop-handoff";
 import { KnowledgeSources, ShopNextStep } from "./shop-knowledge";
 import type { GuideSource, ShopStep } from "@/lib/shop-guide";
 import type { StoreResult } from "@/lib/connected-store";
@@ -369,38 +370,13 @@ export function Thread({
                           Could not send your question to the shop
                         </Receipt>
                       );
-                    return waitingOnShop ? (
-                      <div
+                    return (
+                      <ShopQuestionSent
                         key={index}
-                        role="status"
-                        className="enter bg-surface max-w-[620px] rounded-[12px] px-4 py-3.5 shadow-[0_0_0_1px_var(--color-line)]"
-                      >
-                        <p className="flex items-center gap-2 text-[15px] font-semibold">
-                          <Clock
-                            aria-hidden
-                            className="text-ink-3 size-4 shrink-0"
-                          />
-                          Waiting for {shopName}
-                        </p>
-                        <p className="text-ink-2 mt-1.5 text-[14px] [overflow-wrap:anywhere] leading-snug">
-                          {out.question}
-                        </p>
-                        <p className="text-ink-3 mt-2 text-[13px]">
-                          Their answer will appear here. You can keep browsing.
-                        </p>
-                      </div>
-                    ) : (
-                      <div
-                        key={index}
-                        className="enter bg-surface max-w-[620px] rounded-[12px] px-4 py-3 shadow-[0_0_0_1px_var(--color-line)]"
-                      >
-                        <p className="text-ink-3 text-[13px] font-medium">
-                          Asked {shopName}
-                        </p>
-                        <p className="mt-1 text-[15px] leading-snug">
-                          {out.question}
-                        </p>
-                      </div>
+                        shopName={shopName}
+                        question={out.question}
+                        waiting={waitingOnShop}
+                      />
                     );
                   }
                   if (part.state === "output-error")

@@ -19,13 +19,16 @@ const thread = (waitingOnShop: boolean) => renderToStaticMarkup(createElement(Th
 describe("waiting on the shop", () => {
   it("turns the question into one wait card while the shop has not answered", () => {
     const html = thread(true);
-    expect(html).toContain("Waiting for Spoke Street Cycles");
+    expect(html).toContain("Asked Spoke Street Cycles");
+    expect(html).toContain("Waiting for the owner");
+    expect(html).toContain("close the page and come back");
     expect(html).toContain('role="status"');
     expect(html).toContain("Can you replace a frayed front brake cable by Tuesday?");
   });
   it("keeps the question as a plain record once the shop has answered", () => {
     const html = thread(false);
     expect(html).not.toContain("Waiting for");
+    expect(html).not.toContain("come back");
     expect(html).toContain("Asked Spoke Street Cycles");
   });
   it("does not repeat the wait above the conversation", () => {
