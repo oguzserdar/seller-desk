@@ -277,7 +277,10 @@ export function ShopAssistant({
   }
 
   // Requested, priced, paid and what the shop owes next, read from the quote's own records.
-  const standing = quote.quote ? (
+  // A quote that is ready to pay says all it needs in its lines and Pay button, as checkouts do;
+  // the steps appear while the shop is pricing, when something stops, and after payment.
+  const readyToPay = quote.quote?.status === "review_ready" && !quote.quote.order;
+  const standing = quote.quote && !readyToPay ? (
     // Rendered in both the desktop panel and the phone sheet, so it is named by aria-label, not by an id.
     <section aria-label="Where it stands" className="pt-1">
       <h2 className="text-ink-3 text-[13px] font-medium">Where it stands</h2>
