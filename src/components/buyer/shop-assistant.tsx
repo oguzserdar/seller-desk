@@ -500,12 +500,11 @@ export function ShopAssistant({
                 <ul className="mt-2 flex flex-col">
                   {offers.slice(0, 4).map((offer) => (
                     <li key={offer.id}>
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        disabled={streaming}
-                        onClick={() => ask(`Tell me about the ${offer.title}`)}
-                        className="w-full"
+                        aria-disabled={streaming || undefined}
+                        onClick={streaming ? undefined : () => ask(`Tell me about the ${offer.title}`)}
+                        className="shop-ask-row"
                       >
                         <OfferPhoto
                           offer={offer}
@@ -523,7 +522,7 @@ export function ShopAssistant({
                                 offer.currency,
                               )}
                         </span>
-                      </Button>
+                      </button>
                     </li>
                   ))}
                 </ul>
