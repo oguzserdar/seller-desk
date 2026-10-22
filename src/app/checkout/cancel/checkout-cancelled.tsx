@@ -26,15 +26,19 @@ export function CheckoutCancelled() {
     });
   }, [attemptId]);
 
+  // Once the checkout is closed, the choices below no longer exist and PaymentStatus links back to the shop itself.
+  const open = !view || view.next.includes("approve_in_paypal") || view.next.includes("cancel_checkout");
   return (
     <div className="flex flex-col gap-5">
       <h1 className="page-title">You left PayPal before paying</h1>
-      <p className="text-ink-2">You have not been charged. You can go back to PayPal, or cancel this checkout so the items return to the shop.</p>
+      {open ? <p className="text-ink-2">You have not been charged. You can go back to PayPal, or cancel this checkout so the items return to the shop.</p> : null}
       {problem ? <Alert tone="warning" title={problem} /> : null}
       {view ? <PaymentStatus view={view} onChange={setView} /> : null}
-      <LinkButton href="/buy" variant="secondary" className="self-start">
-        Back to the shop
-      </LinkButton>
+      {view?.next.includes("requote") ? null : (
+        <LinkButton href="/buy" variant="secondary" className="self-start">
+          Back to the shop
+        </LinkButton>
+      )}
     </div>
   );
 }
