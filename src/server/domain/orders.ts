@@ -93,7 +93,8 @@ export function describeTask(
     if (task.state === "completed")
       return {
         label: "Service time confirmed",
-        detail: "The shop recorded the confirmed time.",
+        // Orders confirmed before the agreed time was shared keep the general wording.
+        detail: task.details?.confirmedTime ? `Agreed with the shop: ${task.details.confirmedTime}` : "The shop recorded the confirmed time.",
         tone: "success",
       };
     return {
@@ -408,7 +409,7 @@ export async function recordServiceFollowUp(
         state: input.timeConfirmed ? "completed" : "in_progress",
         completedAt: input.timeConfirmed ? new Date() : null,
         revision: sql`${fulfillmentTask.revision} + 1`,
-        details: { ...task.details, followUps },
+        details: { ...task.details, followUps, ...(input.timeConfirmed ? { confirmedTime: input.note } : {}) },
       })
       .where(
         and(

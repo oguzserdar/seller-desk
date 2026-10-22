@@ -75,7 +75,7 @@ export function TaskActions({ orderId, task, accessReview }: { orderId: string; 
       ) : null}
       {task.type === "service_followup" ? (
         <form className="flex flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
-          <Textarea label="What did you agree with the buyer?" description="For example: “Called, drop-off Saturday 10:00.” Only mark the time confirmed once the buyer agreed." id={`follow-${task.id}`} rows={2} value={note} onChange={(e) => editNote(e.target.value)} maxLength={500} />
+          <Textarea label="What did you agree with the buyer?" description="For example: “Called, drop-off Saturday 10:00.” Only mark the time confirmed once the buyer agreed; your buyer then sees this note on their order." id={`follow-${task.id}`} rows={2} value={note} onChange={(e) => editNote(e.target.value)} maxLength={500} />
           <div className="flex flex-wrap gap-3">
             <Button
               type="button"

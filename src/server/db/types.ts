@@ -91,6 +91,8 @@ export type StoredMessagePart =
 export type TaskDetails = {
   /** Seller's account of delivered work, visible to this order's buyer. */
   completionNote?: string;
+  /** The note recorded with "Time confirmed": the agreed time, shown to the buyer. Follow-up notes stay private. */
+  confirmedTime?: string;
   /** Work can finish without a separately recorded appointment. Never implies a booking. */
   closedBecauseWorkCompleted?: boolean;
   pickupNote?: string;

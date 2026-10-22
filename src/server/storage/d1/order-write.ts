@@ -128,7 +128,7 @@ export function createD1OrderWrites(db: D1Db) {
               state: input.timeConfirmed ? "completed" : "in_progress",
               completedAt: input.timeConfirmed ? new Date() : null,
               revision: task.revision + 1,
-              details: { ...task.details, followUps },
+              details: { ...task.details, followUps, ...(input.timeConfirmed ? { confirmedTime: input.note } : {}) },
             })
             .where(eq(fulfillmentTask.id, task.id))
             .returning(),
