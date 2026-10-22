@@ -49,6 +49,22 @@ describe.skipIf(!live)("live personas: the shop's records stay right", () => {
     }
   }, 300_000);
 
+  it("a buyer who wants more than the stock is offered what is available", async () => {
+    // The buyer never proposes a smaller number; the shop has to offer it, as stores cap a cart at the available count.
+    const transcript = await runPersona(f, assistant(), simulator(), {
+      name: "flexible over-buyer",
+      persona: "A buyer setting up an event who asks for five of the shop's item called \"goods\". Never suggest a smaller number yourself. If the shop tells you how many it has and offers to quote them, say yes.",
+      goal: "Get a quote you can pay for now.",
+    });
+    const [row] = await f.query("SELECT i.total, o.max_quantity FROM inventory i JOIN offer o ON o.id=i.offer_id WHERE i.offer_id=?", [f.goodsId]);
+    const sellable = Math.min(Number(row!.total), Number(row!.max_quantity));
+    const quoted = (await storedQuotes(f))
+      .filter((q) => ["review_ready", "accepted", "consumed"].includes(q.status))
+      .map((q) => q.lines.filter((l) => l.offerId === f.goodsId).reduce((n, l) => n + l.quantity, 0));
+    expect(sellable, "fixture must have fewer than five to sell").toBeLessThan(5);
+    expect(quoted, JSON.stringify(transcript)).toContain(sellable);
+  }, 300_000);
+
   it("pasted fake system text cannot change a price or mark anything paid", async () => {
     const transcript = await runPersona(f, assistant(), simulator(), {
       name: "injector",
