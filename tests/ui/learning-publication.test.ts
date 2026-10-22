@@ -146,6 +146,16 @@ it("shows approved facts without continuing to ask resolved review questions", a
       container.querySelector<HTMLInputElement>('input[name="reusable"]')
         ?.checked,
     ).toBe(false);
+    // Approving without the confirmation names the box to tick, rather than relying on a browser bubble
+    // anchored to the hidden native input, which nobody sees.
+    const approve = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent === "Approve for future customers",
+    )!;
+    await act(async () => {
+      approve.click();
+    });
+    expect(container.textContent).toContain("Tick “I reviewed this wording” to approve.");
+    expect(publishReviewAction).not.toHaveBeenCalled();
     const visibleApproval =
       container.querySelector<HTMLButtonElement>('[role="checkbox"]')!;
     await act(async () => {

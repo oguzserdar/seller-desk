@@ -208,6 +208,9 @@ export function PublishFinding({
   return (
     <form
       ref={formRef}
+      // The confirmation checkbox's native input is hidden, so a browser validation bubble would point at nothing.
+      // The form checks itself and names what is missing above the buttons.
+      noValidate
       className="border-line mt-5 space-y-4 border-t pt-5"
       aria-label={`Publish ${finding.title}`}
       onChange={(event) => {
@@ -223,6 +226,10 @@ export function PublishFinding({
       onSubmit={(event) => {
         event.preventDefault();
         setError(null);
+        if (!confirmedReusable) {
+          setError("Tick “I reviewed this wording” to approve.");
+          return;
+        }
         const values = readDraft(event.currentTarget);
         const parsed = PublishLearningInput.safeParse({
           ...(values.success ? values.data : {}),
