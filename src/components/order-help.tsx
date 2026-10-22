@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ORDER_FOLLOWUP_LABEL, type OrderFollowupView } from "@/lib/order-followup";
 import { Alert } from "@/components/arc/alert/alert";
 import { Textarea } from "@/components/arc/textarea/textarea";
@@ -26,6 +26,8 @@ export function OrderHelp({ audience, view, onSend, onRefresh }: {
   const canWrite = buyer || view.state === "needs_help";
   const heading = buyer ? ORDER_FOLLOWUP_LABEL[view.state] : view.state === "needs_help" ? "Your customer needs help" : view.state === "awaiting_customer" ? "Waiting for your customer" : view.state === "confirmed" ? "Customer confirmed this problem is resolved" : "No customer problem reported";
 
+  useReplyWatch(buyer && view.state === "needs_help", view.state, onRefresh);
+
   async function run(operation: () => Promise<void>, clearDraft: boolean) {
     if (inFlight.current) return;
     inFlight.current = true; setBusy(true); setError(null);
@@ -46,7 +48,7 @@ export function OrderHelp({ audience, view, onSend, onRefresh }: {
         <p className="text-ink mt-1 whitespace-pre-wrap break-words text-[15px]">{item.state === "confirmed" ? "Confirmed this problem is resolved." : item.message}</p>
       </li>)}
     </ol> : <p className="text-ink-2 mt-2 text-[15px]">{buyer ? "Tell the shop what went wrong. Your purchase stays attached, so you do not need to explain it again." : "The customer can ask for help from their receipt."}</p>}
-    {view.state === "needs_help" && buyer ? <p className="text-ink-2 mt-3 text-[14px]">Your message is saved for the shop. Return to this order to check for a reply.</p> : null}
+    {view.state === "needs_help" && buyer ? <p className="text-ink-2 mt-3 text-[14px]">Your message is saved for the shop. Their reply appears here, so you can also close this page and come back to this order later.</p> : null}
     {view.state === "awaiting_customer" && !buyer ? <p className="text-ink-2 mt-3 text-[14px]">Your reply is saved on their receipt. The customer has not confirmed a resolution.</p> : null}
     {draft ? <form className="mt-4 flex flex-col gap-3" onSubmit={event => {
       event.preventDefault();
@@ -68,4 +70,40 @@ export function OrderHelp({ audience, view, onSend, onRefresh }: {
     {buyer && view.state !== "none" ? <p className="text-ink-3 mt-2 text-[13px]">Confirming this problem does not change payment, delivery or your right to ask for help again.</p> : null}
     {error ? <div className="mt-3"><Alert tone="danger" title={error} /></div> : null}
   </section>;
+}
+
+/**
+ * While a buyer waits on the shop, checks for the reply on its own: every 15 s at first,
+ * then once a minute, and once a minute while the tab is hidden. A reply that lands
+ * while the buyer is on another tab puts "(1)" in the title until they return.
+ */
+function useReplyWatch(waiting: boolean, state: string, refresh: () => Promise<void>) {
+  const latest = useRef(refresh);
+  latest.current = refresh;
+  const wasWaiting = useRef(waiting);
+  useEffect(() => {
+    if (!waiting) return;
+    const started = Date.now();
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      const delay = document.hidden || Date.now() - started > 120_000 ? 60_000 : 15_000;
+      timer = setTimeout(async () => {
+        // A failed check is retried on the next tick; the manual button still reports errors.
+        await latest.current().catch(() => undefined);
+        tick();
+      }, delay);
+    };
+    tick();
+    return () => clearTimeout(timer);
+  }, [waiting]);
+  useEffect(() => {
+    const arrived = wasWaiting.current && !waiting && state === "awaiting_customer";
+    wasWaiting.current = waiting;
+    if (!arrived || !document.hidden) return;
+    const base = document.title;
+    document.title = `(1) ${base}`;
+    const back = () => { if (!document.hidden) { document.title = base; document.removeEventListener("visibilitychange", back); } };
+    document.addEventListener("visibilitychange", back);
+    return () => { document.removeEventListener("visibilitychange", back); document.title = base; };
+  }, [waiting, state]);
 }
