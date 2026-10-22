@@ -10,10 +10,12 @@ import { DomainError } from "@/server/domain/errors";
 import { describeTask, ownerStep, getOwnerOrder } from "@/server/domain/orders";
 import { TaskActions } from "./task-actions";
 import { OwnerOrderHelp } from "./order-help";
+import { LocalTime } from "@/components/local-time";
 
 export const metadata: Metadata = { title: "Order" };
 
-const WHEN = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+const WHEN: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" };
+const DAY: Intl.DateTimeFormatOptions = { year: "numeric", month: "numeric", day: "numeric" };
 
 /** Each independent check of PayPal's record, in plain words. */
 const CHECK_WORDS: Record<string, string> = {
@@ -47,7 +49,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
           <h1 className="text-[34px] leading-tight font-semibold tracking-[-0.025em]">Order #{order.number}</h1>
           <p className="text-ink-2 mt-1">
             {order.buyerName ?? "Buyer"}
-            {order.buyerEmail ? `, ${order.buyerEmail}` : ""}. Paid {WHEN.format(order.paidAt)}.
+            {order.buyerEmail ? `, ${order.buyerEmail}` : ""}. Paid <LocalTime value={order.paidAt} options={WHEN} />.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -76,7 +78,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
                   <ul className="text-ink-2 list-disc pl-5 text-[14px]">
                     {task.details.followUps.map((entry) => (
                       <li key={entry.recordedAt}>
-                        {new Date(entry.recordedAt).toLocaleString()}: {entry.note}
+                        <LocalTime value={entry.recordedAt} options={WHEN} />: {entry.note}
                       </li>
                     ))}
                   </ul>
@@ -121,7 +123,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
               <div key={grant.id} className="flex flex-wrap justify-between gap-3 px-5 py-3 text-[15px]">
                 <span>{grant.filename}</span>
                 <span className="text-ink-2">
-                  {grant.state !== "active" ? "Withdrawn" : grant.expiresAt <= new Date() ? "Expired" : "Available"} · {grant.downloadCount} download{grant.downloadCount === 1 ? "" : "s"} · until {grant.expiresAt.toLocaleDateString()}
+                  {grant.state !== "active" ? "Withdrawn" : grant.expiresAt <= new Date() ? "Expired" : "Available"} · {grant.downloadCount} download{grant.downloadCount === 1 ? "" : "s"} · until <LocalTime value={grant.expiresAt} options={DAY} />
                 </span>
               </div>
             ))}
@@ -140,7 +142,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
             <dt className="text-ink-3">Capture</dt>
             <dd className="font-mono text-[13px]">{order.providerCaptureId}</dd>
             <dt className="text-ink-3">Checked</dt>
-            <dd>{evidence ? WHEN.format(new Date(evidence.observedAt)) : "Not yet"}</dd>
+            <dd>{evidence ? <LocalTime value={evidence.observedAt} options={WHEN} /> : "Not yet"}</dd>
           </dl>
           {evidence ? (
             <ul className="mt-3 flex flex-wrap gap-2" aria-label="Independent checks against PayPal">

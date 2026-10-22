@@ -15,6 +15,9 @@ import {
 import { DomainError } from "@/server/domain/errors";
 import { cx } from "@/lib/cx";
 import { CustomerConversation } from "./customer-conversation";
+import { LocalTime } from "@/components/local-time";
+
+const DAY_MONTH: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
 
 export const metadata: Metadata = { title: "Conversations" };
 
@@ -103,13 +106,7 @@ export default async function ConversationsPage({
                             ? "With you"
                             : "With assistant"}
                         </span>
-                        <time dateTime={item.updatedAt}>
-                          {new Intl.DateTimeFormat("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            timeZone: "UTC",
-                          }).format(new Date(item.updatedAt))}
-                        </time>
+                        <LocalTime value={item.updatedAt} options={DAY_MONTH} />
                       </span>
                       <p className="mt-2 line-clamp-3 text-[15px] leading-snug [overflow-wrap:anywhere]">
                         {item.preview || "Customer conversation"}
