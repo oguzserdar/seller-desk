@@ -62,7 +62,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
 
       <section aria-labelledby="work-heading" className="mt-6">
         <h2 id="work-heading" className="mb-2 text-[17px] font-semibold">
-          What this order still needs
+          {tasks.some((task) => task.state !== "completed") ? "What this order still needs" : "Nothing left to do on this order"}
         </h2>
         <div className="flex flex-col gap-3">
           {tasks.map((task) => {
