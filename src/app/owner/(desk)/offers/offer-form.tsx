@@ -108,7 +108,6 @@ export function OfferForm({
   const [uploadFailed, setUploadFailed] = useState(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
-  const [saved, setSaved] = useState<string | null>(null);
 
   const save = useAction(saveOfferAction, {
     onSuccess: ({ data }) => {
@@ -117,10 +116,9 @@ export function OfferForm({
         router.push(`/owner/offers/${data.id}?created=1`);
         return;
       }
-      setSaved(
-        `Saved as version ${data.revision}.${data.published ? " Quotes made from the previous version must be refreshed before buyers pay." : ""}`,
-      );
-      router.refresh();
+      // The page remounts this form for the new revision, which would drop a local message,
+      // so the confirmation travels in the address, as it does after creating an offer.
+      router.replace(`/owner/offers/${data.id}?saved=${data.revision}`);
     },
   });
 
@@ -153,7 +151,6 @@ export function OfferForm({
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
-    setSaved(null);
     setLocalError(null);
     const unitAmountMinor = quotedPerRequest
       ? null
@@ -369,7 +366,6 @@ export function OfferForm({
         />
       </section>
       {error ? <Alert tone="danger" title={error} /> : null}
-      {saved ? <Alert tone="success" title={saved} /> : null}
       <div className="flex flex-wrap gap-3">
         <Button type="submit" loading={save.isPending}>
           {editing ? "Save changes" : "Create offer"}

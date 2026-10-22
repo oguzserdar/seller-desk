@@ -11,10 +11,11 @@ import { PublishToggle } from "../publish-toggle";
 
 export const metadata: Metadata = { title: "Edit offer" };
 
-export default async function EditOfferPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ created?: string }> }) {
+export default async function EditOfferPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ created?: string; saved?: string }> }) {
   const { owner, seller } = await requireOwner(await headers());
   const { id } = await params;
-  const created = (await searchParams).created === "1";
+  const query = await searchParams;
+  const created = query.created === "1";
   const found = (await listOwnerOffers(owner)).find(({ row }) => row.id === id);
   if (!found) notFound();
   const { row, stock, assetName } = found;
@@ -33,6 +34,10 @@ export default async function EditOfferPage({ params, searchParams }: { params: 
       </div>
       {created ? (
         <Alert tone="success" className="mb-4" title={"Offer created as a draft. Publish it when it is ready for buyers."} />
+      ) : null}
+      {/* Shown only while the saved version is still current, so an old link never claims a later edit. */}
+      {query.saved === String(row.revision) ? (
+        <Alert tone="success" className="mb-4" title={`Saved as version ${row.revision}.${row.published ? " Quotes made from the previous version must be refreshed before buyers pay." : ""}`} />
       ) : null}
       {blockers.length > 0 ? (
         <Alert tone="warning" className="mb-4" title="Before buyers can see this">
