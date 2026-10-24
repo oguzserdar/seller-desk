@@ -1,4 +1,5 @@
 import type { BetterAuthOptions } from "better-auth";
+import { connectorPlugins } from "./connector";
 
 /**
  * Better Auth options that decide which auth tables exist.
@@ -23,9 +24,14 @@ export const authSchemaOptions = {
     max: 60,
     customRules: {
       "/sign-in/email": { window: 60, max: 5 },
+      // Registration is open to any AI app, so it gets the tightest limit.
+      "/oauth2/register": { window: 60, max: 5 },
     },
   },
   advanced: {
     database: { generateId: "uuid" },
   },
+  // The connector's tables (keys, AI apps, tokens, consents). The URL only shapes runtime
+  // behaviour, so the schema is the same for every installation; auth.ts passes the real one.
+  plugins: connectorPlugins("https://seller-desk.invalid"),
 } satisfies Partial<BetterAuthOptions>;

@@ -25,7 +25,7 @@ type D1Rows = {
     : never;
 };
 
-it("both native schemas expose exactly the same 44 logical row types", () => {
+it("both native schemas expose exactly the same 52 logical row types", () => {
   expectTypeOf<D1Rows>().toEqualTypeOf<PgRows>();
   const pgTables = Object.values(pg).filter((value) => is(value, PgTable));
   const d1Tables = Object.values(d1).filter(
@@ -33,7 +33,7 @@ it("both native schemas expose exactly the same 44 logical row types", () => {
       is(value, SQLiteTable) &&
       !["storage_sequence", "storage_identity"].includes(getTableName(value)),
   );
-  expect(pgTables).toHaveLength(44);
+  expect(pgTables).toHaveLength(52);
   expect(d1Tables.map(getTableName).sort()).toEqual(
     pgTables.map(getTableName).sort(),
   );

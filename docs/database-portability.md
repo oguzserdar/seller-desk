@@ -34,7 +34,7 @@ Storage tests execute real PostgreSQL and Miniflare/workerd D1 queries. They do 
 
 ## What is native
 
-`src/server/db/schema.ts` is the PostgreSQL schema. `src/server/db/sqlite/schema.ts` is the D1 schema. Their 44 logical table row types, columns, business constraints and relationships are checked for parity. D1 additionally owns native identity counters and an installation identity used to prevent simulation against the source database.
+`src/server/db/schema.ts` is the PostgreSQL schema. `src/server/db/sqlite/schema.ts` is the D1 schema. Their 52 logical table row types, columns, business constraints and relationships are checked for parity. D1 additionally owns native identity counters and an installation identity used to prevent simulation against the source database.
 
 PostgreSQL commands use transactions and row locks. D1 commands use atomic native batches, conditional writes, unique constraints and fresh execution guards. Network calls to PayPal or a model happen outside database transactions. An old receipt can return an existing result; it cannot authorize repeating stock or fulfillment effects.
 

@@ -19,6 +19,7 @@ import type { D1Db } from "@/server/storage/d1/client";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { connectorHooks, connectorPlugins } from "./connector";
 import { authSchemaOptions } from "./options";
 
 /** Endpoints that stay reachable: sign in, sign out, read the session, health. */
@@ -81,7 +82,8 @@ function createAuth(database?: BetterAuthOptions["database"]) {
       cookiePrefix: "seller-desk",
     },
     telemetry: { enabled: false },
-    plugins: [nextCookies()],
+    hooks: connectorHooks,
+    plugins: [...connectorPlugins(config.appUrl), nextCookies()],
   });
 }
 

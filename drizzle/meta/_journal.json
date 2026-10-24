@@ -197,6 +197,13 @@
       "when": 1792537168649,
       "tag": "20261020225928_ai_settings_sealed",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792810465917,
+      "tag": "20261024025425_ai_connector",
+      "breakpoints": true
     }
   ]
 }
