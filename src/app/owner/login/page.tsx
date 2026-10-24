@@ -3,13 +3,16 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { readOwner } from "@/server/auth/owner";
 import { getSeller } from "@/server/domain/seller";
+import { connectorResumeUrl, pageQuery } from "@/lib/connector-resume";
 import { LoginForm } from "./login-form";
 import { firstOwnerSetupEnabled } from "@/server/auth/first-owner";
 
 export const metadata: Metadata = { title: "Owner sign in" };
 
-export default async function OwnerLoginPage() {
-  if (await readOwner(await headers())) redirect("/owner/orders");
+export default async function OwnerLoginPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  if (await readOwner(await headers())) {
+    redirect(connectorResumeUrl(pageQuery(await searchParams)) ?? "/owner/orders");
+  }
   const shop = await getSeller();
   if (!shop && firstOwnerSetupEnabled()) redirect("/owner/start");
   return (

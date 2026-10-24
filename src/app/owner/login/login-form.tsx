@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/arc/button/button";
 import { Alert } from "@/components/arc/alert/alert";
 import { Input } from "@/components/arc/input/input";
+import { connectorResumeUrl } from "@/lib/connector-resume";
 import { signInOwner } from "./actions";
 
 /** Password sign-in through the hydrated action handler, with a POST-only browser fallback. */
@@ -16,7 +17,12 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { execute, isPending, result } = useAction(signInOwner, {
-    onSuccess: () => router.replace("/owner/orders"),
+    onSuccess: () => {
+      // Opened by an AI app asking for access: carry on to its consent page instead of the desk.
+      const resume = connectorResumeUrl(window.location.search);
+      if (resume) window.location.assign(resume);
+      else router.replace("/owner/orders");
+    },
   });
   const error = result.serverError ?? (result.validationErrors ? "Enter your email and password." : null);
 

@@ -22,7 +22,7 @@ it.each(["sandbox", "fixture"])(
   async (mode) => {
     state.mode = mode;
     vi.stubEnv("NODE_ENV", "production");
-    const html = renderToStaticMarkup(await OwnerLoginPage());
+    const html = renderToStaticMarkup(await OwnerLoginPage({ searchParams: Promise.resolve({}) }));
     expect(html).toContain("Sign in to your desk");
     expect(html).not.toContain("pnpm");
     expect(html).not.toContain("on the server");
@@ -30,7 +30,7 @@ it.each(["sandbox", "fixture"])(
 );
 it("keeps maintenance instructions available only in development", async () => {
   vi.stubEnv("NODE_ENV", "development");
-  expect(renderToStaticMarkup(await OwnerLoginPage())).toContain(
+  expect(renderToStaticMarkup(await OwnerLoginPage({ searchParams: Promise.resolve({}) }))).toContain(
     "Developer setup",
   );
 });
