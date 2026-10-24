@@ -11,7 +11,6 @@ export const metadata: Metadata = { title: "Connect an AI app" };
 const CAN = [
   "See buyers and questions waiting for you",
   "Read conversations, orders and your offers",
-  "Draft answers for you to check and send",
 ];
 const CANNOT = ["Message a buyer", "Change prices, stock or orders", "Refund or take payments"];
 
