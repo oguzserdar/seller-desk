@@ -8,14 +8,12 @@ const calls: string[] = [];
 let reduced = false;
 vi.mock("next/navigation", () => ({ usePathname: () => "/owner/orders" }));
 vi.mock("motion/react", async (importOriginal) => ({ ...(await importOriginal<object>()), useReducedMotion: () => reduced }));
-for (const [file, name] of [["inbox", "InboxIcon"], ["chat-bubble-left-right", "ChatBubbleLeftRightIcon"], ["cube", "CubeIcon"], ["book-open", "BookOpenIcon"], ["cog-6-tooth", "Cog6ToothIcon"], ["arrow-down-tray", "ArrowDownTrayIcon"]] as const) {
-  vi.doMock(`../../src/components/animated-icons/${file}`, () => ({
-    [name]: forwardRef((_props, ref) => {
-      useImperativeHandle(ref, () => ({ startAnimation: () => calls.push(`start ${name}`), stopAnimation: () => calls.push(`stop ${name}`) }));
-      return createElement("span", { "data-icon": name });
-    }),
-  }));
-}
+vi.mock("../../src/components/desk-icons", () => Object.fromEntries(
+  ["DeskIcon", "ConversationsIcon", "OffersIcon", "KnowledgeIcon", "SetupIcon", "InstallIcon"].map((name) => [name, forwardRef((_props, ref) => {
+    useImperativeHandle(ref, () => ({ startAnimation: () => calls.push(`start ${name}`), stopAnimation: () => calls.push(`stop ${name}`) }));
+    return createElement("span", { "data-icon": name });
+  })]),
+));
 const { OwnerNav } = await import("../../src/app/owner/(desk)/owner-nav");
 const { SidebarProvider } = await import("../../src/components/shadcn/sidebar");
 
@@ -33,12 +31,12 @@ async function render() {
 it("plays the row's icon on keyboard focus and hover, and settles it on leave", async () => {
   const offers = await render();
   await act(async () => { offers.dispatchEvent(new FocusEvent("focus", { bubbles: false })); offers.focus(); });
-  expect(calls).toContain("start CubeIcon");
+  expect(calls).toContain("start OffersIcon");
   await act(async () => { offers.blur(); });
-  expect(calls).toContain("stop CubeIcon");
+  expect(calls).toContain("stop OffersIcon");
   calls.length = 0;
   await act(async () => { offers.dispatchEvent(new MouseEvent("mouseover", { bubbles: true })); });
-  expect(calls).toEqual(["start CubeIcon"]);
+  expect(calls).toEqual(["start OffersIcon"]);
 });
 
 it("keeps the icon still for viewers who prefer reduced motion", async () => {
