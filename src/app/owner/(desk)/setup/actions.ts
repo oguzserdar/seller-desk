@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { DESK_THEME_COOKIE, DESK_THEME_IDS } from "@/lib/desk-themes";
 import { ownerAction } from "@/server/actions/safe-action";
+import { removeApp } from "@/server/connector/access";
 import { verifyAiSetup } from "@/server/ai/setup-check";
 import { requireUsage } from "@/server/domain/usage";
 import { recordModelCheck } from "@/server/domain/model-check";
@@ -73,4 +74,11 @@ export const setDeskThemeAction = ownerAction.inputSchema(z.object({ theme: z.en
   (await cookies()).set(DESK_THEME_COOKIE, parsedInput.theme, { path: "/owner", sameSite: "lax", httpOnly: true, secure: process.env.NODE_ENV === "production", maxAge: 60 * 60 * 24 * 365 });
   revalidatePath("/owner", "layout");
   return { theme: parsedInput.theme };
+});
+
+/** Removes one AI app the owner connected, with its tokens; its next call is refused. */
+export const removeAiAppAction = ownerAction.inputSchema(z.object({ consentId: z.string().min(1).max(100) }).strict()).action(async ({ parsedInput, ctx }) => {
+  const removed = await removeApp(ctx.owner.userId, parsedInput.consentId);
+  revalidatePath("/owner/setup");
+  return { removed };
 });

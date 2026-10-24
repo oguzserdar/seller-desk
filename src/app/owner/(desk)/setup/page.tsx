@@ -11,14 +11,17 @@ import { describeAiConnection } from "@/server/domain/ai-settings";
 import { getEffectiveConfig } from "@/server/effective-config";
 import { AiSetup } from "./ai-setup";
 import { PayPalSetup } from "./paypal-setup";
+import { AiApps } from "./ai-apps";
+import { allowedApps } from "@/server/connector/access";
+import { connectorResource } from "@/server/auth/connector";
 
 export const metadata: Metadata = { title: "Setup" };
 
 /** Owner setup, with public connection guidance and independently checked readiness. */
 export default async function SetupPage() {
-  const { seller } = await requireOwner(await headers());
+  const { seller, owner } = await requireOwner(await headers());
   const readiness = await getReadiness(seller);
-  const [config, connection] = await Promise.all([getEffectiveConfig(), describeAiConnection()]);
+  const [config, connection, apps] = await Promise.all([getEffectiveConfig(), describeAiConnection(), allowedApps(owner.userId)]);
   const deskTheme = deskThemeId(
     (await cookies()).get(DESK_THEME_COOKIE)?.value,
   );
@@ -55,6 +58,7 @@ export default async function SetupPage() {
               : "Off; using the reply model for all answers"
         }
       />
+      <AiApps address={connectorResource(config.appUrl)} apps={apps} />
       <PayPalSetup
         mode={config.mode}
         appUrl={config.appUrl}

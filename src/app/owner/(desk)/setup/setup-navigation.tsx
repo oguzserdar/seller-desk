@@ -3,6 +3,7 @@ import { Button } from "@/components/shadcn/button";
 const SECTIONS = [
   ["overview", "Overview"],
   ["assistant", "Assistant"],
+  ["ai-apps", "AI apps"],
   ["paypal", "PayPal"],
   ["desk-theme", "Desk theme"],
   ["shop", "Shop"],
