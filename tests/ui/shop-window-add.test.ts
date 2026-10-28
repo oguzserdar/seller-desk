@@ -47,7 +47,10 @@ it("sends work without a price to the assistant, since the shop has to scope it"
 it("does not add a sold-out product or one already in the quote", async () => {
   const { calls, button } = await render({ added: ["light"] });
   await act(async () => button("Front light is in your quote").click());
-  await act(async () => button("Add Brake pads to your quote, $35.00").click());
+  const soldOut = button("Brake pads is sold out");
+  expect(soldOut.disabled).toBe(true);
+  expect(soldOut.querySelector("svg")).toBeNull();
+  await act(async () => soldOut.click());
   expect(calls).toEqual([]);
 });
 

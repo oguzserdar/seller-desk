@@ -81,11 +81,12 @@ function Mosaic({
                       type="button"
                       size="sm"
                       variant="secondary"
-                      aria-disabled={added || busy || soldOut || undefined}
+                      disabled={soldOut && !added}
+                      aria-disabled={added || busy || undefined}
                       onClick={added || busy || soldOut ? undefined : () => onAdd(offer)}
-                      aria-label={added ? `${offer.title} is in your quote` : `Add ${offer.title} to your quote, ${price}`}
+                      aria-label={added ? `${offer.title} is in your quote` : soldOut ? `${offer.title} is sold out` : `Add ${offer.title} to your quote, ${price}`}
                     >
-                      {added ? <Check aria-hidden size={16} /> : <Plus aria-hidden size={16} />}
+                      {added ? <Check aria-hidden size={16} /> : soldOut ? null : <Plus aria-hidden size={16} />}
                       {added ? "In your quote" : soldOut ? "Sold out" : priced ? "Add to quote" : "Request a quote"}
                     </Button>
                   ) : null}

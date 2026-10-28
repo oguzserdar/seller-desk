@@ -107,7 +107,7 @@ export function OfferTile({
           >
             {inQuote ? (
               <Check aria-hidden size={16} />
-            ) : (
+            ) : soldOut ? null : (
               <Plus aria-hidden size={16} />
             )}
             {inQuote
@@ -169,7 +169,7 @@ export function OfferCard({
         aria-disabled={blocked || undefined}
         onClick={blocked ? undefined : onAdd}
       >
-        {inQuote ? <Check aria-hidden size={15} /> : <Plus aria-hidden size={15} />}
+        {inQuote ? <Check aria-hidden size={15} /> : soldOut ? null : <Plus aria-hidden size={15} />}
         {inQuote ? "In your quote" : soldOut ? "Sold out" : offer.unitAmountMinor === null ? "Request a quote" : "Add"}
       </Button>
     </li>
