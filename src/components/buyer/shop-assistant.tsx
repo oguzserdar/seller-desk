@@ -234,6 +234,19 @@ export function ShopAssistant({
     void sendMessage({ text });
   };
 
+  // The first item a buyer adds opens the quote on a phone, so Pay is one tap away instead of
+  // behind the collapsed bar. Later adds leave it closed. Wide screens show the quote in the rail.
+  const openAfterAdd = useRef(false);
+  const addOffer = (offerId: string) => {
+    if (!quote.quote?.isLatest || quote.quote.lines.length === 0) openAfterAdd.current = true;
+    quote.addOffer(offerId);
+  };
+  useEffect(() => {
+    if (!openAfterAdd.current || quote.busy !== null || !quote.quote) return;
+    openAfterAdd.current = false;
+    if (quote.quote.lines.length > 0 && !window.matchMedia("(min-width: 1024px)").matches) setSheetOpen(true);
+  }, [quote.busy, quote.quote]);
+
   // "Describe the work" in the quote panel goes to the chat box, where the assistant takes the description.
   // On a phone the quote is a sheet over the chat, so it closes first and hands focus to the box.
   const focusChatOnClose = useRef(false);
@@ -361,8 +374,9 @@ export function ShopAssistant({
     </>
   );
   const conversation = messages.length > 0;
+  // A quote moves the buyer into the shop view, where the quote bar and Pay stay in reach.
   const browsing =
-    assistant === "off" && (quote.quote !== null || (offers?.length ?? 0) > 6);
+    quote.quote !== null || (assistant === "off" && (offers?.length ?? 0) > 6);
 
   return (
     <div
@@ -486,7 +500,7 @@ export function ShopAssistant({
                   shopName={shopName}
                   inQuote={inQuote}
                   quoteBusy={quote.busy !== null}
-                  onAdd={quote.addOffer}
+                  onAdd={addOffer}
                   onViewQuote={() => setSheetOpen(true)}
                   error={
                     chatError && !chatError.expired ? chatError.text : null
@@ -507,7 +521,7 @@ export function ShopAssistant({
                       offer={offer}
                       inQuote={inQuote(offer.id)}
                       busy={quote.busy !== null}
-                      onAdd={() => quote.addOffer(offer.id)}
+                      onAdd={() => addOffer(offer.id)}
                     />
                   ))}
                 </ul>
@@ -534,7 +548,7 @@ export function ShopAssistant({
                   className="lg:hidden"
                 />
               ) : null}
-              {conversation ? composer(false) : null}
+              {conversation || canChat ? composer(false) : null}
               {conversation ? (
                 <p className="text-ink-3 px-1 text-[12px]">
                   {withSeller
@@ -600,11 +614,10 @@ export function ShopAssistant({
           assistantOn={assistant === "on"}
           composer={composer(true)}
           onSuggestion={ask}
-          onPick={(offer) =>
-            assistant === "on"
-              ? ask(`Tell me about the ${offer.title}`)
-              : quote.addOffer(offer.id)
-          }
+          onAdd={(offer) => addOffer(offer.id)}
+          onAsk={(offer) => ask(`Tell me about the ${offer.title}`)}
+          inQuote={inQuote}
+          busy={quote.busy !== null}
         />
       )}
     </div>

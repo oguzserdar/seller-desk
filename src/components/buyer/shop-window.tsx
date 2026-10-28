@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Card } from "@/components/arc/card/card";
 import { Button } from "@/components/arc/button/button";
+import { Check, Plus } from "lucide-react";
 import { formatQuoteAmount } from "@/lib/money";
 import type { PublicOffer } from "@/server/domain/offers";
 import { OfferPhoto } from "./offer-tile";
@@ -29,55 +30,79 @@ export function suggestionsFor(offers: PublicOffer[]): string[] {
   return out;
 }
 
-/** Actual library cards keep product actions explicit and keyboard accessible. */
+/**
+ * The shop's products as cards. A priced product adds straight to the quote, so a buyer who already
+ * knows what they want reaches PayPal without waiting on the assistant; asking stays one tap away.
+ * A product without a price needs the shop to scope the work, so it only asks.
+ */
 function Mosaic({
   offers,
-  onPick,
-  pickLabel,
-  actionLabel,
+  onAdd,
+  onAsk,
+  inQuote,
+  busy,
 }: {
   offers: PublicOffer[];
-  onPick: (offer: PublicOffer) => void;
-  pickLabel: (offer: PublicOffer) => string;
-  actionLabel: string;
+  onAdd: (offer: PublicOffer) => void;
+  onAsk: ((offer: PublicOffer) => void) | null;
+  inQuote: (offerId: string) => boolean;
+  busy: boolean;
 }) {
   return (
     <ul
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
       aria-label="From the shop"
     >
-      {offers.slice(0, 6).map((offer, index) => (
-        <li key={offer.id} className="min-w-0">
-          <Card
-            title={offer.title}
-            media={
-              <OfferPhoto
-                offer={offer}
-                eager={index === 0}
-                sizes="(min-width: 640px) 300px, 90vw"
-                className="aspect-square w-full"
-              />
-            }
-            description={formatQuoteAmount(
-              offer.unitAmountMinor,
-              offer.currency,
-            )}
-            action={
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                onClick={() => onPick(offer)}
-                aria-label={`${pickLabel(offer)}, ${formatQuoteAmount(offer.unitAmountMinor, offer.currency)}`}
-              >
-                {offer.unitAmountMinor === null
-                  ? "Request a quote"
-                  : actionLabel}
-              </Button>
-            }
-          />
-        </li>
-      ))}
+      {offers.slice(0, 6).map((offer, index) => {
+        const price = formatQuoteAmount(offer.unitAmountMinor, offer.currency);
+        const added = inQuote(offer.id);
+        const priced = offer.unitAmountMinor !== null;
+        const soldOut = offer.available === 0;
+        return (
+          <li key={offer.id} className="min-w-0">
+            <Card
+              title={offer.title}
+              media={
+                <OfferPhoto
+                  offer={offer}
+                  eager={index === 0}
+                  sizes="(min-width: 640px) 300px, 90vw"
+                  className="aspect-square w-full"
+                />
+              }
+              description={price}
+              action={
+                <>
+                  {priced || !onAsk ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      aria-disabled={added || busy || soldOut || undefined}
+                      onClick={added || busy || soldOut ? undefined : () => onAdd(offer)}
+                      aria-label={added ? `${offer.title} is in your quote` : `Add ${offer.title} to your quote, ${price}`}
+                    >
+                      {added ? <Check aria-hidden size={16} /> : <Plus aria-hidden size={16} />}
+                      {added ? "In your quote" : soldOut ? "Sold out" : priced ? "Add to quote" : "Request a quote"}
+                    </Button>
+                  ) : null}
+                  {onAsk ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={priced ? "ghost" : "secondary"}
+                      onClick={() => onAsk(offer)}
+                      aria-label={`Ask about ${offer.title}`}
+                    >
+                      {priced ? "Ask" : "Request a quote"}
+                    </Button>
+                  ) : null}
+                </>
+              }
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -89,14 +114,20 @@ export function ShopWindow({
   composer,
   assistantOn,
   onSuggestion,
-  onPick,
+  onAdd,
+  onAsk,
+  inQuote,
+  busy,
 }: {
   shopName: string;
   offers: PublicOffer[];
   composer: ReactNode;
   assistantOn: boolean;
   onSuggestion: (text: string) => void;
-  onPick: (offer: PublicOffer) => void;
+  onAdd: (offer: PublicOffer) => void;
+  onAsk: (offer: PublicOffer) => void;
+  inQuote: (offerId: string) => boolean;
+  busy: boolean;
 }) {
   const suggestions = assistantOn ? suggestionsFor(offers) : [];
   return (
@@ -132,14 +163,11 @@ export function ShopWindow({
         ) : null}
       </div>
       <Mosaic
-        actionLabel={assistantOn ? "Ask about this" : "Add to quote"}
         offers={offers}
-        onPick={onPick}
-        pickLabel={(offer) =>
-          assistantOn
-            ? `Ask about ${offer.title}`
-            : `Add ${offer.title} to your quote`
-        }
+        onAdd={onAdd}
+        onAsk={assistantOn ? onAsk : null}
+        inQuote={inQuote}
+        busy={busy}
       />
     </main>
   );
