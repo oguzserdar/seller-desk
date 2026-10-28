@@ -88,11 +88,14 @@ export function OfferTile({
             : fulfilmentText(offer)
         }
         media={
-          <OfferPhoto
-            offer={offer}
-            sizes="(min-width: 640px) 300px, 90vw"
-            className="aspect-square w-full"
-          />
+          // A missing photo would leave a screen-tall empty square on a phone.
+          offer.imagePath ? (
+            <OfferPhoto
+              offer={offer}
+              sizes="(min-width: 640px) 300px, 90vw"
+              className="aspect-square w-full"
+            />
+          ) : undefined
         }
         action={
           <Button

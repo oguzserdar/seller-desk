@@ -10,7 +10,7 @@ const { ShopWindow } = await import("../../src/components/buyer/shop-window");
 
 const offer = (id: string, title: string, unitAmountMinor: number | null, available: number | null = 3) =>
   ({ id, kind: unitAmountMinor === null ? "service" : "goods", title, unitAmountMinor, currency: "USD", available, maxQuantity: 5, requiresScopeReview: unitAmountMinor === null, imagePath: null }) as unknown as PublicOffer;
-const offers = [offer("light", "Front light", 9500), offer("repair", "Custom repair", null), offer("pads", "Brake pads", 3500, 0)];
+const offers = [{ ...offer("light", "Front light", 9500), imagePath: "/offers/light.jpg" } as PublicOffer, offer("repair", "Custom repair", null), offer("pads", "Brake pads", 3500, 0)];
 
 let root: ReturnType<typeof createRoot> | null = null;
 afterEach(async () => { if (root) await act(async () => root!.unmount()); root = null; document.body.innerHTML = ""; vi.unstubAllGlobals(); });
@@ -27,7 +27,7 @@ async function render({ assistantOn = true, added = [] as string[] } = {}) {
     onSuggestion: () => {}, onAdd: (o: PublicOffer) => calls.push(`add ${o.id}`), onAsk: (o: PublicOffer) => calls.push(`ask ${o.id}`),
   })));
   const button = (label: string) => [...host.querySelectorAll("button")].find((b) => b.getAttribute("aria-label") === label)!;
-  return { calls, button };
+  return { calls, button, host };
 }
 
 it("adds a priced product without asking the assistant, and keeps Ask beside it", async () => {
@@ -56,4 +56,9 @@ it("offers no Ask button when the shop's assistant is off", async () => {
   expect(button("Ask about Front light")).toBeUndefined();
   await act(async () => button("Add Custom repair to your quote, Awaiting quote").click());
   expect(calls).toEqual(["add repair"]);
+});
+
+it("draws a photo box only for products that have a photo", async () => {
+  const { host } = await render();
+  expect(host.querySelectorAll(".bg-photo")).toHaveLength(1);
 });

@@ -63,12 +63,15 @@ function Mosaic({
             <Card
               title={offer.title}
               media={
-                <OfferPhoto
-                  offer={offer}
-                  eager={index === 0}
-                  sizes="(min-width: 640px) 300px, 90vw"
-                  className="aspect-square w-full"
-                />
+                // A missing photo would leave a screen-tall empty square on a phone.
+                offer.imagePath ? (
+                  <OfferPhoto
+                    offer={offer}
+                    eager={index === 0}
+                    sizes="(min-width: 640px) 300px, 90vw"
+                    className="aspect-square w-full"
+                  />
+                ) : undefined
               }
               description={price}
               action={
