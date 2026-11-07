@@ -3,8 +3,11 @@ import type { AllowedApp } from "@/server/connector/access";
 import { CopyField } from "../install/copy-field";
 import { RemoveAiAppButton } from "./remove-ai-app-button";
 
-/** The connector address to paste into an AI app, and the apps the owner has allowed so far. */
-export function AiApps({ address, apps }: { address: string; apps: AllowedApp[] }) {
+/**
+ * The connector address to paste into an AI app, the one line to paste into a coding agent, and the
+ * apps the owner has allowed so far.
+ */
+export function AiApps({ address, agentLine, apps }: { address: string; agentLine: string; apps: AllowedApp[] }) {
   return (
     <section id="ai-apps" aria-labelledby="ai-apps-heading" className="surface mt-8 scroll-mt-40 sm:scroll-mt-28 px-5 py-6 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -18,6 +21,12 @@ export function AiApps({ address, apps }: { address: string; apps: AllowedApp[] 
       <div className="bg-sunken mt-4 rounded-xl px-4 py-3">
         <p className="text-ink-2 mb-1 text-[13px]">Add this address as a custom connector in your AI app:</p>
         <CopyField label="Connector address" value={address} />
+      </div>
+      <div className="bg-sunken mt-3 rounded-xl px-4 py-3">
+        <p className="text-ink-2 mb-1 text-[13px]">
+          Using Claude Code, Codex or Cursor? Paste this line into it. It adds the connector and the Seller Desk skill itself:
+        </p>
+        <CopyField label="Line for a coding agent" value={agentLine} />
       </div>
       {apps.length ? (
         <ul className="mt-5 divide-y divide-line">

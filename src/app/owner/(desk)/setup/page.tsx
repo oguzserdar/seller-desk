@@ -12,6 +12,7 @@ import { getEffectiveConfig } from "@/server/effective-config";
 import { AiSetup } from "./ai-setup";
 import { PayPalSetup } from "./paypal-setup";
 import { AiApps } from "./ai-apps";
+import { setupLine } from "@/lib/agent-setup";
 import { allowedApps } from "@/server/connector/access";
 import { connectorResource } from "@/server/auth/connector";
 
@@ -58,7 +59,7 @@ export default async function SetupPage() {
               : "Off; using the reply model for all answers"
         }
       />
-      <AiApps address={connectorResource(config.appUrl)} apps={apps} />
+      <AiApps address={connectorResource(config.appUrl)} agentLine={setupLine(config.appUrl)} apps={apps} />
       <PayPalSetup
         mode={config.mode}
         appUrl={config.appUrl}
