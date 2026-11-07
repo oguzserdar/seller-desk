@@ -9,6 +9,7 @@
  *   3. add "mistral" to AI_PROVIDERS and its key name to PROVIDER_KEY_ENV in env.ts
  */
 import { getEffectiveConfig } from "@/server/effective-config";
+import { withDailyBudget } from "./spend";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -49,9 +50,15 @@ export type AssistantModel =
 
 /** Builds the configured model per request; provider objects are cheap and hold no connection. */
 export async function getAssistantModel(): Promise<AssistantModel> {
-  const ai = (await getEffectiveConfig()).ai;
+  const config = await getEffectiveConfig();
+  const ai = config.ai;
   if (ai.status !== "ready") return { ok: false, problem: ai.problem };
-  return { ok: true, model: PROVIDER_FACTORIES[ai.provider](ai.apiKey, ai.modelId), provider: ai.provider, modelId: ai.modelId };
+  const budgeted = await withDailyBudget(PROVIDER_FACTORIES[ai.provider](ai.apiKey, ai.modelId), ai.modelId, {
+    budgetUsd: config.aiDailyBudgetUsd,
+    priceOverride: config.aiPricePerMillionTokens,
+  });
+  if (!budgeted.ok) return budgeted;
+  return { ok: true, model: budgeted.model, provider: ai.provider, modelId: ai.modelId };
 }
 
 /** Limits from the build contract: short turns, a few tool steps, bounded time. */

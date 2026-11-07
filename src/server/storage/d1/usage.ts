@@ -1,5 +1,5 @@
 import { usageBucket } from "@/server/db/sqlite/schema";
-import type { UsageResult } from "@/server/domain/usage";
+import { MAX_COUNT, type UsageResult } from "@/server/domain/usage";
 import { and, eq, sql } from "drizzle-orm";
 import type { D1Db } from "./client";
 
@@ -32,6 +32,27 @@ export function createD1UsageStorage(db: D1Db) {
         count: rows[0]?.count ?? limit,
         resetsAt: new Date(windowStart.getTime() + ms),
       };
+    },
+    async addUsage(
+      feature: string,
+      principal: string,
+      windowSeconds: number,
+      amount: number,
+    ): Promise<void> {
+      const ms = windowSeconds * 1000,
+        windowStart = new Date(Math.floor(Date.now() / ms) * ms),
+        value = Math.min(Math.round(amount), MAX_COUNT);
+      await db
+        .insert(usageBucket)
+        .values({ feature, principal, windowStart, count: value })
+        .onConflictDoUpdate({
+          target: [
+            usageBucket.feature,
+            usageBucket.principal,
+            usageBucket.windowStart,
+          ],
+          set: { count: sql`min(${usageBucket.count}+${value}, ${MAX_COUNT})` },
+        });
     },
     async hasUsageLeft(
       feature: string,

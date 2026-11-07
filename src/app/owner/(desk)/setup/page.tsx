@@ -1,3 +1,4 @@
+import { getAssistantModel } from "@/server/ai/registry";
 import { SetupNavigation } from "./setup-navigation";
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
@@ -22,7 +23,7 @@ export const metadata: Metadata = { title: "Setup" };
 export default async function SetupPage() {
   const { seller, owner } = await requireOwner(await headers());
   const readiness = await getReadiness(seller);
-  const [config, connection, apps] = await Promise.all([getEffectiveConfig(), describeAiConnection(), allowedApps(owner.userId)]);
+  const [config, connection, apps, assistant] = await Promise.all([getEffectiveConfig(), describeAiConnection(), allowedApps(owner.userId), getAssistantModel()]);
   const deskTheme = deskThemeId(
     (await cookies()).get(DESK_THEME_COOKIE)?.value,
   );
@@ -40,9 +41,11 @@ export default async function SetupPage() {
       <AiSetup
         connection={connection}
         reply={
-          config.ai.status === "ready"
-            ? `${config.ai.modelId} through ${config.ai.provider}`
-            : "Not connected"
+          config.ai.status !== "ready"
+            ? "Not connected"
+            : assistant.ok
+              ? `${config.ai.modelId} through ${config.ai.provider}`
+              : `${config.ai.modelId} through ${config.ai.provider}. Off now: ${assistant.problem}`
         }
         routing={
           config.routing.status === "off"

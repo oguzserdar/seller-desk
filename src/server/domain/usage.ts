@@ -10,6 +10,9 @@ import { DomainError } from "./errors";
 
 export type UsageResult = { allowed: boolean; count: number; resetsAt: Date };
 
+/** The largest value a usage counter can hold (a 32-bit integer column). */
+export const MAX_COUNT = 2_147_483_647;
+
 export async function consumeUsage(
   feature: string,
   principal: string,
@@ -35,6 +38,31 @@ export async function consumeUsage(
     count: row?.count ?? limit,
     resetsAt: new Date(windowStart.getTime() + windowMs),
   };
+}
+
+/**
+ * Adds an amount to the current window without a limit, such as the cost of a
+ * model call that already ran. Stays within the column's integer range.
+ */
+export async function addUsage(
+  feature: string,
+  principal: string,
+  windowSeconds: number,
+  amount: number,
+): Promise<void> {
+  const value = Math.min(Math.round(amount), MAX_COUNT);
+  if (!(value > 0)) return;
+  const backend = getStorage();
+  if (backend.kind === "d1")
+    return backend.usage.addUsage(feature, principal, windowSeconds, value);
+
+  const windowMs = windowSeconds * 1000;
+  const windowStart = new Date(Math.floor(Date.now() / windowMs) * windowMs);
+  await getDb().execute(sql`
+    insert into usage_bucket (feature, principal, window_start, count)
+    values (${feature}, ${principal}, ${windowStart.toISOString()}, ${value})
+    on conflict (feature, principal, window_start)
+    do update set count = least(usage_bucket.count::bigint + ${value}, ${MAX_COUNT})::integer`);
 }
 
 /**

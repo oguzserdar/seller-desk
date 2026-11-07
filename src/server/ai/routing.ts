@@ -1,4 +1,5 @@
 import { getEffectiveConfig } from "@/server/effective-config";
+import { meterModel, priceFor, spendRecorder } from "./spend";
 import { getDb } from "@/server/db/client";
 import { recordAudit } from "@/server/domain/audit";
 import { DomainError } from "@/server/domain/errors";
@@ -175,9 +176,12 @@ export async function routeAssistantTurn(input: {
     input.signal,
   );
   const routine = config.routineAi;
+  // Under a daily budget the routine model is metered too; without a known price it is not used.
+  const routinePrice = config.aiDailyBudgetUsd && routine?.status === "ready" ? priceFor(routine.modelId) : null;
   const useRoutine =
     trace.status === "accepted" &&
     routine?.status === "ready" &&
+    (!config.aiDailyBudgetUsd || routinePrice !== null) &&
     config.routing.status === "ready" &&
     canUseRoutineModel(
       trace.route,
@@ -187,7 +191,9 @@ export async function routeAssistantTurn(input: {
     );
   return {
     model: useRoutine
-      ? PROVIDER_FACTORIES[routine.provider](routine.apiKey, routine.modelId)
+      ? routinePrice
+        ? meterModel(PROVIDER_FACTORIES[routine.provider](routine.apiKey, routine.modelId), routinePrice, spendRecorder())
+        : PROVIDER_FACTORIES[routine.provider](routine.apiKey, routine.modelId)
       : main.model,
     provider: useRoutine ? routine.provider : main.provider,
     modelId: useRoutine ? routine.modelId : main.modelId,

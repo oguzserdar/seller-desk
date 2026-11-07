@@ -122,6 +122,11 @@ const EnvSchema = z.object({
     blankToUndefined,
     z.enum(AI_REASONING_LEVELS).optional(),
   ),
+  AI_DAILY_BUDGET_USD: z.preprocess(
+    blankToUndefined,
+    z.coerce.number().positive().max(2000).optional(),
+  ),
+  AI_PRICE_PER_MILLION_TOKENS: optionalText,
   TYPESAFE_AI_API_KEY: optionalText,
   AI_GATEWAY_API_KEY: optionalText,
   VERCEL_OIDC_TOKEN: optionalText,
@@ -206,6 +211,10 @@ export type ServerConfig = {
   routineAi: AiConfig | null;
   /** How hard the assistant thinks before each step; unset keeps the provider default. */
   aiReasoning?: (typeof AI_REASONING_LEVELS)[number];
+  /** US dollars the assistant may spend per UTC day on this installation's key; unset means no dollar limit. */
+  aiDailyBudgetUsd?: number;
+  /** "input,output" US dollars per million tokens, for a model the built-in price table does not list. */
+  aiPricePerMillionTokens?: string;
   paypal: PayPalConfig;
   store: WooStoreConfig | null;
 };
@@ -397,6 +406,8 @@ export function parseServerConfig(
         : null,
     paypal: resolvePayPal(env),
     ...(env.AI_REASONING ? { aiReasoning: env.AI_REASONING } : {}),
+    ...(env.AI_DAILY_BUDGET_USD ? { aiDailyBudgetUsd: env.AI_DAILY_BUDGET_USD } : {}),
+    ...(env.AI_PRICE_PER_MILLION_TOKENS ? { aiPricePerMillionTokens: env.AI_PRICE_PER_MILLION_TOKENS } : {}),
   };
 }
 

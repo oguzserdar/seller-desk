@@ -37,6 +37,31 @@ Run sequentially with one browser/app and inspect results before broadening the 
 5. In the actual browser try product questions, service constraints, digital access, unclear payment, a human request, a corrected pending request, seller proposals and false claimed approval. Refresh and stop a turn. Verify saved input, completed replies, current orders and approval state.
 6. Compare a chosen routine model against the main model before enabling it. Do not equate model probability with measured accuracy or infer savings from a passing unit test.
 
+## A daily budget for a shared key
+
+A public demo, or any installation whose key you pay for while others use it, can set a
+daily dollar budget:
+
+```sh
+AI_DAILY_BUDGET_USD=3
+```
+
+Each model call's reported tokens are priced and added to today's total. Once the total
+reaches the budget, the assistant is off until midnight UTC: customers see the plain shop,
+can still add items and pay with PayPal, and the owner's Setup says why. Shop tests count
+against the same budget. Nothing is measured when the setting is absent.
+
+Prices for the suggested models are built in (`src/server/ai/spend.ts`, with their source).
+For any other model, give its price in US dollars per million input and output tokens:
+
+```sh
+AI_PRICE_PER_MILLION_TOKENS=0.5,1.5
+```
+
+A budget with no known price keeps the assistant off rather than counting calls as free.
+Input tokens include cached reads at the full input price, so the estimate errs high. The
+per-buyer and per-shop message limits still apply on top.
+
 ## Failure behavior
 
 The selected router gets one request and at most 2.5 seconds. Missing, uncertain or failed decisions use the configured main reply model, without replaying tools. User cancellation propagates. A failed reply request remains a visible failed turn; there is no canned successful response. A saved seller answer remains available for the existing fenced recovery worker. Routing does not authorize payment, fulfilment, a refund or a seller proposal.
