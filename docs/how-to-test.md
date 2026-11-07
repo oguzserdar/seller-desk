@@ -1,7 +1,27 @@
 # How to test Seller Desk
 
-About 15 minutes on your own computer. Everything here uses a fictional bike shop and a
-simulated PayPal page, so no money moves and no account is needed.
+## Fastest: the hosted demo
+
+No install and no AI key. The assistant runs on the demo's own server.
+
+- The shop: <https://seller-desk.oguz-077.workers.dev/buy>
+- The owner's desk: <https://seller-desk.oguz-077.workers.dev/owner/login>, login in the
+  Devpost testing instructions
+- Payments go through the PayPal sandbox. No real money moves. Use the sandbox buyer
+  login in the Devpost testing instructions.
+
+The shop is a fictional bike shop. Try sections 3 and 4 below on it. The assistant has a
+daily limit so the demo stays available until judging ends.
+
+To connect your own AI app to the owner's desk, open **Setup → Your AI apps** and paste the
+**Line for a coding agent** into Claude Code, Codex or Cursor, or add the connector address
+in ChatGPT or Claude. The app can read the desk; it cannot message customers or change
+anything.
+
+## On your own computer
+
+About 15 minutes. Everything here uses a fictional bike shop and a simulated PayPal page, so
+no money moves and no account is needed.
 
 ## 1. Start it
 
