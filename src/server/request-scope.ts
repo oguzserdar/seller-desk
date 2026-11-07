@@ -18,7 +18,7 @@ export type RequestScope = (
   frameOrigins?: Promise<string[]>;
   /**
    * A trial's settings, and where its model spend is recorded: the real shop's
-   * database, so a test still counts against the daily AI budget.
+   * database, so a test still counts against the AI budget.
    */
   simulation?: { config: ServerConfig; recordSpend?: (micros: number) => Promise<void> };
   /** This request's settings with any connection saved in Setup applied; read once per request. */

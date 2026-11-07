@@ -37,19 +37,19 @@ Run sequentially with one browser/app and inspect results before broadening the 
 5. In the actual browser try product questions, service constraints, digital access, unclear payment, a human request, a corrected pending request, seller proposals and false claimed approval. Refresh and stop a turn. Verify saved input, completed replies, current orders and approval state.
 6. Compare a chosen routine model against the main model before enabling it. Do not equate model probability with measured accuracy or infer savings from a passing unit test.
 
-## A daily budget for a shared key
+## A budget for a shared key
 
 A public demo, or any installation whose key you pay for while others use it, can set a
-daily dollar budget:
+dollar budget:
 
 ```sh
-AI_DAILY_BUDGET_USD=3
+AI_BUDGET_USD=100
 ```
 
-Each model call's reported tokens are priced and added to today's total. Once the total
-reaches the budget, the assistant is off until midnight UTC: customers see the plain shop,
-can still add items and pay with PayPal, and the owner's Setup says why. Shop tests count
-against the same budget. Nothing is measured when the setting is absent.
+Each model call's reported tokens are priced and added to a running total. Once the total
+reaches the budget, the assistant is off: customers see the plain shop, can still add items
+and pay with PayPal, and the owner's Setup says why. Raise the budget to turn it back on.
+Shop tests count against the same budget. Nothing is measured when the setting is absent.
 
 Prices for the suggested models are built in (`src/server/ai/spend.ts`, with their source).
 For any other model, give its price in US dollars per million input and output tokens:

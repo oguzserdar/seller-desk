@@ -176,12 +176,12 @@ export async function routeAssistantTurn(input: {
     input.signal,
   );
   const routine = config.routineAi;
-  // Under a daily budget the routine model is metered too; without a known price it is not used.
-  const routinePrice = config.aiDailyBudgetUsd && routine?.status === "ready" ? priceFor(routine.modelId) : null;
+  // Under a budget the routine model is metered too; without a known price it is not used.
+  const routinePrice = config.aiBudgetUsd && routine?.status === "ready" ? priceFor(routine.modelId) : null;
   const useRoutine =
     trace.status === "accepted" &&
     routine?.status === "ready" &&
-    (!config.aiDailyBudgetUsd || routinePrice !== null) &&
+    (!config.aiBudgetUsd || routinePrice !== null) &&
     config.routing.status === "ready" &&
     canUseRoutineModel(
       trace.route,

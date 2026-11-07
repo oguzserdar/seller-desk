@@ -9,7 +9,7 @@
  *   3. add "mistral" to AI_PROVIDERS and its key name to PROVIDER_KEY_ENV in env.ts
  */
 import { getEffectiveConfig } from "@/server/effective-config";
-import { withDailyBudget } from "./spend";
+import { withBudget } from "./spend";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -53,8 +53,8 @@ export async function getAssistantModel(): Promise<AssistantModel> {
   const config = await getEffectiveConfig();
   const ai = config.ai;
   if (ai.status !== "ready") return { ok: false, problem: ai.problem };
-  const budgeted = await withDailyBudget(PROVIDER_FACTORIES[ai.provider](ai.apiKey, ai.modelId), ai.modelId, {
-    budgetUsd: config.aiDailyBudgetUsd,
+  const budgeted = await withBudget(PROVIDER_FACTORIES[ai.provider](ai.apiKey, ai.modelId), ai.modelId, {
+    budgetUsd: config.aiBudgetUsd,
     priceOverride: config.aiPricePerMillionTokens,
   });
   if (!budgeted.ok) return budgeted;

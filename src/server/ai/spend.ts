@@ -1,10 +1,10 @@
 /**
- * An optional daily dollar budget for this installation's AI key (AI_DAILY_BUDGET_USD).
+ * An optional dollar budget for this installation's AI key (AI_BUDGET_USD).
  *
- * Every model call's reported tokens are priced and added to a per-day counter in
- * micro-dollars (millionths of a US dollar). Once today's spend reaches the budget the
- * assistant is off until midnight UTC: the shop keeps selling as a plain catalog and
- * the owner sees why in Setup. Unset, nothing is measured and nothing is limited.
+ * Every model call's reported tokens are priced and added to one running total in
+ * micro-dollars (millionths of a US dollar). Once the total reaches the budget the
+ * assistant is off: the shop keeps selling as a plain catalog and the owner sees why
+ * in Setup. Raising the budget turns it back on. Unset, nothing is measured or limited.
  *
  * Prices are US dollars per million tokens. The table covers the models these docs
  * suggest; AI_PRICE_PER_MILLION_TOKENS ("input,output") prices any other model. A model
@@ -31,8 +31,9 @@ export const MODEL_PRICES: Record<string, Price> = {
   "gpt-5-mini": { input: 0.25, output: 2 },
 };
 
-const DAY_SECONDS = 86_400;
-const SPEND_FEATURE = "ai_spend_micros";
+// One window that never rolls over, so spend keeps adding up until the budget is raised.
+const ALL_TIME_SECONDS = 10_000_000_000;
+const SPEND_FEATURE = "ai_spend_total_micros";
 const SPEND_PRINCIPAL = "installation";
 
 /**
@@ -67,7 +68,7 @@ export type SpendRecorder = (micros: number) => Promise<void>;
 export function spendRecorder(): SpendRecorder {
   const scope = getRequestScope();
   if (scope?.simulation) return scope.simulation.recordSpend ?? (async () => {});
-  const add = (micros: number) => addUsage(SPEND_FEATURE, SPEND_PRINCIPAL, DAY_SECONDS, micros);
+  const add = (micros: number) => addUsage(SPEND_FEATURE, SPEND_PRINCIPAL, ALL_TIME_SECONDS, micros);
   if (scope?.d1) {
     const d1 = scope.d1;
     return (micros) => withD1Database(d1, () => add(micros));
@@ -109,11 +110,11 @@ export type Budgeted =
   | { ok: false; problem: string };
 
 /**
- * Applies the daily budget to a model: unchanged without one, metered while today's
- * spend is under it, and off once it is used. A shop test was checked when it started,
- * so its calls are only counted.
+ * Applies the budget to a model: unchanged without one, metered while total spend is
+ * under it, and off once it is used. A shop test was checked when it started, so its
+ * calls are only counted.
  */
-export async function withDailyBudget(
+export async function withBudget(
   model: LanguageModel,
   modelId: string,
   settings: { budgetUsd?: number; priceOverride?: string },
@@ -121,12 +122,12 @@ export async function withDailyBudget(
   if (!settings.budgetUsd) return { ok: true, model };
   const price = priceFor(modelId, parsePrice(settings.priceOverride));
   if (!price) {
-    return { ok: false, problem: `The daily AI budget needs this model's price. Set AI_PRICE_PER_MILLION_TOKENS for ${modelId}, or remove AI_DAILY_BUDGET_USD.` };
+    return { ok: false, problem: `The AI budget needs this model's price. Set AI_PRICE_PER_MILLION_TOKENS for ${modelId}, or remove AI_BUDGET_USD.` };
   }
   if (!getRequestScope()?.simulation) {
     const budgetMicros = Math.round(settings.budgetUsd * 1_000_000);
-    if (!(await hasUsageLeft(SPEND_FEATURE, SPEND_PRINCIPAL, DAY_SECONDS, budgetMicros))) {
-      return { ok: false, problem: "Today's AI budget is used. The shop keeps selling without the assistant, and it returns at midnight UTC." };
+    if (!(await hasUsageLeft(SPEND_FEATURE, SPEND_PRINCIPAL, ALL_TIME_SECONDS, budgetMicros))) {
+      return { ok: false, problem: "The AI budget is used up. The shop keeps selling without the assistant until the owner raises AI_BUDGET_USD." };
     }
   }
   return { ok: true, model: meterModel(model, price, spendRecorder()) };

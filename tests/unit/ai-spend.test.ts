@@ -1,5 +1,5 @@
 /**
- * The daily AI budget's arithmetic: model prices as providers and gateways name
+ * The AI budget's arithmetic: model prices as providers and gateways name
  * models, the operator's price override, cost in micro-dollars, and metering of
  * both generated and streamed calls.
  */
