@@ -2,17 +2,13 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { pageQuery } from "@/lib/connector-resume";
+import { CONNECTOR_CAN as CAN, CONNECTOR_CANNOT as CANNOT } from "@/lib/connector-scope";
 import { getAuth } from "@/server/auth/auth";
 import { readOwner } from "@/server/auth/owner";
 import { ConsentButtons } from "./consent-buttons";
 
 export const metadata: Metadata = { title: "Connect an AI app" };
 
-const CAN = [
-  "See buyers and questions waiting for you",
-  "Read conversations, orders and your offers",
-];
-const CANNOT = ["Message a buyer", "Change prices, stock or orders", "Refund or take payments"];
 
 /** The consent page Better Auth sends an AI app's access request to, after the owner signs in. */
 export default async function ConnectPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {

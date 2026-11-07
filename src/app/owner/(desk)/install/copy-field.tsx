@@ -15,7 +15,7 @@ export function CopyField({
   return (
     <div className="flex min-w-0 items-start gap-3">
       <code
-        className={`text-ink min-w-0 flex-1 font-mono text-sm leading-relaxed ${multiline ? "break-all whitespace-pre-wrap" : "truncate"}`}
+        className={`text-ink min-w-0 flex-1 font-mono text-sm leading-relaxed ${multiline ? "whitespace-pre-wrap [overflow-wrap:anywhere]" : "truncate"}`}
         aria-label={label}
       >
         {value}
