@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { ownerAction } from "@/server/actions/safe-action";
 import { AddDraftsInput, addDraftedOffers, draftFromBusinessText, MAX_SOURCE_CHARS } from "@/server/ai/draft-setup";
-import { requireOwner } from "@/server/auth/owner";
+import { requireOwnerWrite } from "@/server/auth/owner";
 import { MAX_ASSET_BYTES, storeAsset } from "@/server/domain/digital";
 import { DomainError } from "@/server/domain/errors";
 import { MAX_IMPORT_CHARS } from "@/server/domain/catalog-file";
@@ -31,7 +31,7 @@ export type UploadResult = { ok: true; id: string; filename: string; sizeBytes: 
 
 /** Stores the file buyers receive for a digital offer. Authorizes inside, like every Server Action. */
 export async function uploadAssetAction(form: FormData): Promise<UploadResult> {
-  const { owner } = await requireOwner(await headers());
+  const { owner } = await requireOwnerWrite(await headers());
   const file = form.get("file");
   if (!(file instanceof File) || file.size === 0) return { ok: false, message: "Choose a file to upload." };
   if (file.size > MAX_ASSET_BYTES) return { ok: false, message: "Files can be up to 1 MB in this version." };

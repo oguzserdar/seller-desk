@@ -21,7 +21,7 @@ export const metadata: Metadata = { title: "Setup" };
 
 /** Owner setup, with public connection guidance and independently checked readiness. */
 export default async function SetupPage() {
-  const { seller, owner } = await requireOwner(await headers());
+  const { seller, owner, viewer } = await requireOwner(await headers());
   const readiness = await getReadiness(seller);
   const [config, connection, apps, assistant] = await Promise.all([getEffectiveConfig(), describeAiConnection(), allowedApps(owner.userId), getAssistantModel()]);
   const deskTheme = deskThemeId(
@@ -39,7 +39,8 @@ export default async function SetupPage() {
         <ReadinessList readiness={readiness} />
       </div>
       <AiSetup
-        connection={connection}
+        // A demo visitor sees that a key is set, never any part of it.
+        connection={viewer ? { ...connection, keyMask: connection.keyMask ? "hidden in the demo" : null } : connection}
         reply={
           config.ai.status !== "ready"
             ? "Not connected"

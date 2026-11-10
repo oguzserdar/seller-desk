@@ -5,7 +5,7 @@ import { beginOwnerTurn, completeOwnerTurn, loadOwnerHistory, releaseOwnerTurn, 
 import { ownerInstructions, ownerTools } from "@/server/ai/owner-tools";
 import { ASSISTANT_LIMITS, assistantCallSettings, getAssistantModel } from "@/server/ai/registry";
 import { routeAssistantTurn, recordRouting } from "@/server/ai/routing";
-import { requireOwner } from "@/server/auth/owner";
+import { requireOwnerWrite } from "@/server/auth/owner";
 import { DomainError, invalid } from "@/server/domain/errors";
 import { ReportingTimeZone } from "@/server/domain/paid-summary";
 import { requireUsage } from "@/server/domain/usage";
@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
   const requestId = crypto.randomUUID();
   let claim: OwnerTurn | undefined;
   try {
-    const { owner, seller } = await requireOwner(request.headers);
+    const { owner, seller } = await requireOwnerWrite(request.headers);
     const { message, timeZone } = Body.parse(await readJson(request));
     const text = message.parts.map((part) => part.text).join("\n").trim();
     if (!text) throw invalid("Type a question about your desk.");

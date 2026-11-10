@@ -38,7 +38,7 @@ export default async function DeskPage({
 }: {
   searchParams: Promise<{ view?: string }>;
 }) {
-  const { owner } = await requireOwner(await headers());
+  const { owner, viewer } = await requireOwner(await headers());
   const requested = (await searchParams).view;
   const view: DeskView =
     (DESK_VIEWS as readonly string[]).includes(requested ?? "") &&
@@ -71,7 +71,8 @@ export default async function DeskPage({
       (item) => item.buyerSessionId === row.buyerSessionId,
     )?.id,
   }));
-  const assistantOn = (await getAssistantModel()).ok;
+  // The desk assistant spends the shop's AI budget, so a demo visitor does not get it.
+  const assistantOn = !viewer && (await getAssistantModel()).ok;
   const ordersNeedingYou: NeedsYouOrder[] = attention.rows.map((row) => ({
     id: row.id,
     ref: row.ref,
@@ -97,7 +98,11 @@ export default async function DeskPage({
           <h1 className="text-[26px] font-semibold tracking-[-0.02em]">
             Desk
           </h1>
-          {!assistantOn ? (
+          {viewer ? (
+            <p className="text-ink-2 mt-3 text-[14px]">
+              The owner&apos;s own assistant sits here for the signed-in owner.
+            </p>
+          ) : !assistantOn ? (
             <p className="text-ink-2 mt-3 text-[14px]">
               Your assistant isn&apos;t connected yet.{" "}
               <Link

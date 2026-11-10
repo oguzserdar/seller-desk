@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { z } from "zod";
-import { requireOwner } from "@/server/auth/owner";
+import { requireOwnerWrite } from "@/server/auth/owner";
 import { actionClient } from "@/server/actions/safe-action";
 import { answerConsent } from "@/server/connector/consent";
 import { DomainError } from "@/server/domain/errors";
@@ -15,7 +15,7 @@ const ConsentInput = z.object({ accept: z.boolean(), oauthQuery: z.string().min(
  */
 export const answerConnector = actionClient.inputSchema(ConsentInput).action(async ({ parsedInput }) => {
   const requestHeaders = await headers();
-  await requireOwner(requestHeaders);
+  await requireOwnerWrite(requestHeaders);
   try {
     return { redirectTo: await answerConsent(requestHeaders, parsedInput.accept, parsedInput.oauthQuery) };
   } catch (error) {

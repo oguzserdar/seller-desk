@@ -40,6 +40,7 @@ export default async function OwnerDeskLayout({
         name={context.name}
         email={context.email}
         waiting={questions.length + attention.rows.length}
+        viewer={context.viewer}
       >
         {children}
       </OwnerShell>

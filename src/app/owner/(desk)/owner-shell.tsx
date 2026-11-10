@@ -36,12 +36,15 @@ export function OwnerShell({
   name,
   email,
   waiting,
+  viewer = false,
   children,
 }: {
   shopName: string;
   name: string;
   email: string;
   waiting: number;
+  /** A visitor looking around a public demo: the desk says so and offers the owner's sign-in. */
+  viewer?: boolean;
   children: ReactNode;
 }) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
@@ -94,6 +97,12 @@ export function OwnerShell({
             <AccountMenu name={name} email={email} showName={false} />
           </div>
         </header>
+        {viewer ? (
+          <p role="note" className="bg-brand-soft text-ink border-line shrink-0 border-b px-4 py-2 text-[13.5px] leading-snug">
+            <strong className="font-semibold">Demo desk.</strong> You can open every page. Nothing can be changed here.{" "}
+            <Link href="/owner/login" className="text-brand font-semibold underline underline-offset-2">Sign in as the owner</Link>
+          </p>
+        ) : null}
         <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
       </SidebarInset>
     </SidebarProvider>

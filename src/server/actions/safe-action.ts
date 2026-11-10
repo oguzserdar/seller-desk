@@ -1,7 +1,7 @@
 import "server-only";
 import { headers } from "next/headers";
 import { createSafeActionClient } from "next-safe-action";
-import { requireOwner } from "@/server/auth/owner";
+import { requireOwnerWrite } from "@/server/auth/owner";
 import { DomainError } from "@/server/domain/errors";
 
 /**
@@ -18,6 +18,7 @@ export const actionClient = createSafeActionClient({
 });
 
 export const ownerAction = actionClient.use(async ({ next }) => {
-  const context = await requireOwner(await headers());
+  // Every owner action changes something, so a demo visitor is refused here, in one place.
+  const context = await requireOwnerWrite(await headers());
   return next({ ctx: context });
 });
