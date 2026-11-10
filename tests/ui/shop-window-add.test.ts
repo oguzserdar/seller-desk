@@ -61,7 +61,14 @@ it("offers no Ask button when the shop's assistant is off", async () => {
   expect(calls).toEqual(["add repair"]);
 });
 
-it("draws a photo box only for products that have a photo", async () => {
+it("gives a product without a photo an icon panel, which a phone hides", async () => {
   const { host } = await render();
-  expect(host.querySelectorAll(".bg-photo")).toHaveLength(1);
+  const panels = host.querySelectorAll(".bg-photo");
+  expect(panels.length).toBeGreaterThan(1);
+  // One real photo; every other panel is the stand-in, hidden with its wrapper on a phone.
+  expect(host.querySelectorAll(".bg-photo:not([data-no-photo])")).toHaveLength(1);
+  for (const panel of host.querySelectorAll("[data-no-photo]")) {
+    expect(panel.querySelector("svg")).not.toBeNull();
+    expect(panel.closest("article")?.className).toContain("max-sm:[&>div:has([data-no-photo])]:hidden");
+  }
 });

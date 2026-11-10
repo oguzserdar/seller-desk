@@ -19,7 +19,7 @@ it("keeps complete purchase evidence while explaining record limits plainly to l
   const result = toolMessage?.content.find(p => p.type === "tool-result");
   if (!result || result.type !== "tool-result" || result.output.type !== "json") throw new Error("Missing facts");
   const facts = result.output.value;
-  expect(facts).toMatchObject({ recordLimits: { customerAcceptance: "No customer acceptance or satisfaction is recorded. Payment does not establish either.", appointmentDateTime: "No exact appointment date or time is shared in these records." } });
+  expect(facts).toMatchObject({ recordLimits: { customerAcceptance: "No customer acceptance or satisfaction is recorded. Payment does not establish either.", appointmentDateTime: expect.stringContaining("Agreed with the shop") } });
   expect(JSON.stringify(facts)).not.toContain("not_collected");
   expect(JSON.stringify(facts)).not.toContain("not_shared");
   expect(facts).toMatchObject({ orders: [{ paymentId: checkout.attemptId, stillToDo: expect.any(Array) }] });

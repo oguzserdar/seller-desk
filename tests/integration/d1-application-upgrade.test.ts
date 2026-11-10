@@ -73,7 +73,10 @@ it("official Wrangler migrations and native maintenance preserve a populated Sel
     const files = readdirSync("drizzle-d1")
       .filter((n) => n.endsWith(".sql"))
       .sort();
-    for (const file of files.slice(0, 2))
+    // The shop is populated by today's code, which signs the owner in through the connector's
+    // tables. So the starting point is the release that added them; later migrations are the upgrade.
+    const baseline = files.findIndex((n) => n.startsWith("0004_")) + 1;
+    for (const file of files.slice(0, baseline))
       writeFileSync(
         path.join(root, file),
         readFileSync(path.join("drizzle-d1", file)),
@@ -150,7 +153,7 @@ it("official Wrangler migrations and native maintenance preserve a populated Sel
         ),
       );
     const before = digest();
-    for (const file of files.slice(2))
+    for (const file of files.slice(baseline))
       writeFileSync(
         path.join(root, file),
         readFileSync(path.join("drizzle-d1", file)),

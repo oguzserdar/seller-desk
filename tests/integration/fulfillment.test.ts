@@ -128,7 +128,8 @@ describe("custom-price service review", () => {
   it("the owner's approval is a new quote version; the old one cannot be paid", async () => {
     const service = await quoteEachJob("Brake service");
     const buyer = await newBuyer();
-    const asked = await quoteFor(buyer, "Brake service");
+    // A service without a price needs the buyer's description before the shop can quote it.
+    const asked = await quoteFor(buyer, "Brake service", 1, "Front brake rubs after a wheel change.");
     expect(asked.status).toBe("seller_review");
     expect(await code(startCheckout(buyer, { quoteId: asked.id, revision: asked.revision }))).toBe("conflict");
 
@@ -158,7 +159,7 @@ describe("custom-price service review", () => {
   it("a declined quote cannot be paid and the buyer sees why", async () => {
     await quoteEachJob("Brake service");
     const buyer = await newBuyer();
-    const asked = await quoteFor(buyer, "Brake service");
+    const asked = await quoteFor(buyer, "Brake service", 1, "Front brake rubs after a wheel change.");
     await declineQuote(owner, { quoteId: asked.id, expectedRevision: asked.revision, reason: "We are fully booked this month." });
     const seen = await getBuyerQuote(buyer, asked.id);
     expect(seen.status).toBe("cancelled");

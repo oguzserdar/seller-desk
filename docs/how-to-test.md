@@ -11,7 +11,7 @@ No install and no AI key. The assistant runs on the demo's own server.
   login in the Devpost testing instructions.
 
 The shop is a fictional bike shop. Try sections 3 and 4 below on it. The assistant has a
-daily limit so the demo stays available until judging ends.
+spending limit so the demo stays available until judging ends.
 
 To connect your own AI app to the owner's desk, open **Setup → Your AI apps** and paste the
 **Line for a coding agent** into Claude Code, Codex or Cursor, or add the connector address

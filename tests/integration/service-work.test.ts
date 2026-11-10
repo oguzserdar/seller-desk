@@ -46,7 +46,8 @@ it("keeps purchased work open after a confirmed time, then records delivery with
   expect((await listBuyerPurchases(buyer)).orders[0]?.fulfillment).toContainEqual({ label: "The shop marked your work finished", detail: `Shop's completion note: ${input.note}` });
   const modelRecords = await listBuyerPurchases(buyer);
   expect(modelRecords.recordLimits).toEqual({ customerAcceptance: "not_collected", appointmentDateTime: "not_shared" });
-  expect(JSON.stringify(modelRecords)).not.toContain("Buyer agreed Saturday 10am");
+  // The note recorded with "Time confirmed" is the agreed time the buyer is shown; other follow-up notes stay private.
+  expect(modelRecords.orders[0]?.fulfillment).toContainEqual({ label: "Service time confirmed", detail: "Agreed with the shop: Buyer agreed Saturday 10am" });
   expect((await getDb().select().from(fulfillmentTask).where(eq(fulfillmentTask.id, followUp.id)))[0]).toEqual(agreed);
   expect({ orders: await getDb().select().from(orders), payments: await getDb().select().from(paymentAttempt) }).toEqual(before);
   expect(await getDb().select().from(auditEvent).where(and(eq(auditEvent.operation, "fulfillment.service_work_complete"), eq(auditEvent.targetId, work.id)))).toHaveLength(1);

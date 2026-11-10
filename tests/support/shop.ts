@@ -45,8 +45,8 @@ export async function offerId(titlePrefix: string): Promise<string> {
   return row.id;
 }
 
-export async function quoteFor(buyer: BuyerPrincipal, titlePrefix: string, quantity = 1) {
-  return proposeQuote(buyer, { lines: [{ offerId: await offerId(titlePrefix), quantity }] });
+export async function quoteFor(buyer: BuyerPrincipal, titlePrefix: string, quantity = 1, buyerNote?: string) {
+  return proposeQuote(buyer, { lines: [{ offerId: await offerId(titlePrefix), quantity }], buyerNote });
 }
 
 /** Quote + checkout in one step; returns the payment view (order_created on success). */

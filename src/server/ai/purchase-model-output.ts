@@ -21,7 +21,7 @@ export function purchaseFactsForModel(output: BuyerPurchases) {
   return {
     recordLimits: {
       customerAcceptance: "No customer acceptance or satisfaction is recorded. Payment does not establish either.",
-      appointmentDateTime: "No exact appointment date or time is shared in these records.",
+      appointmentDateTime: "The only appointment time on record is one an order's fulfillment lists as \"Agreed with the shop\". Where that line is absent, no date or time is shared.",
     },
     orders: output.orders.map(({ paidAt, help, ...order }) => ({
       ...order, paidAt: recordedTime(paidAt),
