@@ -58,4 +58,4 @@ The source is free to install. Hosting, model usage and payment processing have 
 
 ## Earlier evidence
 
-The [PostgreSQL/D1 verification record](database-verification-2026-10-15.md), [October 15 deployment record](deployment-cloudflare-2026-10-15.md), [verification history](proof-matrix.md) and [handover](../HANDOFF.md) preserve the dated scope. Earlier failures or unverified statements there do not replace the current checklist above. No new cloud deployment or public repository has been created by the October 19 implementation work.
+The [PostgreSQL/D1 verification record](database-verification-2026-10-15.md), [October 15 deployment record](deployment-cloudflare-2026-10-15.md) and [verification history](proof-matrix.md) preserve the dated scope. Earlier failures or unverified statements there do not replace the current checklist above. No new cloud deployment or public repository has been created by the October 19 implementation work.

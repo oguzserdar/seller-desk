@@ -125,6 +125,10 @@ database and no fine-tuning. For every message:
 
 The learning review above is a separate, owner-triggered model call with a structured answer.
 
+**Agentic commerce, with limits.** Each installation is also a connector (MCP) and an Agent
+Skill for the owner's own AI apps. Claude, ChatGPT, Codex or Cursor can read who is waiting,
+orders and offers, and draft answers. They cannot message customers, change prices or move money.
+
 ![Nothing is released until PayPal confirms it: the server retrieves the order, checks it, captures once; recovery job and verified webhook as backups](docs/media/diagram-paypal.png)
 
 **PayPal.** Checkout uses the Orders v2 API: create, retrieve and capture. Before an order or a
