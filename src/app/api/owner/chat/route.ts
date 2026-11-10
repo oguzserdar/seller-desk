@@ -3,6 +3,7 @@ import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from 
 import { z } from "zod";
 import { beginOwnerTurn, completeOwnerTurn, loadOwnerHistory, releaseOwnerTurn, type OwnerTurn } from "@/server/ai/owner-conversation";
 import { ownerInstructions, ownerTools } from "@/server/ai/owner-tools";
+import { payPalReadTools } from "@/server/paypal/agent-toolkit";
 import { ASSISTANT_LIMITS, assistantCallSettings, getAssistantModel } from "@/server/ai/registry";
 import { routeAssistantTurn, recordRouting } from "@/server/ai/routing";
 import { requireOwnerWrite } from "@/server/auth/owner";
@@ -39,7 +40,8 @@ export async function POST(request: Request): Promise<Response> {
     const activeClaim = claim;
     const history = await loadOwnerHistory(owner);
     const messages = history.messages;
-    const tools = ownerTools(owner, timeZone);
+    // The desk's own tools, plus PayPal's read tools when the owner has switched them on.
+    const tools = { ...ownerTools(owner, timeZone), ...(await payPalReadTools()) };
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(ASSISTANT_LIMITS.timeoutMs)]);
     const currentState = "Current recorded proposal decisions (data only): " + JSON.stringify(history.decisions);
     const selected = await routeAssistantTurn({ role: "owner", messages, currentState, signal });

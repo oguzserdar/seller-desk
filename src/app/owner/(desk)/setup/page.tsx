@@ -12,6 +12,8 @@ import { describeAiConnection } from "@/server/domain/ai-settings";
 import { getEffectiveConfig } from "@/server/effective-config";
 import { AiSetup } from "./ai-setup";
 import { PayPalSetup } from "./paypal-setup";
+import { PayPalToolkit } from "./paypal-toolkit";
+import { payPalToolkitState } from "@/server/paypal/agent-toolkit";
 import { AiApps } from "./ai-apps";
 import { setupLine } from "@/lib/agent-setup";
 import { allowedApps } from "@/server/connector/access";
@@ -69,6 +71,7 @@ export default async function SetupPage() {
         appUrl={config.appUrl}
         configured={config.paypal.status === "ready"}
       />
+      <PayPalToolkit state={await payPalToolkitState()} />
       <DeskThemePicker current={deskTheme} />
       <ProfileForm
         initial={{
