@@ -5,13 +5,7 @@
  * `pnpm owner:bootstrap` CLI through Better Auth's own internal adapter.
  */
 import { getDb } from "@/server/db/client";
-import {
-  account,
-  rateLimit,
-  session,
-  user,
-  verification,
-} from "@/server/db/schema";
+import * as pgAuthSchema from "@/server/db/auth-schema";
 import * as d1AuthSchema from "@/server/db/sqlite/auth-schema";
 import { getServerConfig } from "@/server/env";
 import { getRequestScope } from "@/server/request-scope";
@@ -72,7 +66,8 @@ function createAuth(database?: BetterAuthOptions["database"]) {
       database ??
       drizzleAdapter(getDb(), {
         provider: "pg",
-        schema: { user, session, account, verification, rateLimit },
+        // Every auth table, as on D1: the connector's plugins read the OAuth tables too.
+        schema: pgAuthSchema,
       }),
     session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
     disabledPaths: DISABLED_AUTH_PATHS,
