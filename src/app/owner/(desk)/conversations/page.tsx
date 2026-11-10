@@ -13,6 +13,7 @@ import {
   readSellerConversation,
 } from "@/server/domain/conversation-messages";
 import { DomainError } from "@/server/domain/errors";
+import { openQuestions } from "@/server/domain/seller-questions";
 import { cx } from "@/lib/cx";
 import { CustomerConversation } from "./customer-conversation";
 import { LocalTime } from "@/components/local-time";
@@ -30,7 +31,10 @@ export default async function ConversationsPage({
   const { owner } = await requireOwner(await headers());
   const requested = (await searchParams).conversation;
   if (requested && !z.uuid().safeParse(requested).success) notFound();
-  const items = await listSellerConversations(owner);
+  const [listed, questions] = await Promise.all([listSellerConversations(owner), openQuestions(owner)]);
+  // A customer waiting on the owner's answer comes first, whatever its age.
+  const waiting = new Set(questions.map((question) => question.conversationId));
+  const items = [...listed.filter((item) => waiting.has(item.id)), ...listed.filter((item) => !waiting.has(item.id))];
   const aiStatus = (await getEffectiveConfig()).ai.status;
   let selected = null;
   if (requested) {
@@ -47,7 +51,9 @@ export default async function ConversationsPage({
       <div className={cx(selected && "hidden lg:block")}>
         <h1 className="page-title">Conversations</h1>
         <p className="mt-1 text-ink-2">
-          See what the customer needs. Step in when you can help.
+          {waiting.size
+            ? `${waiting.size} ${waiting.size === 1 ? "customer is" : "customers are"} waiting for your answer. They are listed first.`
+            : "See what the customer needs. Step in when you can help."}
         </p>
       </div>
       {!items.length && !selected ? (
@@ -101,11 +107,11 @@ export default async function ConversationsPage({
                       )}
                     >
                       <span className="flex items-center justify-between gap-3 text-[12px] text-ink-3">
-                        <span>
-                          {item.handler === "seller"
-                            ? "With you"
-                            : "With assistant"}
-                        </span>
+                        {waiting.has(item.id) ? (
+                          <span className="text-attention font-semibold">Waiting for your answer</span>
+                        ) : (
+                          <span>{item.handler === "seller" ? "With you" : "With assistant"}</span>
+                        )}
                         <LocalTime value={item.updatedAt} options={DAY_MONTH} />
                       </span>
                       <p className="mt-2 line-clamp-3 text-[15px] leading-snug [overflow-wrap:anywhere]">
