@@ -68,7 +68,7 @@ function ItemCell({ data }: { data?: DeskRow }) {
   return (
     <span className="flex h-full items-center gap-3">
       <OfferPhoto
-        offer={{ title: data.items, imagePath: data.imagePath }}
+        offer={{ title: data.items, imagePath: data.imagePath, kind: data.offerKinds[0] }}
         sizes="48px"
         className="size-12 shrink-0 rounded-[9px]"
       />
@@ -103,8 +103,8 @@ export function DeskGrid({
     () => [
       {
         field: "ref",
-        headerName: "Reference",
-        width: 86,
+        headerName: "Order",
+        width: 92,
         tooltipField: "ref",
         // A real link, so the cell is announced as a link to the order. The grid moves keyboard focus cell by
         // cell, and Enter on a focused cell opens the order (onCellKeyDown); the row click stays for pointer users.
@@ -146,7 +146,26 @@ export function DeskGrid({
       },
       // Kept for the CSV export; the buyer name lives on the order page.
       { field: "who", headerName: "Buyer", hide: true },
-      { field: "status", headerName: "Payment", hide: true },
+      // The payment state in words with a mark, so a paid row never relies on colour alone.
+      {
+        field: "status",
+        headerName: "Payment",
+        width: 150,
+        cellRenderer: ({ data }: { data?: DeskRow }) =>
+          data ? (
+            <span className="flex h-full items-center">
+              <span
+                className={cx(
+                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[13px] leading-none font-medium",
+                  data.status === "Paid" ? "bg-success-soft text-success" : "bg-sunken text-ink-2",
+                )}
+              >
+                {data.status === "Paid" ? <span aria-hidden>✓</span> : null}
+                {data.status}
+              </span>
+            </span>
+          ) : null,
+      },
       {
         field: "when",
         headerName: "When",
