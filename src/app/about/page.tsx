@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Pixelify_Sans } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
 import { ArrowRight, Check, Lock } from "lucide-react";
 import { AgentDemo } from "@/components/about/agent-demo";
 import { PixelField } from "@/components/about/pixel-field";
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   description: "Seller Desk is an open-source AI sales assistant for small sellers who take PayPal.",
 };
 
-// The page's display face: square letters to go with the pixel field. Loaded only here.
-const pixel = Pixelify_Sans({ subsets: ["latin"], weight: ["500", "700"], variable: "--font-pixel", display: "swap" });
+// The headline's face: a high-contrast serif, set large against the field of squares. Loaded only here.
+const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif", display: "swap" });
 
 const SOURCE = "https://github.com/oguzserdar/seller-desk";
 const TEST_GUIDE = `${SOURCE}/blob/main/docs/how-to-test.md`;
@@ -38,7 +38,7 @@ const TESTS = [
 export default async function AboutPage() {
   const shop = await getSeller();
   return (
-    <div className={`about ${pixel.variable} bg-canvas text-ink flex min-h-dvh flex-col`}>
+    <div className={`about ${serif.variable} bg-canvas text-ink flex min-h-dvh flex-col`}>
       <header className="about-hero">
         <PixelField />
         <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-4 px-4 py-4 sm:px-6">
@@ -51,7 +51,7 @@ export default async function AboutPage() {
 
         <div className="about-hero-stage">
           <p className="about-eyebrow">Open source · PayPal checkout · AI assistant</p>
-          <h1 className="about-headline">The sales team a small seller never had</h1>
+          <h1 className="about-headline">The sales team a small seller <em>never had</em></h1>
           <p className="about-lede">
             Seller Desk answers customers from your catalog, asks you only what it cannot know, and
             closes the sale with a PayPal payment the server has checked.
