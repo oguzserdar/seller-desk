@@ -6,10 +6,10 @@ const OTHER = parseSettingsKey("b".repeat(64))!;
 
 describe("secret box", () => {
   it("round-trips a value and never stores it in the clear", async () => {
-    const sealed = await sealSecret(KEY, "purpose-a", "sk-ant-secret-value-1234");
+    const sealed = await sealSecret(KEY, "purpose-a", "sk-ant-fake-1234");
     expect(sealed.startsWith("v1.")).toBe(true);
     expect(sealed).not.toContain("secret-value");
-    expect(await openSecret(KEY, "purpose-a", sealed)).toBe("sk-ant-secret-value-1234");
+    expect(await openSecret(KEY, "purpose-a", sealed)).toBe("sk-ant-fake-1234");
   });
 
   it("uses a fresh IV, so equal values seal differently", async () => {
@@ -38,7 +38,7 @@ describe("secret box", () => {
   });
 
   it("masks keys to a known prefix and the last four characters", () => {
-    expect(maskSecret("sk-ant-api03-abcdefghijklmnop-wxyz")).toBe("sk-ant-••••wxyz");
+    expect(maskSecret("sk-ant-fake-key-wxyz")).toBe("sk-ant-••••wxyz");
     expect(maskSecret("AIzaSyExampleExampleExample1234")).toBe("AIza••••1234");
     expect(maskSecret("short")).toBe("••••");
   });

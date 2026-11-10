@@ -16,7 +16,7 @@ import { withD1Database } from "@/server/request-scope";
 import { createD1Db } from "@/server/storage/d1/client";
 import { newStorageFixture, type StorageFixture } from "../support/storage-fixture";
 
-const KEY = "sk-ant-api03-test-only-not-a-real-key-wxyz";
+const KEY = "sk-ant-test-key-wxyz";
 const INPUT = { provider: "anthropic" as const, modelId: "claude-sonnet-5-5", apiKey: KEY };
 
 for (const dialect of ["postgres", "d1"] as const)
@@ -91,7 +91,7 @@ for (const dialect of ["postgres", "d1"] as const)
       vi.stubEnv("SETTINGS_ENCRYPTION_KEY", "d".repeat(64));
       vi.stubEnv("AI_PROVIDER", "openai");
       vi.stubEnv("AI_MODEL_ID", "gpt-5-mini");
-      vi.stubEnv("OPENAI_API_KEY", "sk-proj-host-setting-key-0000");
+      vi.stubEnv("OPENAI_API_KEY", "sk-proj-host-0000");
       resetServerConfigForTests();
       const ai = (await run(getEffectiveConfig)).ai;
       expect(ai).toMatchObject({ status: "ready", provider: "openai", modelId: "gpt-5-mini" });
@@ -101,7 +101,7 @@ for (const dialect of ["postgres", "d1"] as const)
     it("removing the saved key restores host settings", async () => {
       vi.stubEnv("AI_PROVIDER", "openai");
       vi.stubEnv("AI_MODEL_ID", "gpt-5-mini");
-      vi.stubEnv("OPENAI_API_KEY", "sk-proj-host-setting-key-0000");
+      vi.stubEnv("OPENAI_API_KEY", "sk-proj-host-0000");
       resetServerConfigForTests();
       await run(() => saveAiConnection(f.owner, INPUT));
       expect((await run(getEffectiveConfig)).ai).toMatchObject({ provider: "anthropic" });
