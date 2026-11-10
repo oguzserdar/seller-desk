@@ -31,3 +31,11 @@ it("the deployment button enables the pinned manager before Vercel's dependency 
   expect(query.get("env")?.split(",")).toContain("ENABLE_EXPERIMENTAL_COREPACK");
   expect(JSON.parse(query.get("envDefaults")!)).toHaveProperty("ENABLE_EXPERIMENTAL_COREPACK", "1");
 });
+
+it("opens the About page first only on an installation marked as a public demo", () => {
+  expect(parseServerConfig(TEST_ENV).publicDemo).toBe(false);
+  expect(parseServerConfig({ ...TEST_ENV, PUBLIC_DEMO: "" }).publicDemo).toBe(false);
+  expect(parseServerConfig({ ...TEST_ENV, PUBLIC_DEMO: "false" }).publicDemo).toBe(false);
+  expect(parseServerConfig({ ...TEST_ENV, PUBLIC_DEMO: "true" }).publicDemo).toBe(true);
+  expect(() => parseServerConfig({ ...TEST_ENV, PUBLIC_DEMO: "yes" })).toThrow();
+});

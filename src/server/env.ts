@@ -127,6 +127,7 @@ const EnvSchema = z.object({
     z.coerce.number().positive().max(2000).optional(),
   ),
   AI_PRICE_PER_MILLION_TOKENS: optionalText,
+  PUBLIC_DEMO: z.preprocess(blankToUndefined, z.enum(["true", "false"]).optional()),
   TYPESAFE_AI_API_KEY: optionalText,
   AI_GATEWAY_API_KEY: optionalText,
   VERCEL_OIDC_TOKEN: optionalText,
@@ -215,6 +216,8 @@ export type ServerConfig = {
   aiBudgetUsd?: number;
   /** "input,output" US dollars per million tokens, for a model the built-in price table does not list. */
   aiPricePerMillionTokens?: string;
+  /** A public demo of Seller Desk itself: the home address opens the About page, and the mode banner links to it. */
+  publicDemo: boolean;
   paypal: PayPalConfig;
   store: WooStoreConfig | null;
 };
@@ -405,6 +408,7 @@ export function parseServerConfig(
           )
         : null,
     paypal: resolvePayPal(env),
+    publicDemo: env.PUBLIC_DEMO === "true",
     ...(env.AI_REASONING ? { aiReasoning: env.AI_REASONING } : {}),
     ...(env.AI_BUDGET_USD ? { aiBudgetUsd: env.AI_BUDGET_USD } : {}),
     ...(env.AI_PRICE_PER_MILLION_TOKENS ? { aiPricePerMillionTokens: env.AI_PRICE_PER_MILLION_TOKENS } : {}),

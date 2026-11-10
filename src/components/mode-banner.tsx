@@ -1,4 +1,5 @@
 import { getServerConfig } from "@/server/env";
+import Link from "next/link";
 import { connection } from "next/server";
 
 /**
@@ -17,6 +18,12 @@ export async function ModeBanner() {
   return (
     <div role="note" className="bg-sunken text-ink-2 border-line border-b px-4 py-1.5 text-center text-[13px] font-medium">
       PayPal sandbox · Test payments only.
+      {config.publicDemo ? (
+        <>
+          {" · "}
+          <Link href="/about" className="text-brand font-semibold hover:underline">About this demo</Link>
+        </>
+      ) : null}
     </div>
   );
 }
