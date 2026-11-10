@@ -17,6 +17,7 @@ export function GET(): Response {
 Facts:
 - Prices come from the shop's catalog or the owner's reviewed quote. The AI model cannot set a price or mark anything paid.
 - Payment uses PayPal Orders v2 (create, retrieve, capture) and verified webhooks. The server checks merchant, amount and currency with PayPal before it creates an order or releases a download.
+- The owner's desk assistant can read orders, transactions, invoices and disputes through PayPal's own Agent Toolkit. It is read-only; checkout never goes through a model.
 - The assistant learns only facts the owner approves. A one-off favour for one customer is never reused.
 - The owner can test the assistant with simulated customers in a throwaway copy of the shop.
 - It installs in the owner's own Cloudflare or Vercel account. License: MIT.

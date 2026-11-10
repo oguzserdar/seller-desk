@@ -4,19 +4,22 @@
 
 It answers customers from your catalog, asks you only what it can't know, and closes the sale with a verified PayPal payment.
 
+**The one rule:** the AI talks, the server decides money. The model cannot set a price, change a total or mark anything paid. A haggler, a fake "system" message, a tampered amount, a forged webhook and a double payment all end the same way: refused, or one order and one payment.
+
 [Live demo](https://sellerdesk.dev) · [Try the shop](https://sellerdesk.dev/buy) · [How to test it](docs/how-to-test.md) · [How it learns](#it-learns-from-the-answers-you-give) · [Install](#deploy) · [Guide](docs/guide.md)
 
 ![The current catalog, quote, service order and seller desk in the original exploded-view animation](docs/media/hero.gif)
 
-## Try it in two minutes (for judges)
+## For judges: pick your time
 
-No install and no login. The demo shop is fictional and payments run in the PayPal sandbox.
+No install. The demo shop is fictional and payments run in the PayPal sandbox.
 
-1. **Ask the shop.** Open [the shop](https://sellerdesk.dev/buy) and ask for something, such as "Can you replace my brake cable by Tuesday?"
-2. **Pay with PayPal.** Take the quote and pay with a PayPal sandbox buyer account. The server checks the payment with PayPal before it makes the order.
-3. **Look around the owner's desk.** On [the home page](https://sellerdesk.dev) press **Look around the owner's desk**. Every page opens and nothing can be changed. To answer a customer or send a quote, [sign in as the owner](https://sellerdesk.dev/owner/login).
-
-[The 15-minute checklist](docs/how-to-test.md) lists each check and its expected result.
+| You have | Do this | You see |
+|---|---|---|
+| **30 seconds** | Open [sellerdesk.dev](https://sellerdesk.dev) | One sale playing out, from a question to a checked PayPal payment |
+| **2 minutes** | Open [the shop](https://sellerdesk.dev/buy) and ask "Can you replace my brake cable by Tuesday?" | An answer from the real catalog, and a quote with **Pay with PayPal** |
+| **5 minutes** | On the home page press **Look around the owner's desk** (no login, read-only) | Paid orders, the customers waiting for an answer, and Setup with both PayPal paths |
+| **15 minutes** | Sign in as the owner with the login in the submission's testing instructions, then follow [the checklist](docs/how-to-test.md) | Answer a customer, send a quote, pay it as a sandbox buyer, watch the order appear |
 
 ## See it work
 
@@ -147,6 +150,33 @@ download is released, the server retrieves the PayPal order itself and checks th
 currency and recipient. Webhooks are verified with PayPal's signature check. If a customer's
 return is interrupted, a recovery job finds or completes the payment and records one order,
 never a second charge.
+
+## Receipts: every PayPal call, and what the server checks
+
+| Step | PayPal call | What the server does around it |
+|---|---|---|
+| Sign in to PayPal | `POST /v1/oauth2/token` | Client credentials stay on the server |
+| Start checkout | `POST /v2/checkout/orders` | Amount comes from the saved quote, never from the chat. A `PayPal-Request-Id` saved before the call makes a retry safe |
+| Customer returns | `GET /v2/checkout/orders/{id}` | Merchant, amount and currency must match the quote before anything else happens |
+| Take the money | `POST /v2/checkout/orders/{id}/capture` | Captured once. Paying twice or reloading still ends in one order |
+| Backup | Webhook, checked with `POST /v1/notifications/verify-webhook-signature` | An unsigned or forged event is refused. A lost return page is recovered by a scheduled job |
+| Owner lookups (optional) | PayPal Agent Toolkit: `get_order`, `list_transactions`, `list_invoices`, `get_invoice`, `list_disputes`, `get_dispute` | Read-only, for the owner's desk assistant |
+
+### Two ways to PayPal, kept apart
+
+Seller Desk uses PayPal's own [Agent Toolkit](https://github.com/paypal/agent-toolkit) and its own checkout code, each for what it is good at.
+
+- **Reading: PayPal's Agent Toolkit.** With `PAYPAL_AGENT_TOOLKIT=on`, the owner's desk assistant can ask PayPal directly: "what does PayPal say about order 1006?", "any open disputes?". The toolkit is configured with read actions only, and the tools it returns are checked against a fixed list again before the model sees them.
+- **Moving money: this server's code.** A model that can call `create_order` or capture a payment decides money. Here it cannot: checkout is server code with a saved quote, a per-attempt request id, a merchant, amount and currency check, and a verified webhook.
+
+### What is real and what is simulated
+
+| | Hosted demo | `pnpm demo` on your machine |
+|---|---|---|
+| AI answers | Real model | Real model if you add a key; plain catalog without |
+| PayPal | Real PayPal sandbox | A built-in stand-in, no account needed |
+| Shop and customers | Fictional | Fictional |
+| "Test your assistant" | Real model, throwaway copy of the shop | Same |
 
 ## Try it locally
 
