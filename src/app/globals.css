@@ -351,10 +351,3 @@ body:has(> [role="note"]) { --banner-h: 33px; }
 @keyframes shop-handoff-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { .shop-handoff-dot { animation: none; } }
 
-/* About page: the two ways into the demo. On the band, the main one is light and the quiet one is outlined. */
-.about-cta { display: inline-flex; min-height: 48px; align-items: center; gap: 8px; padding: 0 20px; border-radius: 12px; font-size: 16px; font-weight: 600; transition: background-color 150ms ease, border-color 150ms ease; }
-.about-cta:focus-visible { outline: 2px solid var(--color-band-ink); outline-offset: 3px; }
-.about-cta-primary { background: var(--color-band-ink); color: var(--color-band); }
-.about-cta-primary:hover { background: #fff; }
-.about-cta-quiet { border: 1px solid var(--color-band-line); color: var(--color-band-ink); }
-.about-cta-quiet:hover { border-color: var(--color-band-ink-2); }
