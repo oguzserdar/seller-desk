@@ -21,7 +21,7 @@ export default async function EditOfferPage({ params, searchParams }: { params: 
   const { row, stock, assetName } = found;
   const blockers = publishBlockers(seller, row, stock);
   return (
-    <section className="w-full max-w-3xl px-4 py-8 sm:px-8">
+    <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-8">
       <Link href="/owner/offers" className="text-brand text-[14px] font-semibold hover:underline">
         ← Offers
       </Link>

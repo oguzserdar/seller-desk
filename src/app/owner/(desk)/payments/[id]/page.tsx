@@ -52,7 +52,7 @@ export default async function OwnerPaymentPage({ params }: { params: Promise<{ i
   }
   const words = ownerWords(view);
   return (
-    <section className="w-full max-w-3xl px-4 py-8 sm:px-8">
+    <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-8">
       <Link href="/owner/orders?view=payments_uncertain" className="text-brand text-[14px] font-semibold hover:underline">
         ← Payments to check
       </Link>

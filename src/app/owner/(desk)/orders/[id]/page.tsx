@@ -40,7 +40,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
   const { order, attempt, tasks, grants, accessReview } = detail;
   const evidence = attempt.evidence;
   return (
-    <section className="w-full max-w-4xl px-4 py-8 sm:px-8">
+    <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-8">
       <Link href="/owner/orders" className="text-brand text-[14px] font-semibold hover:underline">
         ← Desk
       </Link>

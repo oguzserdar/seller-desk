@@ -17,7 +17,7 @@ export default async function InstructionsPage() {
   const { owner } = await requireOwner(await headers());
   const entries = await listProcedures(owner, true);
   const previews = await listProcedurePreviews(owner);
-  return <section className="w-full max-w-3xl px-4 py-8 sm:px-8">
+  return <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-8">
     <LinkButton href="/owner/knowledge" variant="ghost" className="mb-4 -ml-4">Back to shop knowledge</LinkButton>
     <h1 className="page-title">How your assistant helps</h1>
     <p className="text-ink-2 mt-3 max-w-2xl text-[16px] leading-relaxed">Tell it what to ask, what to check and when to bring a decision to you. Save your wording privately, then publish it when ready.</p>

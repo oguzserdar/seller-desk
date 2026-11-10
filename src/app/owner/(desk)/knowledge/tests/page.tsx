@@ -17,7 +17,7 @@ export default async function SimulationPage() {
   const reports = await listSimulations(owner);
   const offers = await listOwnerOffers(owner);
   const instructions = await listProcedures(owner);
-  return <section className="w-full max-w-5xl px-4 py-8 sm:px-8">
+  return <section className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-8">
     <LinkButton href="/owner/knowledge" variant="ghost" className="mb-4 -ml-4">Back to shop knowledge</LinkButton>
     <h1 className="page-title">Test your assistant</h1>
     <p className="text-ink-2 mt-3 max-w-2xl text-[16px] leading-relaxed">Try a customer request before it happens. Read what your assistant says, which actions it takes and where it asks for help.</p>

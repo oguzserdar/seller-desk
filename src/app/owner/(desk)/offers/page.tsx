@@ -20,7 +20,7 @@ export default async function OffersPage() {
   const offers = await listOwnerOffers(owner);
   const published = offers.filter(({ row }) => row.published).length;
   return (
-    <section className="w-full max-w-5xl px-4 py-8 sm:px-8">
+    <section className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="page-title">Offers</h1>

@@ -21,7 +21,7 @@ export default async function InstallPage({ searchParams }: { searchParams: Prom
   const checkStore = (await searchParams).checkStore === "1";
   const storeCheck = config.store && checkStore ? await searchWooProducts(config.store, { search: "", page: 1 }).catch(() => null) : undefined;
   return (
-    <section className="w-full max-w-4xl px-4 pt-8 pb-16 sm:px-8">
+    <section className="mx-auto w-full max-w-4xl px-4 pt-8 pb-16 sm:px-8">
       <h1 className="page-title">Bring your assistant to your website</h1>
       <p className="text-ink-2 mt-3 max-w-xl text-[17px] leading-relaxed">Give customers an “Ask the shop” button. They can find the right product and get answers while they browse.</p>
 

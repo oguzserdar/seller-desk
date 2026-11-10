@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Add offers" };
 export default async function ImportPage() {
   const { seller } = await requireOwner(await headers());
   return (
-    <section className="w-full max-w-3xl px-4 pt-8 pb-16 sm:px-8">
+    <section className="mx-auto w-full max-w-3xl px-4 pt-8 pb-16 sm:px-8">
       <Link href="/owner/offers" className="text-ink-2 hover:text-ink text-[15px] font-medium">
         Offers
       </Link>

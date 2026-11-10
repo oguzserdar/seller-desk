@@ -28,7 +28,7 @@ export default async function SetupPage() {
     (await cookies()).get(DESK_THEME_COOKIE)?.value,
   );
   return (
-    <section className="w-full max-w-4xl px-4 py-8 sm:px-8">
+    <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-8">
       <h1 className="page-title">Setup</h1>
       <p className="text-ink-2 mt-1">
         Check your shop, payments and optional AI assistant. Buyers can browse

@@ -47,7 +47,7 @@ export default async function ConversationsPage({
     }
   }
   return (
-    <section className="max-w-[1280px] px-4 pt-7 pb-10 sm:px-8">
+    <section className="mx-auto max-w-[1280px] px-4 pt-7 pb-10 sm:px-8">
       <div className={cx(selected && "hidden lg:block")}>
         <h1 className="page-title">Conversations</h1>
         <p className="mt-1 text-ink-2">
