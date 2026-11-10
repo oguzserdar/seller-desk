@@ -114,6 +114,12 @@
 .agent-line[data-kind="item"] { padding-left: 16px; color: var(--about-on-2); }
 .agent-line[data-kind="item"]::before { content: "\2022  "; margin-left: -16px; }
 
+.about-questions { display: grid; gap: 0; margin-top: 28px; border-top: 1px solid var(--color-line); }
+.about-questions > div { display: grid; gap: 6px 40px; padding: 22px 0; border-bottom: 1px solid var(--color-line); }
+.about-questions dt { font-size: 18px; font-weight: 600; line-height: 1.35; }
+.about-questions dd { color: var(--color-ink-2); line-height: 1.65; text-wrap: pretty; }
+@media (min-width: 860px) { .about-questions > div { grid-template-columns: 5fr 7fr; } }
+
 .about-shot { width: 100%; height: auto; border: 1px solid var(--color-line); border-radius: 18px; box-shadow: 0 24px 60px oklch(22% 0.05 262 / 0.14); }
 .about-close { margin-top: 96px; padding: 96px 16px; text-align: center; color: var(--about-on); background: radial-gradient(55% 90% at 50% 120%, var(--about-glow), transparent 70%), linear-gradient(180deg, var(--about-night-2), var(--about-night)); }
 .about-foot { padding: 22px 16px; text-align: center; font-size: 13px; color: var(--about-on-2); background: var(--about-night); border-top: 1px solid var(--about-on-line); }

@@ -10,7 +10,7 @@ const LINES = [
   { kind: "say", text: "Two things need you:" },
   { kind: "item", text: "A customer is waiting for a price on a brake cable repair." },
   { kind: "item", text: "Order #1001, disc brake pads, is paid and ready for pickup." },
-  { kind: "say", text: "I drafted a reply for the first one. Nothing was sent." },
+  { kind: "say", text: "I can read your desk. I cannot send or change anything." },
 ] as const;
 
 export function AgentDemo() {
@@ -30,7 +30,7 @@ export function AgentDemo() {
   }, [seen, still]);
 
   return (
-    <div ref={block} className="agent-demo" role="img" aria-label="Illustration: the owner asks their own AI app what needs them today, and it answers from the desk's records without sending anything.">
+    <div ref={block} className="agent-demo" role="img" aria-label="Illustration: the owner asks their own AI app what needs them today, and it answers from the desk's records. It can read and cannot send or change anything.">
       <div aria-hidden className="agent-demo-bar"><span /><span /><span /><em>your AI app</em></div>
       <div aria-hidden className="agent-demo-body">
         {LINES.map((line, index) => (

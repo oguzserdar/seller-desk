@@ -21,7 +21,7 @@ export async function ModeBanner() {
       {config.publicDemo ? (
         <>
           {" · "}
-          <Link href="/about" className="text-brand font-semibold hover:underline">About this demo</Link>
+          <Link href="/" className="text-brand font-semibold hover:underline">About this demo</Link>
         </>
       ) : null}
     </div>

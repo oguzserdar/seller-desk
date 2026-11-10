@@ -216,7 +216,7 @@ export type ServerConfig = {
   aiBudgetUsd?: number;
   /** "input,output" US dollars per million tokens, for a model the built-in price table does not list. */
   aiPricePerMillionTokens?: string;
-  /** A public demo of Seller Desk itself: the home address opens the About page, and the mode banner links to it. */
+  /** A public demo of Seller Desk itself: the home address is the Seller Desk home page, and the mode banner links to it. */
   publicDemo: boolean;
   paypal: PayPalConfig;
   store: WooStoreConfig | null;
