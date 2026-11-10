@@ -351,3 +351,8 @@ body:has(> [role="note"]) { --banner-h: 33px; }
 @keyframes shop-handoff-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { .shop-handoff-dot { animation: none; } }
 
+/* Anything that can be pressed shows the hand; a disabled control does not. */
+@layer base {
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, label[for], select { cursor: pointer; }
+  button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
+}
