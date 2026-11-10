@@ -48,7 +48,7 @@ export default async function OffersPage() {
               <li key={row.id}>
                 <section className="surface flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex min-w-0 gap-4">
-                    <OfferPhoto offer={{ title: row.title, imagePath: row.imagePath }} sizes="64px" className="size-16 shrink-0 rounded-[10px]" />
+                    <OfferPhoto offer={{ title: row.title, imagePath: row.imagePath, kind: row.kind }} sizes="64px" className="size-16 shrink-0 rounded-[10px]" />
                     <div className="min-w-0">
                     <Link href={`/owner/offers/${row.id}`} className="block text-[17px] font-semibold hover:underline">
                       {row.title}

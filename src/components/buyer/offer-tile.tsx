@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/arc/card/card";
 import { Button } from "@/components/arc/button/button";
-import { Check, Download, Package, Plus, Wrench } from "lucide-react";
+import { Check, Download, Package, Plus, Tag, Wrench } from "lucide-react";
 import Image from "next/image";
 import { cx } from "@/lib/cx";
 import { formatQuoteAmount } from "@/lib/money";
@@ -41,7 +41,7 @@ export function OfferPhoto({
   className,
   eager = false,
 }: {
-  offer: Pick<TileOffer, "title" | "imagePath">;
+  offer: Pick<TileOffer, "title" | "imagePath"> & { kind?: OfferKind };
   sizes: string;
   className?: string;
   /** The page's largest above-the-fold image: load it first (Next 16 docs prefer this to preload). */ eager?: boolean;
@@ -59,8 +59,20 @@ export function OfferPhoto({
             : {})}
           className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
         />
-      ) : null}
+      ) : (
+        // No photo: a small mark instead of an empty square. The kind's own icon when the caller knows it.
+        <NoPhotoMark kind={offer.kind} />
+      )}
     </div>
+  );
+}
+
+function NoPhotoMark({ kind }: { kind?: OfferKind }) {
+  const Icon = kind ? KIND_ICON[kind] : Tag;
+  return (
+    <span className="text-ink-3 absolute inset-0 grid place-items-center">
+      <Icon aria-hidden strokeWidth={1.5} className="size-2/5 max-h-11 max-w-11" />
+    </span>
   );
 }
 
