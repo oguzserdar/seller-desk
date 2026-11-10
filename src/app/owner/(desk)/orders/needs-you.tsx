@@ -1,5 +1,6 @@
 "use client";
 
+import { LocalTime } from "@/components/local-time";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
@@ -21,7 +22,8 @@ import type { CustomerQuestion } from "../customer-questions";
 /** An order that waits on the owner, as one Desk row. */
 export type NeedsYouOrder = { id: string; ref: string; items: string; amount: string; nextStep: string; imagePath: string | null; href: string };
 
-const TIME = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
+// Day and time, so a question from last week does not read as one from this morning.
+const ASKED: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" };
 const enter = { duration: motionTokens.duration.standard, ease: [...motionTokens.ease.enter] } as const;
 
 function QuestionCard({ item }: { item: CustomerQuestion }) {
@@ -31,7 +33,8 @@ function QuestionCard({ item }: { item: CustomerQuestion }) {
   const [sentAt, setSentAt] = useState<string | null>(null);
   const send = useAction(answerQuestionAction, {
     onSuccess: () => {
-      setSentAt(TIME.format(new Date()));
+      // Runs in the browser after the send, so the owner's own clock is right.
+      setSentAt(new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date()));
       router.refresh();
     },
   });
@@ -57,7 +60,7 @@ function QuestionCard({ item }: { item: CustomerQuestion }) {
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
               <h3 className="bg-attention-soft text-attention rounded-[6px] px-2 py-0.5 text-[12px] font-semibold">Your assistant needs an answer</h3>
               <p className="text-ink-3 flex items-baseline gap-3 text-[13px]">
-                <time className="tabular" dateTime={item.askedAt}>{TIME.format(new Date(item.askedAt))}</time>
+                <span className="tabular"><LocalTime value={item.askedAt} options={ASKED} /></span>
                 <Link href={`/owner/conversations?conversation=${item.conversationId}`} className="text-ink-2 decoration-line-strong font-medium underline underline-offset-4 hover:text-ink">Open conversation</Link>
               </p>
             </div>
