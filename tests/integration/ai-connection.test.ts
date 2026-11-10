@@ -52,6 +52,8 @@ for (const dialect of ["postgres", "d1"] as const)
       else await f.binding.prepare("INSERT INTO installation(singleton, environment) VALUES (1, 'sandbox') ON CONFLICT(singleton) DO NOTHING").run();
     });
     afterEach(async () => {
+      // The PostgreSQL database is shared by every test file; a saved connection must not outlive this one.
+      if (f && !f.binding) await getDb().update(installation).set({ aiSettingsSealed: null });
       await f?.close();
       vi.unstubAllEnvs();
       resetServerConfigForTests();
