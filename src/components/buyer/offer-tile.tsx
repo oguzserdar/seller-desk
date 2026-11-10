@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/arc/card/card";
 import { Button } from "@/components/arc/button/button";
-import { Check, Plus } from "lucide-react";
+import { Check, Download, Package, Plus, Wrench } from "lucide-react";
 import Image from "next/image";
 import { cx } from "@/lib/cx";
 import { formatQuoteAmount } from "@/lib/money";
@@ -64,6 +64,55 @@ export function OfferPhoto({
   );
 }
 
+const KIND_ICON = { goods: Package, service: Wrench, digital: Download } as const;
+
+/** Card class that hides the stand-in panel's wrapper on a phone. */
+export const OFFER_CARD_CLASS = "h-full max-sm:[&>div:has([data-no-photo])]:hidden";
+
+/**
+ * The top of a product card. Without a photo, wide screens get a quiet panel with the kind's icon,
+ * so every card in a row is the same height. A phone shows no panel: it would be a screen-tall
+ * empty square.
+ */
+export function OfferMedia({
+  offer,
+  eager = false,
+}: {
+  offer: Pick<TileOffer, "title" | "imagePath" | "kind">;
+  eager?: boolean;
+}) {
+  if (offer.imagePath)
+    return (
+      <OfferPhoto
+        offer={offer}
+        eager={eager}
+        sizes="(min-width: 640px) 300px, 90vw"
+        className="aspect-square w-full"
+      />
+    );
+  return <OfferIcon kind={offer.kind} data-no-photo className="aspect-square w-full" size={44} />;
+}
+
+/** A product's kind as an icon on the photo tint, for a product without a photo. */
+export function OfferIcon({
+  kind,
+  size,
+  className,
+  ...props
+}: {
+  kind: OfferKind;
+  size: number;
+  className?: string;
+  "data-no-photo"?: boolean;
+}) {
+  const Icon = KIND_ICON[kind];
+  return (
+    <div {...props} className={cx("bg-photo text-ink-3 grid place-items-center", className)}>
+      <Icon aria-hidden size={size} strokeWidth={1.25} />
+    </div>
+  );
+}
+
 /** One offer the assistant found: photo, price, what happens next, and a way to add it. */
 export function OfferTile({
   offer,
@@ -87,16 +136,8 @@ export function OfferTile({
             ? `${stock.text}. ${fulfilmentText(offer)}`
             : fulfilmentText(offer)
         }
-        media={
-          // A missing photo would leave a screen-tall empty square on a phone.
-          offer.imagePath ? (
-            <OfferPhoto
-              offer={offer}
-              sizes="(min-width: 640px) 300px, 90vw"
-              className="aspect-square w-full"
-            />
-          ) : undefined
-        }
+        className={OFFER_CARD_CLASS}
+        media={<OfferMedia offer={offer} />}
         action={
           <Button
             type="button"

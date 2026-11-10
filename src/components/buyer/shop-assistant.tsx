@@ -21,7 +21,7 @@ import {
 import type { PublicOffer } from "@/server/domain/offers";
 import type { BuyerQuoteView } from "@/server/domain/quotes";
 import { Composer } from "./composer";
-import { OfferPhoto, OfferTile } from "./offer-tile";
+import { OfferIcon, OfferPhoto, OfferTile } from "./offer-tile";
 import { formatQuoteAmount } from "@/lib/money";
 import { QuoteBar, QuoteSheet } from "./quote-sheet";
 import { PurchaseLadder } from "./purchase-ladder";
@@ -458,21 +458,26 @@ export function ShopAssistant({
       {offers === null || assistant === "loading" ? (
         <div
           role="status"
-          className="mx-auto grid w-full max-w-[1200px] gap-10 px-4 pt-6 sm:px-6 lg:grid-cols-[5fr_6fr] lg:pt-12"
+          className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-4 py-8 sm:px-6"
           aria-label="Opening the shop"
         >
+          {/* Same shape as the first view, so the page does not jump when the shop arrives. */}
           <div className="flex flex-col gap-4">
-            <div className="bg-sunken h-11 w-4/5 animate-pulse rounded-[10px]" />
-            <div className="bg-sunken h-5 w-3/5 rounded" />
-            <div className="bg-sunken mt-6 h-16 rounded-[14px]" />
+            <div className="bg-sunken h-11 w-3/5 max-w-[420px] animate-pulse rounded-[10px]" />
+            <div className="bg-sunken h-5 w-2/5 max-w-[360px] rounded" />
+            <div className="bg-sunken mt-4 h-14 rounded-[28px]" />
           </div>
-          <div className="bg-sunken aspect-[4/3] animate-pulse rounded-[12px]" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="bg-sunken aspect-square animate-pulse rounded-[16px]" />
+            <div className="bg-sunken hidden aspect-square animate-pulse rounded-[16px] sm:block" />
+            <div className="bg-sunken hidden aspect-square animate-pulse rounded-[16px] lg:block" />
+          </div>
         </div>
       ) : conversation || browsing ? (
         <div className="shop-workspace">
           <main className="flex min-h-0 min-w-0 flex-col">
             <h1 className="sr-only">Shopping with {shopName}</h1>
-            <ShopConversation shopName={shopName} sending={status === "submitted"} follow={answersArrived}>
+            <ShopConversation shopName={shopName} sending={status === "submitted"} follow={answersArrived} browse={!conversation}>
               {withSeller ? (
                 <p role="status" className="mb-5 text-[14px] text-ink-2">
                   The shop owner is handling this conversation. Your messages go
@@ -575,11 +580,15 @@ export function ShopAssistant({
                         onClick={streaming ? undefined : () => ask(`Tell me about the ${offer.title}`)}
                         className="shop-ask-row"
                       >
-                        <OfferPhoto
-                          offer={offer}
-                          sizes="40px"
-                          className="size-10 shrink-0 rounded-[8px]"
-                        />
+                        {offer.imagePath ? (
+                          <OfferPhoto
+                            offer={offer}
+                            sizes="40px"
+                            className="size-10 shrink-0 rounded-[8px]"
+                          />
+                        ) : (
+                          <OfferIcon kind={offer.kind} className="size-10 shrink-0 rounded-[8px]" size={18} />
+                        )}
                         <span className="min-w-0 flex-1 line-clamp-2 leading-snug">
                           {offer.title}
                         </span>

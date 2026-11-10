@@ -6,7 +6,7 @@ import { Button } from "@/components/arc/button/button";
 import { Check, Plus } from "lucide-react";
 import { formatQuoteAmount } from "@/lib/money";
 import type { PublicOffer } from "@/server/domain/offers";
-import { OfferPhoto } from "./offer-tile";
+import { OFFER_CARD_CLASS, OfferMedia } from "./offer-tile";
 
 /** Starter questions drawn from what this shop actually sells. */
 export function suggestionsFor(offers: PublicOffer[]): string[] {
@@ -62,17 +62,8 @@ function Mosaic({
           <li key={offer.id} className="min-w-0">
             <Card
               title={offer.title}
-              media={
-                // A missing photo would leave a screen-tall empty square on a phone.
-                offer.imagePath ? (
-                  <OfferPhoto
-                    offer={offer}
-                    eager={index === 0}
-                    sizes="(min-width: 640px) 300px, 90vw"
-                    className="aspect-square w-full"
-                  />
-                ) : undefined
-              }
+              className={OFFER_CARD_CLASS}
+              media={<OfferMedia offer={offer} eager={index === 0} />}
               description={price}
               action={
                 <>
