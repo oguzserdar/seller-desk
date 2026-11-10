@@ -8,7 +8,7 @@ It answers customers from your catalog, asks you only what it can't know, and cl
 
 ![The current catalog, quote, service order and seller desk in the original exploded-view animation](docs/media/hero.gif)
 
-## Try it in two minutes
+## Try it in two minutes (for judges)
 
 No install and no login. The demo shop is fictional and payments run in the PayPal sandbox.
 
