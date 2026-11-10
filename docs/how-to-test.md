@@ -4,9 +4,12 @@
 
 No install and no AI key. The assistant runs on the demo's own server.
 
-- The shop: <https://seller-desk.oguz-077.workers.dev/buy>
-- The owner's desk: <https://seller-desk.oguz-077.workers.dev/owner/login>, login in the
-  Devpost testing instructions
+- Start here: <https://sellerdesk.dev>
+- The shop: <https://sellerdesk.dev/buy>
+- The owner's desk, read-only, no login: press **Look around the owner's desk** on
+  <https://sellerdesk.dev>
+- The owner's desk, to answer and send quotes: <https://sellerdesk.dev/owner/login>, login in
+  the Devpost testing instructions
 - Payments go through the PayPal sandbox. No real money moves. Use the sandbox buyer
   login in the Devpost testing instructions.
 

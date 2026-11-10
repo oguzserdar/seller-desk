@@ -4,9 +4,19 @@
 
 It answers customers from your catalog, asks you only what it can't know, and closes the sale with a verified PayPal payment.
 
-[Demo](https://seller-desk.oguz-077.workers.dev/buy) · [How it learns](#it-learns-from-the-answers-you-give) · [Install](#deploy) · [Guide](docs/guide.md)
+[Live demo](https://sellerdesk.dev) · [Try the shop](https://sellerdesk.dev/buy) · [How to test it](docs/how-to-test.md) · [How it learns](#it-learns-from-the-answers-you-give) · [Install](#deploy) · [Guide](docs/guide.md)
 
 ![The current catalog, quote, service order and seller desk in the original exploded-view animation](docs/media/hero.gif)
+
+## Try it in two minutes
+
+No install and no login. The demo shop is fictional and payments run in the PayPal sandbox.
+
+1. **Ask the shop.** Open [the shop](https://sellerdesk.dev/buy) and ask for something, such as "Can you replace my brake cable by Tuesday?"
+2. **Pay with PayPal.** Take the quote and pay with a PayPal sandbox buyer account. The server checks the payment with PayPal before it makes the order.
+3. **Look around the owner's desk.** On [the home page](https://sellerdesk.dev) press **Look around the owner's desk**. Every page opens and nothing can be changed. To answer a customer or send a quote, [sign in as the owner](https://sellerdesk.dev/owner/login).
+
+[The 15-minute checklist](docs/how-to-test.md) lists each check and its expected result.
 
 ## See it work
 
@@ -35,7 +45,7 @@ visible in one desk. The desk assistant can read order records when you ask what
 
 <picture>
   <source media="(max-width: 600px)" srcset="docs/media/seller-desk-mobile.png">
-  <img alt="The current seller desk showing orders and work that need attention" src="docs/media/seller-desk.png">
+  <img alt="The seller desk: paid orders, what needs the owner, and a customer question waiting for an answer" src="docs/media/seller-desk.png">
 </picture>
 
 **“Did my payment go through?”** The assistant checks the payment record. It can recover a
@@ -127,7 +137,8 @@ The learning review above is a separate, owner-triggered model call with a struc
 
 **Agentic commerce, with limits.** Each installation is also a connector (MCP) and an Agent
 Skill for the owner's own AI apps. Claude, ChatGPT, Codex or Cursor can read who is waiting,
-orders and offers, and draft answers. They cannot message customers, change prices or move money.
+conversations, orders and offers. The connector is read-only: they cannot message customers,
+change prices or move money.
 
 ![Nothing is released until PayPal confirms it: the server retrieves the order, checks it, captures once; recovery job and verified webhook as backups](docs/media/diagram-paypal.png)
 

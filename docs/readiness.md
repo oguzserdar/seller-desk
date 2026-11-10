@@ -4,7 +4,7 @@ Current as of October 19, 2026 (America/Edmonton). The implementation candidate 
 
 ## Existing hosted demo
 
-[Demo](https://seller-desk.oguz-077.workers.dev/buy). PayPal sandbox only.
+[Demo](https://sellerdesk.dev/buy). PayPal sandbox only.
 
 The existing Worker remains on version `9481e2a4-44a4-44eb-a568-b98e15caa3f1`. The October 19 browser run completed a $25 USD download purchase through the actual app and PayPal sandbox buyer UI. Independent PayPal and native-D1 reads agree on one completed capture, one paid attempt and one order. Both original webhook events were processed. Reload preserves the paid order.
 
