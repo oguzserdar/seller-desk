@@ -113,6 +113,9 @@ export default defineConfig(({ mode }) => {
       compatibilityDate: "2026-10-09",
       compatibilityFlags: ["nodejs_compat"],
       assets: { notFoundHandling: "none" },
+      // CUSTOM_DOMAIN in the deploy settings publishes the Worker on the operator's own domain as well.
+      // The workers.dev address stays on, so old links still arrive and are sent to the shop's address.
+      ...(settings.CUSTOM_DOMAIN?.trim() ? { domains: [settings.CUSTOM_DOMAIN.trim()], workersDev: true } : {}),
       triggers: [triggers.scheduled({ schedule: "* * * * *" })],
       exports: { SimulationDatabase: exports.durableObject({ storage: "sqlite" }) },
       env: {
