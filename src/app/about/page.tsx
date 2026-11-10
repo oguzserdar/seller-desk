@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Check, CircleDollarSign, Lock, MessageCircleQuestion, PackageCheck, ShieldCheck, Wrench } from "lucide-react";
+import { Pixelify_Sans } from "next/font/google";
+import { ArrowRight, Check, Lock } from "lucide-react";
 import { AgentDemo } from "@/components/about/agent-demo";
+import { PixelField } from "@/components/about/pixel-field";
 import { SaleDemo } from "@/components/about/sale-demo";
 import { getSeller } from "@/server/domain/seller";
 import "./about.css";
@@ -14,36 +16,31 @@ export const metadata: Metadata = {
   description: "Seller Desk is an open-source AI sales assistant for small sellers who take PayPal.",
 };
 
+// The page's display face: square letters to go with the pixel field. Loaded only here.
+const pixel = Pixelify_Sans({ subsets: ["latin"], weight: ["500", "700"], variable: "--font-pixel", display: "swap" });
+
 const SOURCE = "https://github.com/oguzserdar/seller-desk";
+const TEST_GUIDE = `${SOURCE}/blob/main/docs/how-to-test.md`;
 
-/** Small records from one sale, drifting around the headline. */
-const FLOATS = [
-  { icon: MessageCircleQuestion, text: "Asked the shop", at: "about-float-1" },
-  { icon: CircleDollarSign, text: "Quote ready · $95.00", at: "about-float-2" },
-  { icon: ShieldCheck, text: "Payment checked", at: "about-float-3" },
-  { icon: PackageCheck, text: "Order #1004", at: "about-float-4" },
-  { icon: Wrench, text: "Next: confirm a time", at: "about-float-5" },
-  { icon: BadgeCheck, text: "Fact approved", at: "about-float-6" },
-];
-
+// Each row of cards keeps its three texts the same length, so they wrap to the same number of lines.
 const STEPS = [
-  { title: "Ask the shop", body: "Ask for a gift under $100, or for a brake cable replaced by Tuesday. It answers from the catalog and asks the owner what it cannot know." },
-  { title: "Pay in the PayPal sandbox", body: "Add disc brake pads and press Pay with PayPal. The server checks the payment with PayPal before any order exists." },
-  { title: "See it on the owner's desk", body: "Sign in to the desk. The order is there with its next step, next to the customer who is waiting for a price." },
+  { title: "Ask the shop", body: "Ask for a gift under $100 or a brake cable repair. It answers from the catalog and asks the owner the rest." },
+  { title: "Pay in the PayPal sandbox", body: "Add disc brake pads and press Pay with PayPal. The server checks the payment before any order exists." },
+  { title: "See it on the owner's desk", body: "Sign in to the desk. The order is there with its next step, beside the customer waiting for a price." },
 ];
 
 const TESTS = [
   { who: "A haggler", result: "Kept the published price" },
   { who: "Pasted fake system text", result: "Refused, no price change" },
-  { who: "A firm $60 budget", result: "Stayed within stock" },
 ];
 
 /** What Seller Desk is and what to try, for someone who opens a public demo. */
 export default async function AboutPage() {
   const shop = await getSeller();
   return (
-    <div className="about bg-canvas text-ink flex min-h-dvh flex-col">
+    <div className={`about ${pixel.variable} bg-canvas text-ink flex min-h-dvh flex-col`}>
       <header className="about-hero">
+        <PixelField />
         <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <p className="font-display text-[20px] font-semibold tracking-[-0.02em]">Seller Desk</p>
           <nav aria-label="Seller Desk" className="about-nav flex items-center gap-5 text-[14px] font-medium">
@@ -53,13 +50,8 @@ export default async function AboutPage() {
         </div>
 
         <div className="about-hero-stage">
-          <ul aria-hidden className="about-floats">
-            {FLOATS.map(({ icon: Icon, text, at }) => (
-              <li key={text} className={`about-float ${at}`}><Icon size={15} strokeWidth={1.75} /> {text}</li>
-            ))}
-          </ul>
           <p className="about-eyebrow">Open source · PayPal checkout · AI assistant</p>
-          <h1 className="about-headline font-display">The sales team a small seller never had</h1>
+          <h1 className="about-headline">The sales team a small seller never had</h1>
           <p className="about-lede">
             Seller Desk answers customers from your catalog, asks you only what it cannot know, and
             closes the sale with a PayPal payment the server has checked.
@@ -94,6 +86,22 @@ export default async function AboutPage() {
           </ol>
         </section>
 
+        <section aria-labelledby="judges" className="mx-auto mt-10 w-full max-w-[1180px] px-4 sm:px-6">
+          <div className="about-judges">
+            <div>
+              <h2 id="judges" className="about-judges-title">Judging this entry?</h2>
+              <p className="text-ink-2 mt-1.5 max-w-[60ch] leading-relaxed">
+                The shop needs no login. The owner&rsquo;s desk does: its email and password are in the
+                testing instructions of the submission, with a PayPal sandbox buyer.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/owner/login" className="about-judges-link about-judges-link-main">Owner&rsquo;s desk sign in</Link>
+              <a href={TEST_GUIDE} className="about-judges-link">Step-by-step test guide</a>
+            </div>
+          </div>
+        </section>
+
         <section aria-labelledby="different" className="about-section mx-auto w-full max-w-[1180px] px-4 sm:px-6">
           <h2 id="different" className="about-h2 font-display">What is different</h2>
           <ul className="mt-8 grid gap-4 lg:grid-cols-3">
@@ -103,15 +111,15 @@ export default async function AboutPage() {
                 <p className="about-art-reply"><Lock size={14} /> No payment is on record for this quote.</p>
               </div>
               <h3>The model never decides money</h3>
-              <p>Prices, totals and payment status are server records checked against PayPal. Paying twice still ends in one order.</p>
+              <p>Prices, totals and payment status are server records checked against PayPal. Paying twice makes one order.</p>
             </li>
             <li className="about-tile">
               <div aria-hidden className="about-art">
                 <p className="about-art-row"><span>The side entrance is step-free.</span><em data-kind="fact"><Check size={12} /> Fact, approved</em></p>
                 <p className="about-art-row"><span>Isabel can pick up until 18:00 on Friday.</span><em>One-off, stays private</em></p>
               </div>
-              <h3>It learns only what the owner approves</h3>
-              <p>An answer is split into a fact every customer should know and a favour for one customer. Only approved facts are used again.</p>
+              <h3>It learns only what you approve</h3>
+              <p>Each answer is split into a fact for every customer and a favour for one. Only approved facts are used again.</p>
             </li>
             <li className="about-tile">
               <div aria-hidden className="about-art">
@@ -120,7 +128,7 @@ export default async function AboutPage() {
                 ))}
               </div>
               <h3>The owner can test it first</h3>
-              <p>Simulated customers talk to the real assistant in a throwaway copy of the shop. Every quote is checked against real prices and stock.</p>
+              <p>Simulated customers talk to the real assistant in a throwaway copy of the shop. Every quote is checked.</p>
             </li>
           </ul>
         </section>
