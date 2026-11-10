@@ -14,6 +14,7 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { connectorHooks, connectorPlugins } from "./connector";
+import { reportingDatabaseErrors } from "./adapter-errors";
 import { authSchemaOptions } from "./options";
 
 /** Endpoints that stay reachable: sign in, sign out, read the session, health. */
@@ -64,11 +65,13 @@ function createAuth(database?: BetterAuthOptions["database"]) {
     trustedOrigins: [config.appUrl],
     database:
       database ??
-      drizzleAdapter(getDb(), {
-        provider: "pg",
-        // Every auth table, as on D1: the connector's plugins read the OAuth tables too.
-        schema: pgAuthSchema,
-      }),
+      reportingDatabaseErrors(
+        drizzleAdapter(getDb(), {
+          provider: "pg",
+          // Every auth table, as on D1: the connector's plugins read the OAuth tables too.
+          schema: pgAuthSchema,
+        }),
+      ),
     session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
     disabledPaths: DISABLED_AUTH_PATHS,
     advanced: {
@@ -85,7 +88,7 @@ function createAuth(database?: BetterAuthOptions["database"]) {
 /** Creates the same owner-only authentication service on a native D1 adapter. */
 export function createD1Auth(db: D1Db) {
   return createAuth(
-    drizzleAdapter(db, { provider: "sqlite", schema: d1AuthSchema }),
+    reportingDatabaseErrors(drizzleAdapter(db, { provider: "sqlite", schema: d1AuthSchema })),
   );
 }
 
