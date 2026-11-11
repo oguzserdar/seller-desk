@@ -15,7 +15,7 @@ it("asks what a customer of this shop would ask, from its own catalog", () => {
   ];
   expect(suggestionsFor(offers)).toEqual([
     "Can you do a brake service this week?",
-    "Is the rechargeable front light in stock?",
+    "Anything under $75?",
     "Can you quote a job for me?",
   ]);
 });

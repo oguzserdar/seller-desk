@@ -10,16 +10,21 @@ import { OFFER_CARD_CLASS, OfferMedia } from "./offer-tile";
 
 /**
  * Starter questions drawn from what this shop actually sells, phrased the way a customer would ask
- * this shop: a booking for a priced service, stock of a short-named product, then a quote or a download.
+ * this shop: a booking for a priced service, a budget, then a quote or a download.
  */
 export function suggestionsFor(offers: PublicOffer[]): string[] {
   const out: string[] = [];
   const service = offers.find((offer) => offer.kind === "service" && offer.unitAmountMinor !== null);
   if (service) out.push(`Can you do a ${service.title.toLowerCase()} this week?`);
-  const goods = offers
-    .filter((offer) => offer.kind === "goods" && offer.available !== 0)
-    .sort((left, right) => left.title.length - right.title.length)[0];
-  if (goods) out.push(`Is the ${goods.title.toLowerCase()} in stock?`);
+  // A budget question reads naturally for any product name, singular or plural.
+  const prices = offers
+    .filter((offer) => offer.kind === "goods" && offer.available !== 0 && offer.unitAmountMinor !== null)
+    .map((offer) => ({ amount: offer.unitAmountMinor!, currency: offer.currency }));
+  if (prices.length > 0) {
+    const cheapest = prices.reduce((low, next) => (next.amount < low.amount ? next : low));
+    const ceiling = Math.ceil((cheapest.amount + 1) / 2500) * 2500;
+    out.push(`Anything under ${formatQuoteAmount(ceiling, cheapest.currency).replace(/\.00$/, "")}?`);
+  }
   if (offers.some((offer) => offer.kind === "service" && offer.unitAmountMinor === null))
     out.push("Can you quote a job for me?");
   else if (offers.some((offer) => offer.kind === "digital")) out.push("Something I can download today");
