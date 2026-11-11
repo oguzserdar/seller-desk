@@ -35,7 +35,7 @@ async function ask(body: unknown, address = "203.0.113.7") {
 const turn = { messages: [{ role: "user", content: "What sold best?" }] };
 
 it("gives demo visitors their own allowance per address, separate from the owner's", async () => {
-  for (let index = 0; index < 12; index += 1) {
+  for (let index = 0; index < 40; index += 1) {
     const result = await ask(turn);
     expect(result.body.message ?? "").not.toMatch(/resting/);
   }
@@ -46,7 +46,15 @@ it("gives demo visitors their own allowance per address, separate from the owner
 });
 
 it("refuses a turn too large to be the dashboard's own conversation", async () => {
-  const result = await ask({ instructions: "x".repeat(170_000), messages: [{ role: "user", content: "hi" }] });
+  const part = "x".repeat(35_000);
+  const result = await ask({ instructions: "y".repeat(120_000), messages: [...Array(6).fill(part), "hi"].map((content) => ({ role: "user", content })) });
+  expect(result.status).toBe(400);
+  expect(result.body.message).toMatch(/too long/);
+});
+
+it("counts tool schemas toward the size, so they cannot carry a hidden prompt", async () => {
+  const bulky = Array.from({ length: 20 }, (_, i) => ({ name: `tool_${i}`, description: "d".repeat(18_000), parameters: { type: "object", properties: {} } }));
+  const result = await ask({ instructions: "short", messages: [{ role: "user", content: "hi" }], tools: bulky });
   expect(result.status).toBe(400);
   expect(result.body.message).toMatch(/too long/);
 });

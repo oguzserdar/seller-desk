@@ -8,11 +8,13 @@ import { failure, readJson } from "@/server/http/respond";
 
 // Studio's agents read and rearrange the dashboard in the browser. They cannot reach orders,
 // payments, refunds or customers, so a demo visitor may ask too, but never on the owner's limits:
-// visitors get their own small allowance per address and a shared daily total.
-const VIEWER_PER_ADDRESS = { windowSeconds: 600, turns: 12 } as const;
-const VIEWER_DAILY_TOTAL = 150;
-/** Room for Studio's own agent instructions and data schema, not for using this route as a free model. */
-const MAX_TURN_CHARS = 160_000;
+// visitors get their own allowance per address and a shared daily total. One chart request takes about
+// a dozen model turns across Studio's agents, so the window allows three such requests; the shop's
+// total AI budget stays the spending ceiling.
+const VIEWER_PER_ADDRESS = { windowSeconds: 600, turns: 40 } as const;
+const VIEWER_DAILY_TOTAL = 400;
+/** Room for Studio's instructions, tools, data schema and a conversation, not for using this route as a free model. */
+const MAX_TURN_CHARS = 300_000;
 
 const RULES =
   "You are the analyst inside Seller Desk's Insights dashboard for a small shop. Answer from the dashboard's data only, " +
@@ -26,7 +28,8 @@ export async function POST(request: Request): Promise<Response> {
     const { owner, seller, viewer } = await requireOwner(request.headers);
     // Studio's own agents send their full instructions and the data schema on every turn.
     const turn = WireTurn.parse(await readJson(request, 400_000));
-    const size = (turn.instructions?.length ?? 0) + turn.messages.reduce((total, message) => total + message.content.length, 0);
+    // Every part counts: instructions, messages, tool calls, tool schemas and any answer schema.
+    const size = JSON.stringify(turn).length;
     if (size > MAX_TURN_CHARS) throw invalid("That conversation is too long. Start a new chat.");
     if (viewer) {
       const address = clientKey(request.headers);
@@ -78,13 +81,21 @@ export async function POST(request: Request): Promise<Response> {
       maxOutputTokens: ASSISTANT_LIMITS.maxOutputTokens,
       abortSignal: AbortSignal.any([request.signal, AbortSignal.timeout(ASSISTANT_LIMITS.timeoutMs)]),
       ...assistantCallSettings(),
+      // Studio resends its instructions, tools and the conversation so far on every turn, and one
+      // question can take a dozen turns across its agents. Anthropic serves that repeated prefix from
+      // its prompt cache at a tenth of the input price; other providers ignore this option.
+      providerOptions: { anthropic: { cacheControl: { type: "ephemeral" } } },
     });
     const answer: WireAnswer = {
       // A structured answer exists only when the model did not stop to call a tool.
       content: turn.json && result.toolCalls.length === 0 ? JSON.stringify(result.output) : result.text,
       toolCalls: result.toolCalls.map((call) => ({ id: call.toolCallId, name: call.toolName, arguments: JSON.stringify(call.input ?? {}) })),
       model: assistant.modelId,
-      usage: { inputTokens: result.usage.inputTokens ?? 0, outputTokens: result.usage.outputTokens ?? 0 },
+      usage: {
+        inputTokens: result.usage.inputTokens ?? 0,
+        outputTokens: result.usage.outputTokens ?? 0,
+        cachedInputTokens: result.usage.inputTokenDetails?.cacheReadTokens ?? 0,
+      },
     };
     return Response.json(answer, { headers: { "Cache-Control": "no-store", "X-Request-Id": requestId } });
   } catch (error) {

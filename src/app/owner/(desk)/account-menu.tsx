@@ -21,6 +21,7 @@ import {
 } from "@/components/shadcn/sidebar";
 import { Alert } from "@/components/arc/alert/alert";
 import { signOutOwner } from "../login/actions";
+import { forgetOwnerHistory } from "@/components/insights/analyst-history";
 
 /** Official shadcn sidebar-07 account composition, wired only to real owner settings and sign-out. */
 export function AccountMenu({
@@ -48,6 +49,8 @@ export function AccountMenu({
     try {
       const result = await executeAsync();
       if (result?.data?.ok) {
+        // Analyst chats hold customer labels and amounts; a shared browser should not keep them.
+        forgetOwnerHistory();
         setOpen(false);
         router.replace("/owner/login");
       } else setError(result?.serverError ?? "Could not sign out. Try again.");

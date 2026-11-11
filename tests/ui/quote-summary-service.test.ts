@@ -54,6 +54,16 @@ describe("service quote panel", () => {
     expect(item).not.toContain("Awaiting quote");
   });
 
+  it("while the shop prices it, the total says Awaiting quote with no currency, and the buyer is told they can leave", () => {
+    vi.stubGlobal("Notification", { permission: "default", requestPermission: vi.fn() });
+    render(awaitingPrice);
+    const text = container.textContent!;
+    expect(text).toContain("Awaiting quote");
+    expect(text).not.toMatch(/Awaiting quote\s*USD/);
+    expect(button("Notify me when it's priced")).not.toBeNull();
+    expect(text).toContain("you can close it and come back");
+  });
+
   it("once the shop priced the work, Pay comes first and changing the work is folded below it", () => {
     render(priced);
     const pay = button("Pay with PayPal");

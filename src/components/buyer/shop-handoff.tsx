@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell, Check } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/arc/button/button";
 
 type Permission = NotificationPermission | "unsupported";
@@ -16,8 +16,6 @@ function currentPermission(): Permission {
  * answer stays in this chat, so leaving the page loses nothing.
  */
 export function ShopQuestionSent({ shopName, question, waiting }: { shopName: string; question: string; waiting: boolean }) {
-  const [permission, setPermission] = useState<Permission>("unsupported");
-  useEffect(() => setPermission(currentPermission()), []);
   const initial = shopName.trim().charAt(0).toUpperCase() || "S";
 
   return (
@@ -36,23 +34,64 @@ export function ShopQuestionSent({ shopName, question, waiting }: { shopName: st
       </div>
       <p className="shop-handoff-question">{question}</p>
       {waiting ? (
-        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-          {permission === "default" ? (
-            <Button type="button" variant="secondary" onClick={() => void Notification.requestPermission().then(setPermission)}>
-              <Bell aria-hidden size={16} strokeWidth={1.75} />
-              Notify me when they reply
-            </Button>
-          ) : permission === "granted" ? (
-            <p className="text-ink-2 flex items-center gap-1.5 text-[13px]">
-              <Check aria-hidden size={14} strokeWidth={2} />
-              You&apos;ll get a notification when they reply
-            </p>
-          ) : null}
-          <p className="text-ink-3 text-[13px]">The reply lands in this chat, so you can close the page and come back.</p>
-        </div>
+        <NotifyWhenReady className="mt-3" ask="Notify me when they reply" granted="You'll get a notification when they reply">
+          The reply lands in this chat, so you can close the page and come back.
+        </NotifyWhenReady>
       ) : null}
     </div>
   );
+}
+
+/**
+ * Lets a waiting buyer ask for a system notification, and says that leaving the page loses nothing.
+ * Hidden when the browser cannot notify or the buyer already declined; the reassurance always shows.
+ */
+export function NotifyWhenReady({ ask, granted, children, className = "" }: { ask: string; granted: string; children: ReactNode; className?: string }) {
+  const [permission, setPermission] = useState<Permission>("unsupported");
+  useEffect(() => setPermission(currentPermission()), []);
+  return (
+    <div className={`flex flex-wrap items-center gap-x-3 gap-y-2 ${className}`}>
+      {permission === "default" ? (
+        <Button type="button" variant="secondary" onClick={() => void Notification.requestPermission().then(setPermission)}>
+          <Bell aria-hidden size={16} strokeWidth={1.75} />
+          {ask}
+        </Button>
+      ) : permission === "granted" ? (
+        <p className="text-ink-2 flex items-center gap-1.5 text-[13px]">
+          <Check aria-hidden size={14} strokeWidth={2} />
+          {granted}
+        </p>
+      ) : null}
+      <p className="text-ink-3 text-[13px]">{children}</p>
+    </div>
+  );
+}
+
+/**
+ * Tells the buyer the shop finished pricing their request: a count in the tab title until they look,
+ * and a system notification when they allowed one and the page is hidden.
+ *
+ * @example
+ * ```tsx
+ * useQuoteReadyAlert({ shopName, status: quote.quote?.status });
+ * ```
+ */
+export function useQuoteReadyAlert({ shopName, status }: { shopName: string; status?: string }) {
+  const last = useRef(status);
+  useEffect(() => {
+    const before = last.current;
+    last.current = status;
+    if (before !== "seller_review" || !status || status === "seller_review" || status === "expired") return;
+    const base = document.title.replace(/^\(1\) /, "");
+    if (document.visibilityState === "visible") return;
+    document.title = `(1) ${base}`;
+    const clear = () => { if (document.visibilityState === "visible") { document.title = base; document.removeEventListener("visibilitychange", clear); } };
+    document.addEventListener("visibilitychange", clear);
+    if (currentPermission() === "granted") {
+      const note = new Notification(`${shopName} sent your quote`, { body: "Open it to review the price before you pay.", tag: "shop-quote" });
+      note.onclick = () => { window.focus(); note.close(); };
+    }
+  }, [shopName, status]);
 }
 
 /**

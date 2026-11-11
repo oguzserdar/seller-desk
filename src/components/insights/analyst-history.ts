@@ -38,3 +38,15 @@ export function browserHistory(key: string): AgAiHistoryStore {
     removeEventListener: (_type, listener) => void listeners.delete(listener),
   };
 }
+
+/** The owner's analyst history key; demo visitors use their own. */
+export const OWNER_HISTORY_KEY = "seller-desk.analyst.owner";
+
+/** Forgets the owner's analyst conversations in this browser, so the next person at it cannot read them. */
+export function forgetOwnerHistory(): void {
+  try {
+    window.localStorage.removeItem(OWNER_HISTORY_KEY);
+  } catch {
+    // Blocked storage held nothing.
+  }
+}

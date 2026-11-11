@@ -7,6 +7,7 @@ import { Button } from "@/components/arc/button/button";
 import { cx } from "@/lib/cx";
 import { Alert } from "@/components/arc/alert/alert";
 import { Textarea } from "@/components/arc/textarea/textarea";
+import { NotifyWhenReady } from "./shop-handoff";
 import { formatQuoteAmount } from "@/lib/money";
 import type { BuyerQuoteView } from "@/server/domain/quotes";
 import { QUOTE_STATUS } from "./labels";
@@ -322,7 +323,8 @@ export function QuoteSummary({
         <span className="text-[15px] font-semibold">Total</span>
         <span className="tabular text-[22px] font-semibold tracking-[-0.01em]">
           {needsDetails ? "Needs details" : formatQuoteAmount(quote.totalMinor, quote.currency)}{" "}
-          {needsDetails ? null : (
+          {/* A currency beside "Awaiting quote" reads as a price; show it only beside an amount. */}
+          {needsDetails || quote.totalMinor === null ? null : (
             <span className="text-ink-3 text-[13px] font-medium tracking-normal">
               {quote.currency}
             </span>
@@ -387,6 +389,13 @@ export function QuoteSummary({
           <Alert tone="info" title="The shop prices this work first">
             {quote.reviewReason} You will see the confirmed quote here. Nothing
             is charged before you approve it.
+            <NotifyWhenReady
+              className="mt-3"
+              ask={quote.totalMinor === null ? "Notify me when it's priced" : "Notify me when it's confirmed"}
+              granted="You'll get a notification when the quote is ready"
+            >
+              It stays on this page, so you can close it and come back.
+            </NotifyWhenReady>
           </Alert>
         ) : null}
         {quote.approvedScope ? (

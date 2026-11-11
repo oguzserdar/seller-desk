@@ -11,7 +11,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { addEvent, toolKind, type Receipt } from "@/components/insights/analyst-receipt";
 import { browserHistory } from "@/components/insights/analyst-history";
 
-const zero: Receipt = { questions: 0, lookups: 0, changes: 0, handoffs: 0, failed: 0, tokens: 0, steps: [] };
+const zero: Receipt = { questions: 0, lookups: 0, changes: 0, handoffs: 0, failed: 0, tokens: 0, cachedTokens: 0, steps: [] };
 const trace = (parentRunId?: string) => ({ threadId: "t", runId: "r", agentId: "a", ...(parentRunId ? { parentRunId } : {}) });
 const event = (value: object) => ({ timestamp: 0, trace: trace(), ...value }) as AgAiTelemetryEvent;
 
@@ -36,9 +36,9 @@ describe("analyst receipt", () => {
       event({ type: "tool_execution_finished", toolCallId: "1", name: "top_sellers", kind: "client", ok: true }),
       event({ type: "tool_execution_finished", toolCallId: "2", name: "add_widget", kind: "client", ok: true }),
       event({ type: "tool_execution_finished", toolCallId: "3", name: "execute_query", kind: "client", ok: false }),
-      event({ type: "turn_finished", usage: { inputTokens: 900, outputTokens: 100 } }),
+      event({ type: "turn_finished", usage: { inputTokens: 900, outputTokens: 100, cachedInputTokens: 600 } }),
     ];
-    expect(steps.reduce(addEvent, zero)).toEqual({ questions: 0, lookups: 1, changes: 1, handoffs: 0, failed: 1, tokens: 1000, steps: [{ text: "Ranked top sellers", kind: "lookup" }, { text: "Added a chart", kind: "change" }] });
+    expect(steps.reduce(addEvent, zero)).toEqual({ questions: 0, lookups: 1, changes: 1, handoffs: 0, failed: 1, tokens: 1000, cachedTokens: 600, steps: [{ text: "Ranked top sellers", kind: "lookup" }, { text: "Added a chart", kind: "change" }] });
   });
 });
 

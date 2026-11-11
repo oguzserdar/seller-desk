@@ -9,7 +9,7 @@ import { INSIGHT_PAGES, PHONE_WIDTH, insightsReport, pageHeight, phonePageHeight
 import { deskStudioTheme } from "./studio-theme";
 import { SELLER_DESK_WIDGETS } from "./studio-widgets";
 import { SELLER_DESK_TOOL_DISPLAY, sellerDeskHarness } from "./seller-desk-agent";
-import { browserHistory } from "./analyst-history";
+import { OWNER_HISTORY_KEY, browserHistory } from "./analyst-history";
 import { AnalystReceipt, visitReceipt } from "./analyst-receipt";
 import { createCellRenderer } from "./studio-cells";
 
@@ -54,7 +54,7 @@ const widgets = (defaults: { menu: unknown[] }) =>
 export function InsightsStudio({ data, licenseKey, viewer = false }: { data: InsightsData; licenseKey?: string; viewer?: boolean }) {
   // One receipt per visit (shared with the canvas widget) and one conversation history; the owner and demo visitors keep separate histories.
   const receipt = visitReceipt;
-  const history = useMemo(() => browserHistory(`seller-desk.analyst.${viewer ? "visitor" : "owner"}`), [viewer]);
+  const history = useMemo(() => browserHistory(viewer ? "seller-desk.analyst.visitor" : OWNER_HISTORY_KEY), [viewer]);
   const api = useRef<AgStudioApi | null>(null);
   const [page, setPage] = useState<string>(insightsReport.selectedPageId ?? INSIGHT_PAGES[0].id);
   const [panel, setPanel] = useState<Panel>("none");

@@ -27,7 +27,7 @@ import { QuoteBar, QuoteSheet } from "./quote-sheet";
 import { PurchaseLadder } from "./purchase-ladder";
 import { QuoteSummary } from "./quote-summary";
 import { purchaseSteps } from "@/lib/purchase-steps";
-import { useShopReplyAlert, useAnswersArrived } from "./shop-handoff";
+import { useShopReplyAlert, useAnswersArrived, useQuoteReadyAlert } from "./shop-handoff";
 import { ShopWindow } from "./shop-window";
 import { Thread } from "./thread";
 import { useBuyerQuote } from "./use-buyer-quote";
@@ -125,6 +125,7 @@ export function ShopAssistant({
   });
   const withSeller = control?.handler === "seller";
   useShopReplyAlert({ shopName, state: handoff?.state, answer: handoff?.answer });
+  useQuoteReadyAlert({ shopName, status: quote.quote?.status });
   const answersArrived = useAnswersArrived(handoff?.state);
   const canChat = assistant === "on" || withSeller;
 

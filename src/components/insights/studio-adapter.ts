@@ -57,7 +57,7 @@ function* eventsOf(id: string, answer: WireAnswer): Generator<AgAiEvent> {
 }
 
 /** The adapter Studio's harness calls once per model turn. */
-export function sellerDeskAdapter(endpoint = "/api/owner/insights/turn"): AgLlmAdapter {
+export function sellerDeskAdapter(endpoint = "/api/owner/insights/turn", polish?: (text: string) => string): AgLlmAdapter {
   let count = 0;
   return {
     executeTurn(request, options) {
@@ -72,7 +72,10 @@ export function sellerDeskAdapter(endpoint = "/api/owner/insights/turn"): AgLlmA
         });
         const body = (await response.json().catch(() => ({}))) as Partial<WireAnswer> & { message?: string };
         if (!response.ok) throw new Error(body.message ?? "The analyst could not answer just now.");
-        return { content: body.content ?? "", toolCalls: body.toolCalls ?? [], model: body.model ?? "", usage: body.usage };
+        const toolCalls = body.toolCalls ?? [];
+        // A sub-agent's report goes back through complete_task; give it the owner's names, not raw references.
+        const reported = polish ? toolCalls.map((call) => (call.name === "complete_task" ? { ...call, arguments: polishJson(call.arguments, polish) } : call)) : toolCalls;
+        return { content: body.content ?? "", toolCalls: reported, model: body.model ?? "", usage: body.usage };
       })();
       // A failed turn is reported on `complete`; the stream just ends, so Studio never waits on it.
       const complete: Promise<AgLlmResponse> = answer.then(
@@ -94,4 +97,15 @@ export function sellerDeskAdapter(endpoint = "/api/owner/insights/turn"): AgLlmA
       return { stream, complete };
     },
   };
+}
+
+/** Applies `polish` to every string inside a JSON argument object; unreadable JSON is left as sent. */
+function polishJson(text: string, polish: (value: string) => string): string {
+  try {
+    const walk = (value: unknown): unknown =>
+      typeof value === "string" ? polish(value) : Array.isArray(value) ? value.map(walk) : value && typeof value === "object" ? Object.fromEntries(Object.entries(value).map(([key, item]) => [key, walk(item)])) : value;
+    return JSON.stringify(walk(JSON.parse(text)));
+  } catch {
+    return text;
+  }
 }

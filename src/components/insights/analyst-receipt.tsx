@@ -11,8 +11,8 @@ import type { AgWidgetDefinition } from "ag-studio-react";
 
 /** Counts for this visit, plus the last few steps in plain words, newest last. */
 export type Step = { text: string; kind: "lookup" | "change" | "handoff" };
-export type Receipt = { questions: number; lookups: number; changes: number; handoffs: number; failed: number; tokens: number; steps: Step[] };
-const EMPTY: Receipt = { questions: 0, lookups: 0, changes: 0, handoffs: 0, failed: 0, tokens: 0, steps: [] };
+export type Receipt = { questions: number; lookups: number; changes: number; handoffs: number; failed: number; tokens: number; cachedTokens: number; steps: Step[] };
+const EMPTY: Receipt = { questions: 0, lookups: 0, changes: 0, handoffs: 0, failed: 0, tokens: 0, cachedTokens: 0, steps: [] };
 const STEP_LIMIT = 4;
 
 // Seller Desk's tools and Studio's own, in the words an owner would use.
@@ -56,7 +56,11 @@ export function addEvent(receipt: Receipt, event: AgAiTelemetryEvent): Receipt {
     case "run_started":
       return event.trace.parentRunId ? receipt : { ...receipt, questions: receipt.questions + 1 };
     case "turn_finished":
-      return { ...receipt, tokens: receipt.tokens + (event.usage ? event.usage.inputTokens + event.usage.outputTokens : 0) };
+      return {
+        ...receipt,
+        tokens: receipt.tokens + (event.usage ? event.usage.inputTokens + event.usage.outputTokens : 0),
+        cachedTokens: receipt.cachedTokens + (event.usage?.cachedInputTokens ?? 0),
+      };
     case "tool_execution_finished": {
       if (!event.ok) return { ...receipt, failed: receipt.failed + 1 };
       const kind = toolKind(event.name);
@@ -112,7 +116,11 @@ export function AnalystReceipt({ source }: { source: ReceiptSource }) {
       <span className="insights-receipt-title">What the analyst did</span>
       <span className="insights-receipt-items">{items.join(" · ")}</span>
       <span className="insights-receipt-money">Money changed: none. It has no tool that can.</span>
-      {receipt.tokens ? <span className="insights-receipt-tokens">{(receipt.tokens / 1000).toFixed(1)}k tokens</span> : null}
+      {receipt.tokens ? (
+        <span className="insights-receipt-tokens">
+          {(receipt.tokens / 1000).toFixed(1)}k tokens{receipt.cachedTokens ? ` · ${Math.round((receipt.cachedTokens / receipt.tokens) * 100)}% from cache` : ""}
+        </span>
+      ) : null}
     </div>
   );
 }
