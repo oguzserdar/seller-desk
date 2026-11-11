@@ -5,6 +5,7 @@
 import { queryDesk } from "@/server/domain/desk";
 import { listSellerConversations } from "@/server/domain/conversation-messages";
 import { listOwnerOffers } from "@/server/domain/offers";
+import { customerLabel } from "@/lib/customer-label";
 import type { OwnerPrincipal } from "@/server/domain/principal";
 import { openQuestions } from "@/server/domain/seller-questions";
 
@@ -53,9 +54,9 @@ export async function loadInsights(owner: OwnerPrincipal): Promise<InsightsData>
     currency: orders[0]?.currency ?? "USD",
     orders,
     // Shoppers are anonymous; a short label lets the owner and the analyst tell them apart.
-    conversations: conversations.map((item, index) => ({
+    conversations: conversations.map((item) => ({
       id: item.id,
-      customer: `Customer ${conversations.length - index}`,
+      customer: customerLabel(item.id),
       date: new Date(item.updatedAt).toISOString(),
       handledBy: item.handler === "seller" ? "You" : "Assistant",
       waitingForYou: askedIn.has(item.id) ? "Waiting for you" : "Answered",

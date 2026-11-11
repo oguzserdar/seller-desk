@@ -1,4 +1,5 @@
 "use client";
+import { customerLabel } from "@/lib/customer-label";
 import Link from "next/link";
 import { useAction } from "next-safe-action/hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -140,7 +141,7 @@ export function CustomerConversation({
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-4">
         <div>
           <h2 className="text-[22px] font-semibold tracking-[-0.02em]">
-            Customer conversation
+            {customerLabel(view.control.id)}
           </h2>
           <p role="status" className="mt-1 text-[14px] text-ink-2">
             {human

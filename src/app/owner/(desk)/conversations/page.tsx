@@ -15,6 +15,7 @@ import {
 import { DomainError } from "@/server/domain/errors";
 import { openQuestions } from "@/server/domain/seller-questions";
 import { cx } from "@/lib/cx";
+import { customerLabel } from "@/lib/customer-label";
 import { CustomerConversation } from "./customer-conversation";
 import { LocalTime } from "@/components/local-time";
 
@@ -116,7 +117,8 @@ export default async function ConversationsPage({
                         )}
                         <LocalTime value={item.updatedAt} options={DAY_MONTH} />
                       </span>
-                      <p className="mt-2 line-clamp-3 text-[15px] leading-snug [overflow-wrap:anywhere]">
+                      <p className="mt-1.5 text-[14px] font-semibold text-ink">{customerLabel(item.id)}</p>
+                      <p className="mt-1 line-clamp-2 text-[14px] leading-snug text-ink-2 [overflow-wrap:anywhere]">
                         {asked.get(item.id) || item.preview || "Customer conversation"}
                       </p>
                     </Link>
