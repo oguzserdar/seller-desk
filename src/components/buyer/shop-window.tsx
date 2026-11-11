@@ -188,23 +188,24 @@ function DemoGuide({ shopName }: { shopName: string }) {
   ] as const;
   return (
     <section aria-label="About this demo shop" className="demo-guide mb-8">
-      <p className="demo-guide-kicker">Demo shop</p>
-      <p className="demo-guide-lede">
-        You are a customer at <strong>{shopName}</strong>, a made-up bike repair shop running Seller Desk.
-      </p>
+      <div className="demo-guide-intro">
+        <p className="demo-guide-kicker">Demo shop</p>
+        <p className="demo-guide-lede">
+          You are a customer at <strong>{shopName}</strong>, a made-up bike repair shop running Seller Desk.
+        </p>
+        <form method="post" action="/owner/demo">
+          <button type="submit" className="demo-guide-link">Then see the same sale from the owner&rsquo;s desk &rarr;</button>
+        </form>
+      </div>
       <ol className="demo-guide-steps">
         {steps.map(([title, body], index) => (
           <li key={title}>
             <span className="demo-guide-number" aria-hidden>{index + 1}</span>
-            <span>
-              <strong>{title}.</strong> {body}
-            </span>
+            <strong>{title}</strong>
+            <span>{body}</span>
           </li>
         ))}
       </ol>
-      <form method="post" action="/owner/demo" className="mt-4">
-        <button type="submit" className="demo-guide-link">Then see the same sale from the owner&rsquo;s desk &rarr;</button>
-      </form>
     </section>
   );
 }

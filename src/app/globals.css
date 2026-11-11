@@ -358,15 +358,19 @@ body:has(> [role="note"]) { --banner-h: 33px; }
 }
 
 /* The public demo's guide above the shop: says who the visitor is and what to try. */
-.demo-guide { padding: 20px 22px; border-radius: 16px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line); max-width: 760px; }
+/* The demo guide spans the content width: who you are on the left, the three steps as tiles on the right. */
+.demo-guide { display: grid; gap: 20px; padding: 24px; border-radius: 16px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line); }
+.demo-guide-intro { display: flex; flex-direction: column; gap: 10px; }
 .demo-guide-kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-brand); }
-.demo-guide-lede { margin-top: 6px; font-size: 17px; line-height: 1.5; color: var(--color-ink); }
-.demo-guide-steps { display: grid; gap: 10px; margin-top: 14px; font-size: 15px; line-height: 1.5; color: var(--color-ink-2); }
-.demo-guide-steps li { display: flex; gap: 12px; align-items: flex-start; }
-.demo-guide-steps strong { color: var(--color-ink); font-weight: 600; }
-.demo-guide-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 999px; background: var(--color-brand-soft); color: var(--color-brand); font-size: 13px; font-weight: 600; }
-.demo-guide-link { font-size: 15px; font-weight: 600; color: var(--color-brand); text-decoration: underline; text-underline-offset: 3px; }
-@media (min-width: 860px) { .demo-guide-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.demo-guide-lede { font-size: 18px; line-height: 1.45; color: var(--color-ink); text-wrap: pretty; }
+.demo-guide-steps { display: grid; gap: 12px; }
+.demo-guide-steps li { display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; row-gap: 4px; align-content: start; padding: 16px; border-radius: 12px; background: var(--color-canvas); font-size: 14px; line-height: 1.5; color: var(--color-ink-2); }
+.demo-guide-steps li > span:last-child { grid-column: 2; }
+.demo-guide-steps strong { align-self: center; font-size: 15px; font-weight: 600; color: var(--color-ink); }
+.demo-guide-number { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px; background: var(--color-brand-soft); color: var(--color-brand); font-size: 13px; font-weight: 600; }
+.demo-guide-link { margin-top: 4px; font-size: 15px; font-weight: 600; color: var(--color-brand); text-decoration: underline; text-underline-offset: 3px; text-align: left; }
+@media (min-width: 640px) { .demo-guide-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .demo-guide { grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); align-items: center; gap: 32px; padding: 28px; } }
 
 /* Disclosure rows: one chevron that turns when open, instead of the browser's default triangle.
    A summary that draws its own marker opts out with .list-none. */
