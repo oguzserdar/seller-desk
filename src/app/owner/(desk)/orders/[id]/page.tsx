@@ -28,7 +28,7 @@ const CHECK_WORDS: Record<string, string> = {
 };
 
 export default async function OwnerOrderPage({ params }: { params: Promise<{ id: string }> }) {
-  const { owner } = await requireOwner(await headers());
+  const { owner, viewer } = await requireOwner(await headers());
   const { id } = await params;
   let detail;
   try {
@@ -48,8 +48,8 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
         <div>
           <h1 className="text-[34px] leading-tight font-semibold tracking-[-0.025em]">Order #{order.number}</h1>
           <p className="text-ink-2 mt-1">
-            {order.buyerName ?? "Buyer"}
-            {order.buyerEmail ? `, ${order.buyerEmail}` : ""}. Paid <LocalTime value={order.paidAt} options={WHEN} />.
+            {/* A demo visitor never sees who bought: the buyer's name and email are the owner's to read. */}
+            {viewer ? "Buyer details hidden in the demo" : `${order.buyerName ?? "Buyer"}${order.buyerEmail ? `, ${order.buyerEmail}` : ""}`}. Paid <LocalTime value={order.paidAt} options={WHEN} />.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
                 {task.details.pickupNote ? <p className="text-ink-2 text-[14px]">Pickup note: {task.details.pickupNote}</p> : null}
                 {task.details.completionNote ? <p className="text-ink-2 text-[14px]">Shared with your buyer: {task.details.completionNote}</p> : null}
                 {task.type === "digital_access" && accessReview ? <Alert tone="warning" title={accessReview} /> : null}
-                <TaskActions orderId={order.id} task={{ id: task.id, type: task.type, state: task.state, revision: task.revision }} accessReview={accessReview} />
+                {viewer ? null : <TaskActions orderId={order.id} task={{ id: task.id, type: task.type, state: task.state, revision: task.revision }} accessReview={accessReview} />}
               </section>
             );
           })}
@@ -95,7 +95,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
 
       <section aria-labelledby="items-heading" className="mt-6">
         <h2 id="items-heading" className="mb-2 text-[17px] font-semibold">
-          What was bought (as reviewed by the buyer)
+          What the buyer approved and paid for
         </h2>
         <section className="surface p-5">
           <ul className="flex flex-col gap-1.5 text-[15px]">
@@ -150,7 +150,8 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
                 <li key={check.name}>
                   <Badge tone={check.passed ? "success" : "danger"}>
                     {check.passed ? "✓" : "✗"} {CHECK_WORDS[check.name] ?? check.name.replace("_", " ")}
-                    {check.detail ? ` (${check.detail})` : ""}
+                    {/* "Capture completed (COMPLETED)" says the same thing twice; other details add a fact. */}
+                    {check.detail && !(check.name === "capture_status" && check.passed) ? ` (${check.detail})` : ""}
                   </Badge>
                 </li>
               ))}
