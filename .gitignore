@@ -34,3 +34,6 @@ design/**/codex.log
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
+
+# AG Studio licence key, pasted locally, never committed
+.ag-studio-key
