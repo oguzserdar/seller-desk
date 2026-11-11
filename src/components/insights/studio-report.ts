@@ -46,7 +46,7 @@ const sales: AgPageState = {
       type: "grid",
       // Columns fit their content, so order numbers and statuses are never cut short.
       dataMapping: {
-        cols: [{ id: "orders.ref" }, { id: "orders.product" }, { id: "orders.kind" }, { id: "revenue" }, { id: "orders.needsYou" }, { id: "orders.nextStep" }],
+        cols: [{ id: "orders.ref" }, { id: "orders.product" }, { id: "revenue" }, { id: "orders.needsYou" }, { id: "orders.nextStep" }],
       },
       format: { ...titled("Paid orders and what is still owed"), style: { columnAutoSize: true } },
     },

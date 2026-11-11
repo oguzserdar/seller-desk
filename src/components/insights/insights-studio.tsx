@@ -5,7 +5,7 @@ import { AgStudioAiModule, createAiHarness, type AgPanelConfig, type AgReportSta
 import { AgStudio, AgStudioProvider, createWidgets } from "ag-studio-react";
 import type { InsightsData } from "@/server/domain/insights";
 import { studioData } from "./studio-data";
-import { INSIGHT_PAGES, insightsReport } from "./studio-report";
+import { INSIGHT_PAGES, insightsReport, pageHeight } from "./studio-report";
 import { deskStudioTheme } from "./studio-theme";
 import { SELLER_DESK_WIDGETS } from "./studio-widgets";
 import { sellerDeskAdapter } from "./studio-adapter";
@@ -16,7 +16,7 @@ const MODULES = [AgStudioAiModule];
 const STARTERS = [
   { label: "What sold best?", prompt: "Which products brought in the most revenue, and how much each?" },
   { label: "Who is waiting?", prompt: "Which customers are waiting for my answer, and what do they want?" },
-  { label: "Add a chart", prompt: "Add a chart of paid revenue by week to this page." },
+  { label: "Add a chart", prompt: "Add a chart of units sold by product to this page." },
 ];
 
 type Panel = "none" | "analyst" | "edit";
@@ -42,6 +42,8 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
   const api = useRef<AgStudioApi | null>(null);
   const [page, setPage] = useState<string>(insightsReport.selectedPageId ?? INSIGHT_PAGES[0].id);
   const [panel, setPanel] = useState<Panel>("none");
+  // Follows the live report: an agent can add widgets or switch pages, and the canvas grows to fit.
+  const [heights, setHeights] = useState<Record<string, number>>(() => Object.fromEntries(INSIGHT_PAGES.map((item) => [item.id, item.height])));
   const sources = useMemo(() => studioData(data), [data]);
 
   const open = (id: string) => {
@@ -90,7 +92,7 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
           </button>
         </div>
       </div>
-      <div className="insights-canvas mx-2 flex-none sm:mx-6" style={{ height: Math.max(INSIGHT_PAGES.find((item) => item.id === page)?.height ?? 900, panel === "none" ? 0 : 760) }}>
+      <div className="insights-canvas mx-2 flex-none sm:mx-6" style={{ height: Math.max(heights[page] ?? 900, panel === "none" ? 0 : 760) }}>
         <AgStudioProvider licenseKey={licenseKey} modules={MODULES}>
           <AgStudio
             style={{ height: "100%", width: "100%" }}
@@ -103,6 +105,11 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
             initialState={insightsReport}
             mode={panel === "none" ? "view" : "edit"}
             ai={({ api: studio }) => createAiHarness(studio as AgStudioApi, { adapter: sellerDeskAdapter(), promptStarters: STARTERS })}
+            onStateUpdated={(event) => {
+              const next = Object.fromEntries(event.state.pages.map((item) => [item.id, pageHeight(item)]));
+              setHeights((current) => (JSON.stringify(current) === JSON.stringify(next) ? current : next));
+              if (event.state.selectedPageId && event.state.selectedPageId !== page) setPage(event.state.selectedPageId);
+            }}
             onApiReady={(event) => {
               api.current = event.api;
             }}
