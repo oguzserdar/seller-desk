@@ -126,7 +126,7 @@ const catalog: AgPageState = {
   widgetLayout: {
     "sold-by-offer": at(0, 0, 12, 16),
     "stock-left": at(12, 0, 12, 16),
-    "offer-list": at(0, 16, 24, 26),
+    "offer-list": at(0, 16, 24, 25),
   },
 };
 
