@@ -10,6 +10,6 @@ const Studio = dynamic(() => import("./insights-studio").then((module) => module
 });
 
 /** Client boundary for the Insights page. */
-export function InsightsLoader(props: { data: InsightsData; licenseKey?: string }) {
+export function InsightsLoader(props: { data: InsightsData; licenseKey?: string; viewer?: boolean }) {
   return <Studio {...props} />;
 }

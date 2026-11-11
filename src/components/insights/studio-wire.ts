@@ -33,4 +33,4 @@ export const WireTurn = z
 export type WireTurn = z.infer<typeof WireTurn>;
 
 /** One answered turn: text, tool calls for Studio to run, or both. */
-export type WireAnswer = { content: string; toolCalls: WireToolCall[]; model: string };
+export type WireAnswer = { content: string; toolCalls: WireToolCall[]; model: string; usage?: { inputTokens: number; outputTokens: number } };

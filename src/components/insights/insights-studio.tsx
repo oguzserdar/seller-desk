@@ -9,6 +9,9 @@ import { INSIGHT_PAGES, PHONE_WIDTH, insightsReport, pageHeight, phonePageHeight
 import { deskStudioTheme } from "./studio-theme";
 import { SELLER_DESK_WIDGETS } from "./studio-widgets";
 import { SELLER_DESK_TOOL_DISPLAY, sellerDeskHarness } from "./seller-desk-agent";
+import { browserHistory } from "./analyst-history";
+import { AnalystReceipt, createReceipt } from "./analyst-receipt";
+import { createCellRenderer } from "./studio-cells";
 
 const MODULES = [AgStudioAiModule];
 
@@ -37,6 +40,8 @@ type MenuGroup = { label?: string; widgetIds?: string[] };
 const widgets = (defaults: { menu: unknown[] }) =>
   createWidgets({
     additionalTypes: SELLER_DESK_WIDGETS,
+    // Status pills, order links and low-stock flags in every grid.
+    overrides: [{ id: "grid", options: { createCellRenderer } }],
     menu: [
       ...(defaults.menu as MenuGroup[]).map((group) => (group.widgetIds ? { ...group, widgetIds: group.widgetIds.filter((id) => id !== "image") } : group)),
       { label: "Seller Desk", widgetIds: SELLER_DESK_WIDGETS.map((widget) => (widget as unknown as { id: string }).id) }],
@@ -46,7 +51,10 @@ const widgets = (defaults: { menu: unknown[] }) =>
  * The owner's Insights dashboard: AG Studio over the shop's own orders, conversations and offers.
  * Our tabs choose the page; Edit lets the owner rearrange or add widgets for this visit.
  */
-export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licenseKey?: string }) {
+export function InsightsStudio({ data, licenseKey, viewer = false }: { data: InsightsData; licenseKey?: string; viewer?: boolean }) {
+  // One receipt and one conversation history per visit; the owner and demo visitors keep separate histories.
+  const receipt = useMemo(() => createReceipt(), []);
+  const history = useMemo(() => browserHistory(`seller-desk.analyst.${viewer ? "visitor" : "owner"}`), [viewer]);
   const api = useRef<AgStudioApi | null>(null);
   const [page, setPage] = useState<string>(insightsReport.selectedPageId ?? INSIGHT_PAGES[0].id);
   const [panel, setPanel] = useState<Panel>("none");
@@ -110,6 +118,9 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
           </button>
         </div>
       </div>
+      <div className="px-4 sm:px-8">
+        <AnalystReceipt source={receipt} />
+      </div>
       <div className="insights-canvas mx-2 flex-none sm:mx-6" style={{ height: Math.max((phone ? heights[page]?.phone : heights[page]?.wide) ?? 900, panel === "none" ? 0 : 760) }}>
         <AgStudioProvider licenseKey={licenseKey} modules={MODULES}>
           <AgStudio
@@ -123,7 +134,7 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
             widgets={widgets as never}
             initialState={insightsReport}
             mode={panel === "none" ? "view" : "edit"}
-            ai={({ api: studio }) => sellerDeskHarness(studio as AgStudioApi, data, STARTERS)}
+            ai={({ api: studio }) => sellerDeskHarness(studio as AgStudioApi, data, STARTERS, { history, observers: [receipt.observer] })}
             aiToolDisplay={SELLER_DESK_TOOL_DISPLAY}
             onStateUpdated={(event) => {
               const next = Object.fromEntries(event.state.pages.map((item) => [item.id, { wide: pageHeight(item), phone: phonePageHeight(item) }]));

@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Insights" };
 
 /** How the shop sold, how much the assistant handled alone, and how the catalog moves. */
 export default async function InsightsPage() {
-  const { owner } = await requireOwner(await headers());
+  const { owner, viewer } = await requireOwner(await headers());
   const data = await loadInsights(owner);
   return (
     <section className="flex min-h-full flex-col pt-8 pb-10">
@@ -19,7 +19,7 @@ export default async function InsightsPage() {
           What sold, what the assistant handled on its own, and what is still waiting for you. Every amount is a payment PayPal confirmed.
         </p>
       </div>
-      <InsightsLoader data={data} licenseKey={getServerConfig().agStudioLicense} />
+      <InsightsLoader data={data} licenseKey={getServerConfig().agStudioLicense} viewer={viewer} />
     </section>
   );
 }

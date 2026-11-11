@@ -84,6 +84,7 @@ export async function POST(request: Request): Promise<Response> {
       content: turn.json && result.toolCalls.length === 0 ? JSON.stringify(result.output) : result.text,
       toolCalls: result.toolCalls.map((call) => ({ id: call.toolCallId, name: call.toolName, arguments: JSON.stringify(call.input ?? {}) })),
       model: assistant.modelId,
+      usage: { inputTokens: result.usage.inputTokens ?? 0, outputTokens: result.usage.outputTokens ?? 0 },
     };
     return Response.json(answer, { headers: { "Cache-Control": "no-store", "X-Request-Id": requestId } });
   } catch (error) {

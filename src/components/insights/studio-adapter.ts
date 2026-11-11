@@ -72,11 +72,11 @@ export function sellerDeskAdapter(endpoint = "/api/owner/insights/turn"): AgLlmA
         });
         const body = (await response.json().catch(() => ({}))) as Partial<WireAnswer> & { message?: string };
         if (!response.ok) throw new Error(body.message ?? "The analyst could not answer just now.");
-        return { content: body.content ?? "", toolCalls: body.toolCalls ?? [], model: body.model ?? "" };
+        return { content: body.content ?? "", toolCalls: body.toolCalls ?? [], model: body.model ?? "", usage: body.usage };
       })();
       // A failed turn is reported on `complete`; the stream just ends, so Studio never waits on it.
       const complete: Promise<AgLlmResponse> = answer.then(
-        (result) => ({ id, createdAt, status: "completed", output: outputOf(id, result), model: result.model }),
+        (result) => ({ id, createdAt, status: "completed", output: outputOf(id, result), model: result.model, ...(result.usage ? { usage: result.usage } : {}) }),
         (error: unknown) => ({
           id,
           createdAt,
