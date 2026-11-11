@@ -71,7 +71,8 @@ export default async function OffersPage() {
                     ) : null}
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  {/* On a phone the actions sit under the text column, not under the photo. */}
+                  <div className="flex shrink-0 items-center gap-2 pl-20 sm:pl-0">
                     <LinkButton href={`/owner/offers/${row.id}`} variant="secondary">
                       {viewer ? "View" : "Edit"}
                     </LinkButton>
