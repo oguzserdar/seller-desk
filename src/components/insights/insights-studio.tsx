@@ -1,13 +1,30 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import type { AgReportState, AgStudioApi, AgStudioMode } from "ag-studio";
+import { AgStudioAiModule, createAiHarness, type AgPanelConfig, type AgReportState, type AgStudioApi } from "ag-studio";
 import { AgStudio, AgStudioProvider, createWidgets } from "ag-studio-react";
 import type { InsightsData } from "@/server/domain/insights";
 import { studioData } from "./studio-data";
 import { INSIGHT_PAGES, insightsReport } from "./studio-report";
 import { deskStudioTheme } from "./studio-theme";
 import { SELLER_DESK_WIDGETS } from "./studio-widgets";
+import { sellerDeskAdapter } from "./studio-adapter";
+
+const MODULES = [AgStudioAiModule];
+
+// Questions a shop owner asks about the week; each one runs against this page's data.
+const STARTERS = [
+  { label: "What sold best?", prompt: "Which products brought in the most revenue, and how much each?" },
+  { label: "Who is waiting?", prompt: "Which customers are waiting for my answer, and what do they want?" },
+  { label: "Add a chart", prompt: "Add a chart of paid revenue by week to this page." },
+];
+
+type Panel = "none" | "analyst" | "edit";
+const PANELS: Record<Panel, AgPanelConfig> = {
+  none: { view: { left: [], right: [] } },
+  analyst: { view: { left: [], right: [] }, edit: { left: [], right: ["ai"] } },
+  edit: { view: { left: [], right: [] }, edit: { left: ["filters"], right: ["ai", "edit", "data"] } },
+};
 import "./insights.css";
 
 // Our widgets join Studio's own, in their own group of the widget menu.
@@ -24,7 +41,7 @@ const widgets = (defaults: { menu: unknown[] }) =>
 export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licenseKey?: string }) {
   const api = useRef<AgStudioApi | null>(null);
   const [page, setPage] = useState<string>(insightsReport.selectedPageId ?? INSIGHT_PAGES[0].id);
-  const [mode, setMode] = useState<AgStudioMode>("view");
+  const [panel, setPanel] = useState<Panel>("none");
   const sources = useMemo(() => studioData(data), [data]);
 
   const open = (id: string) => {
@@ -35,7 +52,7 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-2 sm:px-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-6 pb-4 sm:px-8">
         <div role="tablist" aria-label="Dashboard pages" className="bg-sunken inline-flex rounded-[10px] p-1">
           {INSIGHT_PAGES.map((item) => (
             <button
@@ -54,27 +71,38 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => setMode(mode === "view" ? "edit" : "view")}
-          aria-pressed={mode === "edit"}
-          className="border-line-strong hover:bg-sunken rounded-[var(--radius-control)] border px-3.5 py-1.5 text-[14px] font-medium"
-        >
-          {mode === "view" ? "Edit dashboard" : "Done editing"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPanel(panel === "analyst" ? "none" : "analyst")}
+            aria-pressed={panel === "analyst"}
+            className="bg-brand hover:bg-brand-strong rounded-[var(--radius-control)] px-3.5 py-1.5 text-[14px] font-medium text-white"
+          >
+            {panel === "analyst" ? "Close analyst" : "Ask the analyst"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setPanel(panel === "edit" ? "none" : "edit")}
+            aria-pressed={panel === "edit"}
+            className="border-line-strong hover:bg-sunken rounded-[var(--radius-control)] border px-3.5 py-1.5 text-[14px] font-medium"
+          >
+            {panel === "edit" ? "Done editing" : "Edit dashboard"}
+          </button>
+        </div>
       </div>
-      <div className="h-[900px] flex-none">
-        <AgStudioProvider licenseKey={licenseKey}>
+      <div className="insights-canvas mx-2 flex-none sm:mx-6" style={{ height: Math.max(INSIGHT_PAGES.find((item) => item.id === page)?.height ?? 900, panel === "none" ? 0 : 760) }}>
+        <AgStudioProvider licenseKey={licenseKey} modules={MODULES}>
           <AgStudio
             style={{ height: "100%", width: "100%" }}
             theme={deskStudioTheme}
             layout={{ widgetBorderEnabled: true }}
-            // No side panel while reading; editing brings the data and widget panels.
-            panels={{ view: { left: [], right: [] }, edit: { right: ["edit", "data"] } }}
+            // Reading shows no side panel; the analyst opens its chat; editing adds the widget and data panels.
+            panels={PANELS[panel]}
             data={sources}
             widgets={widgets as never}
             initialState={insightsReport}
-            mode={mode}
+            mode={panel === "none" ? "view" : "edit"}
+            ai={({ api: studio }) => createAiHarness(studio as AgStudioApi, { adapter: sellerDeskAdapter(), promptStarters: STARTERS })}
             onApiReady={(event) => {
               api.current = event.api;
             }}

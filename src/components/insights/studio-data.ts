@@ -113,6 +113,16 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
     ],
     expressions: [
       {
+        // A named measure, so tables say "Revenue" rather than "Revenue (sum)".
+        id: "revenue",
+        name: "Revenue",
+        description: "Paid revenue through PayPal.",
+        format: "currencyFormat",
+        formatOptions: { format: new Intl.NumberFormat("en-US", { style: "currency", currency: data.currency }) },
+        isMeasure: true,
+        expression: { operator: "coalesce", inputs: [{ id: "orders.amount", aggregation: "sum" }] },
+      },
+      {
         id: "assistantShare",
         name: "Handled by the assistant",
         description: "Share of conversations the assistant answered without needing the owner.",
