@@ -71,6 +71,8 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
               <section key={task.id} className="surface flex flex-col gap-3 p-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className={words.tone === "attention" ? "text-attention text-[17px] font-semibold" : "text-[17px] font-semibold"}>{task.type === "digital_access" && task.state !== "completed" && accessReview ? "Review download access" : ownerStep(task)}</h3>
+                  {/* Each step says whether it is finished, so the list reads without the owner's controls. */}
+                  {task.state === "completed" ? <Badge tone="success">Done</Badge> : <Badge tone="warning">Still to do</Badge>}
                   {task.retryCount > 0 ? <span className="text-ink-3 text-[13px]">{task.retryCount} retr{task.retryCount === 1 ? "y" : "ies"}</span> : null}
                 </div>
                 {task.lastError && task.state !== "completed" && !(task.type === "digital_access" && accessReview) ? <Alert tone="warning" title="Last problem">{task.lastError}</Alert> : null}
