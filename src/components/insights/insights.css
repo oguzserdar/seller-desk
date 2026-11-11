@@ -110,7 +110,11 @@
 
 /* The analyst panel is AG Studio's own chat. It takes Seller Desk's chat scale so it reads like the
    shop and desk assistants: a filled bubble for the owner, a flat answer, a round composer and pill starters. */
-.ag-studio-ai-panel .ag-studio-ai-input-message-content { max-width: 88%; margin-left: auto; padding: 10px 14px; border-radius: 14px; background: var(--color-sunken); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+/* Studio already wraps the question in its own box; that wrapper becomes the one bubble and the inner
+   text is plain, so there is never a bubble inside a bubble. */
+.ag-studio-ai-panel .ag-studio-ai-input-message-user { width: fit-content; max-width: 88%; margin-left: auto; padding: 12px 16px; border-radius: 10px; background: oklch(93.6% 0.006 258); }
+.ag-studio-ai-panel .ag-studio-ai-input-message-content { margin: 0; padding: 0; border-radius: 0; background: none; font-size: 15px; line-height: 1.55; text-align: start; overflow-wrap: anywhere; }
+.ag-studio-ai-panel .ag-studio-ai-output-message-error { padding: 12px 14px; border-radius: 10px; border: 0; background: var(--color-danger-soft, oklch(96% 0.02 25)); color: var(--color-ink); font-size: 14px; line-height: 1.5; }
 .ag-studio-ai-panel .ag-studio-ai-output-message-content { font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
 .ag-studio-ai-panel .ag-studio-ai-assistant-input { margin: 8px 12px 12px; border-radius: 20px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line), 0 1px 2px rgb(0 0 0 / 0.04); overflow: hidden; }
 .ag-studio-ai-panel .ag-studio-ai-assistant-input:focus-within { box-shadow: 0 0 0 1px var(--color-line-strong), 0 0 0 3px var(--color-brand-soft); }
