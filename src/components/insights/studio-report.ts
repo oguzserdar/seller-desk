@@ -7,7 +7,7 @@ import type { AgPageState, AgReportState, AgWidgetLayoutState } from "ag-studio"
 
 /** Canvas position in tracks: 24 columns across, rows of the theme's row height. */
 /** Every page: an 8px gutter round each card (16px between cards) and no canvas padding. */
-const PAGE_LAYOUT = { widgetPadding: 8, pagePadding: 0, rowHeight: 18 } as const;
+const PAGE_LAYOUT = { widgetPadding: 8, pagePadding: 0, rowHeight: 18, minWidth: 300 } as const;
 
 const at = (xTrack: number, yTrack: number, xSpan: number, ySpan: number): AgWidgetLayoutState => ({ xTrack, yTrack, xSpan, ySpan });
 const titled = (text: string) => ({ title: { enabled: true, text } });
@@ -136,11 +136,46 @@ export function pageHeight(page: AgPageState): number {
   return rows * PAGE_LAYOUT.rowHeight + 24;
 }
 
+/** Below this canvas width every card takes the full width, stacked in reading order. */
+export const PHONE_WIDTH = 760;
+
+type Placement = { xTrack: number; yTrack: number; xSpan: number; ySpan: number };
+
+/**
+ * A card's height on a phone. A full-width strip under 10 rows holds figures side by side
+ * (the sales summary); on a phone they wrap into two rows, so it needs twice the height.
+ */
+export function phoneRows(card: Placement, columns = 24): number {
+  return card.xSpan >= columns && card.ySpan < 10 ? card.ySpan * 2 : card.ySpan;
+}
+
+/**
+ * Stacks cards full width in reading order (top to bottom, then left to right), keeping each
+ * card's own height. Returns positions in the order the cards were given.
+ */
+export function stackForPhone(cards: Placement[], columns: number): Placement[] {
+  const order = cards.map((card, index) => ({ card, index })).sort((a, b) => a.card.yTrack - b.card.yTrack || a.card.xTrack - b.card.xTrack);
+  const placed: Placement[] = new Array(cards.length);
+  let y = 0;
+  for (const { card, index } of order) {
+    const rows = phoneRows(card, columns);
+    placed[index] = { xTrack: 0, yTrack: y, xSpan: columns, ySpan: rows };
+    y += rows;
+  }
+  return placed;
+}
+
+/** Pixel height of a page when its cards are stacked for a phone. */
+export function phonePageHeight(page: AgPageState): number {
+  const rows = Object.values(page.widgetLayout ?? {}).reduce((total, item) => total + (item ? phoneRows(item) : 0), 0);
+  return rows * PAGE_LAYOUT.rowHeight + 24;
+}
+
 /** Studio keeps no page names, so the dashboard's own tabs name them. */
 export const INSIGHT_PAGES = [
-  { id: sales.id, title: "Sales", height: pageHeight(sales) },
-  { id: assistant.id, title: "Assistant", height: pageHeight(assistant) },
-  { id: catalog.id, title: "Catalog", height: pageHeight(catalog) },
+  { id: sales.id, title: "Sales", height: pageHeight(sales), phoneHeight: phonePageHeight(sales) },
+  { id: assistant.id, title: "Assistant", height: pageHeight(assistant), phoneHeight: phonePageHeight(assistant) },
+  { id: catalog.id, title: "Catalog", height: pageHeight(catalog), phoneHeight: phonePageHeight(catalog) },
 ] as const;
 
 /** Opens on Sales. */

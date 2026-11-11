@@ -100,7 +100,7 @@ export default async function DeskPage({
           </h1>
           {viewer ? (
             <p className="text-ink-2 mt-3 text-[14px]">
-              The owner&apos;s own assistant sits here for the signed-in owner.
+              A read-only look at this shop&apos;s desk. After signing in, the owner asks their own assistant about orders here.
             </p>
           ) : !assistantOn ? (
             <p className="text-ink-2 mt-3 text-[14px]">

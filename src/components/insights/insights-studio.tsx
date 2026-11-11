@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AgStudioAiModule, createAiHarness, type AgPanelConfig, type AgReportState, type AgStudioApi } from "ag-studio";
 import { AgStudio, AgStudioProvider, createWidgets } from "ag-studio-react";
 import type { InsightsData } from "@/server/domain/insights";
 import { studioData } from "./studio-data";
-import { INSIGHT_PAGES, insightsReport, pageHeight } from "./studio-report";
+import { INSIGHT_PAGES, PHONE_WIDTH, insightsReport, pageHeight, phonePageHeight, stackForPhone } from "./studio-report";
 import { deskStudioTheme } from "./studio-theme";
 import { SELLER_DESK_WIDGETS } from "./studio-widgets";
 import { sellerDeskAdapter } from "./studio-adapter";
@@ -19,11 +19,14 @@ const STARTERS = [
   { label: "Add a chart", prompt: "Add a chart of units sold by product to this page." },
 ];
 
+// On a phone every card goes full width, in reading order.
+const BREAKPOINTS = [{ maxWidth: PHONE_WIDTH - 1, layout: (cards: { layout: { xTrack: number; yTrack: number; xSpan: number; ySpan: number } }[], grid: { columns: number }) => stackForPhone(cards.map((card) => card.layout), grid.columns) }];
+
 type Panel = "none" | "analyst" | "edit";
 const PANELS: Record<Panel, AgPanelConfig> = {
   none: { view: { left: [], right: [] } },
   analyst: { view: { left: [], right: [] }, edit: { left: [], right: ["ai"] } },
-  edit: { view: { left: [], right: [] }, edit: { left: ["filters"], right: ["ai", "edit", "data"] } },
+  edit: { view: { left: [], right: [] }, edit: { left: [], right: ["edit", "data"] } },
 };
 import "./insights.css";
 
@@ -47,7 +50,17 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
   const [page, setPage] = useState<string>(insightsReport.selectedPageId ?? INSIGHT_PAGES[0].id);
   const [panel, setPanel] = useState<Panel>("none");
   // Follows the live report: an agent can add widgets or switch pages, and the canvas grows to fit.
-  const [heights, setHeights] = useState<Record<string, number>>(() => Object.fromEntries(INSIGHT_PAGES.map((item) => [item.id, item.height])));
+  const [heights, setHeights] = useState<Record<string, { wide: number; phone: number }>>(() =>
+    Object.fromEntries(INSIGHT_PAGES.map((item) => [item.id, { wide: item.height, phone: item.phoneHeight }])),
+  );
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia(`(max-width: ${PHONE_WIDTH}px)`);
+    const update = () => setPhone(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   const sources = useMemo(() => studioData(data), [data]);
 
   const open = (id: string) => {
@@ -96,7 +109,7 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
           </button>
         </div>
       </div>
-      <div className="insights-canvas mx-2 flex-none sm:mx-6" style={{ height: Math.max(heights[page] ?? 900, panel === "none" ? 0 : 760) }}>
+      <div className="insights-canvas mx-2 flex-none sm:mx-6" style={{ height: Math.max((phone ? heights[page]?.phone : heights[page]?.wide) ?? 900, panel === "none" ? 0 : 760) }}>
         <AgStudioProvider licenseKey={licenseKey} modules={MODULES}>
           <AgStudio
             style={{ height: "100%", width: "100%" }}
@@ -104,13 +117,14 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
             layout={{ widgetBorderEnabled: true }}
             // Reading shows no side panel; the analyst opens its chat; editing adds the widget and data panels.
             panels={PANELS[panel]}
+            responsiveLayoutBreakpoints={BREAKPOINTS}
             data={sources}
             widgets={widgets as never}
             initialState={insightsReport}
             mode={panel === "none" ? "view" : "edit"}
             ai={({ api: studio }) => createAiHarness(studio as AgStudioApi, { adapter: sellerDeskAdapter(), promptStarters: STARTERS })}
             onStateUpdated={(event) => {
-              const next = Object.fromEntries(event.state.pages.map((item) => [item.id, pageHeight(item)]));
+              const next = Object.fromEntries(event.state.pages.map((item) => [item.id, { wide: pageHeight(item), phone: phonePageHeight(item) }]));
               setHeights((current) => (JSON.stringify(current) === JSON.stringify(next) ? current : next));
               if (event.state.selectedPageId && event.state.selectedPageId !== page) setPage(event.state.selectedPageId);
             }}

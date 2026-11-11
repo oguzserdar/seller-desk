@@ -24,7 +24,11 @@ export const metadata: Metadata = { title: "Setup" };
 /** Owner setup, with public connection guidance and independently checked readiness. */
 export default async function SetupPage() {
   const { seller, owner, viewer } = await requireOwner(await headers());
-  const readiness = await getReadiness(seller);
+  const checked = await getReadiness(seller);
+  // A demo visitor is not the owner: say so, rather than "Signed in as the owner".
+  const readiness = viewer
+    ? { ...checked, checks: checked.checks.map((check) => (check.key === "owner" ? { ...check, detail: "You are looking around as a demo visitor. The owner signs in to change anything." } : check)) }
+    : checked;
   const [config, connection, apps, assistant] = await Promise.all([getEffectiveConfig(), describeAiConnection(), allowedApps(owner.userId), getAssistantModel()]);
   const deskTheme = deskThemeId(
     (await cookies()).get(DESK_THEME_COOKIE)?.value,
@@ -65,7 +69,7 @@ export default async function SetupPage() {
               : "Off; using the reply model for all answers"
         }
       />
-      <AiApps address={connectorResource(config.appUrl)} agentLine={setupLine(config.appUrl)} apps={apps} />
+      <AiApps address={connectorResource(config.appUrl)} agentLine={setupLine(config.appUrl)} apps={viewer ? [] : apps} />
       <PayPalSetup
         mode={config.mode}
         appUrl={config.appUrl}

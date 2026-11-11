@@ -29,6 +29,7 @@ const fieldsIn = (currency: string) => (list: Field[]): AgFieldDefinition[] =>
 function conversationRows(data: InsightsData) {
   return data.conversations.map((row) => ({
     ...row,
+    date: wallClock(row.date),
     one: 1,
     // Answered by the assistant means it needed nobody: not taken over, and not waiting on the owner.
     byAssistant: row.handledBy === "Assistant" && row.waitingForYou !== "Waiting for you" ? 1 : 0,
@@ -43,8 +44,11 @@ function conversationRows(data: InsightsData) {
  * @returns Studio's data sources definition
  */
 export function studioData(data: InsightsData): AgDataSourcesDefinition {
-  const dates = [...data.orders, ...data.conversations].map((row) => row.date.slice(0, 10)).sort();
-  const today = data.asOf.slice(0, 10);
+  // Studio buckets by the date it is given; hand it the viewer's own wall-clock time, so an
+  // evening order lands on today, not on tomorrow in UTC.
+  const orders = data.orders.map((row) => ({ ...row, date: wallClock(row.date) }));
+  const dates = [...orders, ...data.conversations.map((row) => ({ date: wallClock(row.date) }))].map((row) => row.date.slice(0, 10)).sort();
+  const today = wallClock(data.asOf).slice(0, 10);
   const fields = fieldsIn(data.currency);
   const money = new Intl.NumberFormat("en-US", { style: "currency", currency: data.currency });
   return {
@@ -56,7 +60,7 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
         id: "orders",
         name: "Paid orders",
         description: "One row per paid order. Amount is what the customer paid through PayPal.",
-        data: data.orders,
+        data: orders,
         fields: fields([
           ["id", "Order ID", "textFormat", true],
           ["ref", "Order", "textFormat"],
@@ -158,4 +162,11 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
       },
     ],
   };
+}
+
+/** An ISO timestamp as the viewer's local wall-clock time, without a zone (YYYY-MM-DDTHH:mm:ss). */
+export function wallClock(iso: string): string {
+  const at = new Date(iso);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}T${pad(at.getHours())}:${pad(at.getMinutes())}:${pad(at.getSeconds())}`;
 }
