@@ -13,6 +13,7 @@ import {
   ShopConversation,
 } from "@/components/assistant/conversation";
 import { conversationText, sellerReplyOf } from "@/lib/conversation-messages";
+import { Message } from "@/components/assistant/message";
 import type { SellerConversation } from "@/server/domain/conversation-messages";
 import {
   controlConversationAction,
@@ -177,26 +178,20 @@ export function CustomerConversation({
       </header>
       <div className="min-h-0 flex-1 py-6">
         <ShopConversation shopName="Customer">
-          <ol className="flex flex-col gap-7" aria-label="Conversation history">
+          <ol className="chat-list" aria-label="Conversation history">
             {view.messages.map((message) => {
               const text = conversationText(message);
               if (!text) return null;
               const sellerReply = sellerReplyOf(message);
+              // As in the shop: the customer (the AI SDK user) sits at the end in a bubble; the shop side, assistant or owner, at the start.
               return (
                 <li key={message.id} className="min-w-0">
-                  <p className="mb-2 text-[12px] font-semibold text-ink-3">
-                    {sellerReply
-                      ? "You · Seller"
-                      : message.role === "user"
-                        ? "Customer"
-                        : "AI assistant"}
-                  </p>
-                  {message.role === "user" || sellerReply ? (
-                    <p className="whitespace-pre-wrap text-[16px] leading-relaxed [overflow-wrap:anywhere]">
-                      {text}
-                    </p>
+                  {sellerReply ? (
+                    <Message variant="card" label="You · Seller">{text}</Message>
+                  ) : message.role === "user" ? (
+                    <Message variant="bubble" align="end" label="Customer">{text}</Message>
                   ) : (
-                    <AssistantAnswer text={text} streaming={false} />
+                    <Message variant="answer" label="AI assistant"><AssistantAnswer text={text} streaming={false} /></Message>
                   )}
                 </li>
               );

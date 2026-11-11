@@ -5,6 +5,7 @@ import { ReceiptText } from "lucide-react";
 import { isValidElement, type ReactNode } from "react";
 import { sellerReplyOf } from "@/lib/conversation-messages";
 import { AssistantAnswer } from "@/components/assistant/conversation";
+import { Message } from "@/components/assistant/message";
 import { Button } from "@/components/arc/button/button";
 import { Alert } from "@/components/arc/alert/alert";
 import { formatQuoteAmount } from "@/lib/money";
@@ -30,7 +31,7 @@ type QuoteToolOutput = {
 function Searching({ shopName }: { shopName: string }) {
   return (
     <div className="enter" role="status">
-      <p className="text-ink-3 text-[14px]">Looking through {shopName}…</p>
+      <p className="chat-shimmer">Looking through {shopName}…</p>
       <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3" aria-hidden>
         {[0, 1, 2].map((i) => (
           <div key={i} className={i === 2 ? "hidden sm:block" : undefined}>
@@ -175,31 +176,21 @@ export function Thread({
             newest.state === "output-error"))));
 
   return (
-    <div className="flex min-w-0 flex-col gap-8">
+    <div className="chat-list">
       {messages.map((message) =>
         sellerReplyOf(message) ? (
-          <div
-            key={message.id}
-            className="enter bg-surface min-w-0 max-w-[620px] rounded-[14px] px-4 py-3.5 shadow-[0_0_0_1px_var(--color-line)]"
-          >
-            <p className="text-ink-2 mb-1 text-[13px] font-medium">
-              From the shop
-            </p>
-            <p className="whitespace-pre-wrap text-[15px] leading-relaxed [overflow-wrap:anywhere]">
-              {sellerReplyOf(message)!.text}
-            </p>
-          </div>
+          <Message key={message.id} variant="card" label="From the shop">
+            {sellerReplyOf(message)!.text}
+          </Message>
         ) : message.role === "user" ? (
-          <div key={message.id} className="enter flex justify-end">
-            <p className="bg-sunken max-w-[88%] rounded-[14px] px-4 py-3 text-[15px] leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
-              {message.parts
-                .map((part) => (part.type === "text" ? part.text : ""))
-                .join("")}
-            </p>
-          </div>
+          <Message key={message.id} variant="bubble" align="end">
+            {message.parts
+              .map((part) => (part.type === "text" ? part.text : ""))
+              .join("")}
+          </Message>
         ) : (
-          <div key={message.id} className="enter flex min-w-0 flex-col gap-4">
-            <p className="text-ink-3 text-[13px]">{shopName} assistant</p>
+          <div key={message.id} className="chat-message chat-answer-turn enter">
+            <p className="chat-label">{shopName} assistant</p>
             {joinReceipts(
               message.parts.map((part, index) => {
                 if (part.type === "text") {

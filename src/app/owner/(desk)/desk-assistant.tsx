@@ -5,6 +5,7 @@
  * through fixed views, and at most suggests one action. The action runs only
  * when the owner presses its button, through the same server code as the desk.
  */
+import { Message } from "@/components/assistant/message";
 import { useChat } from "@ai-sdk/react";
 import { isToolUIPart } from "ai";
 import { useAction } from "next-safe-action/hooks";
@@ -221,35 +222,29 @@ export function DeskAssistant({
                 : "The desk assistant is off: no AI provider is configured."}
             </p>
             {assistantOn ? (
-              <ul className="flex flex-col gap-2">
+              <ul className="flex flex-wrap gap-2">
                 {STARTERS.map((text) => (
                   <li key={text}>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => ask(text)}
-                    >
+                    {/* Same suggestion pill as the shop's assistant. */}
+                    <button type="button" className="shop-suggestion" onClick={() => ask(text)}>
                       {text}
-                    </Button>
+                    </button>
                   </li>
                 ))}
               </ul>
             ) : null}
           </div>
         ) : (
-          <div className="flex flex-col gap-5">
+          <div className="chat-list">
             {messages.map((message) =>
               message.role === "user" ? (
-                <p
-                  key={message.id}
-                  className="enter bg-sunken self-end rounded-[16px] rounded-br-[6px] px-3.5 py-2 text-[15px]"
-                >
+                <Message key={message.id} variant="bubble" align="end">
                   {message.parts
                     .map((part) => (part.type === "text" ? part.text : ""))
                     .join("")}
-                </p>
+                </Message>
               ) : (
-                <div key={message.id} className="enter flex flex-col gap-3">
+                <div key={message.id} className="chat-message chat-answer-turn enter">
                   {message.parts.map((part, index) => {
                     if (part.type === "text")
                       return part.text.trim() ? (

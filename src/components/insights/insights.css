@@ -107,3 +107,16 @@
 /* Studio sizes grid columns from regular text; a bolder totals row then overflows its column and is cut
    to "$435.…". Medium weight fits the measured width and still reads as the total. */
 .insights-canvas .ag-row-grand-total .ag-cell { font-weight: 600; letter-spacing: -0.01em; }
+
+/* The analyst panel is AG Studio's own chat. It takes Seller Desk's chat scale so it reads like the
+   shop and desk assistants: a filled bubble for the owner, a flat answer, a round composer and pill starters. */
+.ag-studio-ai-panel .ag-studio-ai-input-message-content { max-width: 88%; margin-left: auto; padding: 10px 14px; border-radius: 14px; background: var(--color-sunken); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.ag-studio-ai-panel .ag-studio-ai-output-message-content { font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
+.ag-studio-ai-panel .ag-studio-ai-assistant-input { margin: 8px 12px 12px; border-radius: 20px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line), 0 1px 2px rgb(0 0 0 / 0.04); overflow: hidden; }
+.ag-studio-ai-panel .ag-studio-ai-assistant-input:focus-within { box-shadow: 0 0 0 1px var(--color-line-strong), 0 0 0 3px var(--color-brand-soft); }
+.ag-studio-ai-panel .ag-studio-ai-assistant-textarea { padding: 12px 14px 4px; font-size: 16px; line-height: 1.4; }
+.ag-studio-ai-panel .ag-studio-ai-assistant-input-controls { padding: 4px 8px 8px; }
+.ag-studio-ai-panel .ag-studio-ai-assistant-send-button { min-height: 32px; padding: 0 14px; border-radius: 999px; background: var(--color-ink); color: var(--color-surface); font-weight: 600; }
+.ag-studio-ai-panel .ag-studio-ai-assistant-send-button:disabled { background: var(--color-sunken); color: var(--color-ink-3); }
+.ag-studio-ai-panel .ag-studio-ai-prompt-starter { min-height: 32px; padding: 6px 14px; border-radius: 999px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line); font-size: 14px; line-height: 1.3; color: var(--color-ink-2); }
+.ag-studio-ai-panel .ag-studio-ai-prompt-starter:hover { background: var(--color-sunken); color: var(--color-ink); }
