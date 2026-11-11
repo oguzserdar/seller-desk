@@ -39,7 +39,7 @@ it("adds a priced product without asking the assistant, and keeps Ask beside it"
 
 it("sends work without a price to the assistant, since the shop has to scope it", async () => {
   const { calls, button } = await render();
-  expect(button("Add Custom repair to your quote, Awaiting quote")).toBeUndefined();
+  expect(button("Add Custom repair to your quote, Quoted per job")).toBeUndefined();
   await act(async () => button("Ask about Custom repair").click());
   expect(calls).toEqual(["ask repair"]);
 });
@@ -57,7 +57,7 @@ it("does not add a sold-out product or one already in the quote", async () => {
 it("offers no Ask button when the shop's assistant is off", async () => {
   const { calls, button } = await render({ assistantOn: false });
   expect(button("Ask about Front light")).toBeUndefined();
-  await act(async () => button("Add Custom repair to your quote, Awaiting quote").click());
+  await act(async () => button("Add Custom repair to your quote, Quoted per job").click());
   expect(calls).toEqual(["add repair"]);
 });
 

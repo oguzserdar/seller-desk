@@ -55,7 +55,8 @@ function Mosaic({
       aria-label="From the shop"
     >
       {offers.slice(0, 6).map((offer, index) => {
-        const price = formatQuoteAmount(offer.unitAmountMinor, offer.currency);
+        // A catalog card has no request yet, so an unpriced job is "quoted per job", not "awaiting".
+        const price = offer.unitAmountMinor === null ? "Quoted per job" : formatQuoteAmount(offer.unitAmountMinor, offer.currency);
         const added = inQuote(offer.id);
         const priced = offer.unitAmountMinor !== null;
         const soldOut = offer.available === 0;

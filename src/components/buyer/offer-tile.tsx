@@ -175,7 +175,7 @@ export function OfferTile({
       >
         <p className="mt-3 tabular">
           {offer.unitAmountMinor === null
-            ? "Price after review"
+            ? "Quoted per job"
             : formatQuoteAmount(offer.unitAmountMinor, offer.currency)}
         </p>
       </Card>
@@ -212,7 +212,7 @@ export function OfferCard({
         {stock ? `${stock.text}. ${fulfilmentText(offer)}` : fulfilmentText(offer)}
       </p>
       <p className="tabular mt-1 mb-2 text-[14px]">
-        {offer.unitAmountMinor === null ? "Price after review" : formatQuoteAmount(offer.unitAmountMinor, offer.currency)}
+        {offer.unitAmountMinor === null ? "Quoted per job" : formatQuoteAmount(offer.unitAmountMinor, offer.currency)}
       </p>
       <Button
         type="button"
