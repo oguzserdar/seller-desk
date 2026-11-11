@@ -103,26 +103,27 @@ const catalog: AgPageState = {
   widgets: {
     "sold-by-offer": {
       type: "bar-chart-grouped",
-      dataMapping: { categoryKey: [{ id: "offers.title" }], valueKey: [sum("offers.sold")] },
-      sort: [{ field: sum("offers.sold"), direction: "desc" }],
-      format: titled("Units sold by offer"),
+      dataMapping: { categoryKey: [{ id: "offerSales.title" }], valueKey: [sum("offerSales.sold")] },
+      sort: [{ field: sum("offerSales.sold"), direction: "desc" }],
+      format: titled("Units sold"),
     },
     "stock-left": {
       type: "bar-chart-grouped",
-      dataMapping: { categoryKey: [{ id: "offers.title" }], valueKey: [sum("offers.inStock")] },
-      format: titled("Stock left"),
+      dataMapping: { categoryKey: [{ id: "offerStock.title" }], valueKey: [sum("offerStock.inStock")] },
+      sort: [{ field: sum("offerStock.inStock"), direction: "asc" }],
+      format: titled("Stock left, lowest first"),
     },
     "offer-list": {
       type: "grid",
       // Columns fit their content, so order numbers and statuses are never cut short.
-      dataMapping: { cols: [{ id: "offers.title" }, { id: "offers.kind" }, sum("offers.price"), sum("offers.inStock"), sum("offers.sold")] },
+      dataMapping: { cols: [{ id: "offers.title" }, { id: "offers.kind" }, { id: "offers.priceLabel" }, { id: "offers.stockLabel" }, { id: "offers.sold" }] },
       format: { ...titled("Catalog"), style: { columnAutoSize: true } },
     },
   },
   widgetLayout: {
-    "sold-by-offer": at(0, 0, 12, 20),
-    "stock-left": at(12, 0, 12, 20),
-    "offer-list": at(0, 20, 24, 20),
+    "sold-by-offer": at(0, 0, 12, 16),
+    "stock-left": at(12, 0, 12, 16),
+    "offer-list": at(0, 16, 24, 26),
   },
 };
 

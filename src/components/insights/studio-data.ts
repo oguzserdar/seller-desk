@@ -46,6 +46,7 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
   const dates = [...data.orders, ...data.conversations].map((row) => row.date.slice(0, 10)).sort();
   const today = data.asOf.slice(0, 10);
   const fields = fieldsIn(data.currency);
+  const money = new Intl.NumberFormat("en-US", { style: "currency", currency: data.currency });
   return {
     description:
       `A small shop's sales desk. Seller Desk's AI assistant answers customers, builds quotes and takes payment through PayPal; ` +
@@ -75,6 +76,7 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
         data: conversationRows(data),
         fields: fields([
           ["id", "Conversation ID", "textFormat", true],
+          ["customer", "Customer", "textFormat"],
           ["date", "Last message", "dateTimeFormat"],
           ["handledBy", "Handled by", "textFormat"],
           ["waitingForYou", "Waiting", "textFormat"],
@@ -87,15 +89,39 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
       {
         id: "offers",
         name: "Offers",
-        description: "The shop's catalog: price, stock left and units sold. A service without a price is quoted by the owner.",
-        data: data.offers,
+        description: "The shop's catalog: price, stock left and units sold. A service without a price is quoted by the owner per job.",
+        data: data.offers.map((offer) => ({ ...offer, priceLabel: offer.price === null ? "Quoted per job" : money.format(offer.price), stockLabel: offer.inStock === null ? "Not stocked" : String(offer.inStock) })),
         fields: fields([
           ["id", "Offer ID", "textFormat", true],
           ["title", "Offer", "textFormat"],
           ["kind", "Offer kind", "textFormat"],
-          ["price", "Price", "currencyFormat"],
+          ["price", "Price", "currencyFormat", true],
+          ["priceLabel", "Price", "textFormat"],
+          ["inStock", "In stock", "integerFormat", true],
+          ["stockLabel", "In stock", "textFormat"],
+          ["sold", "Units sold", "integerFormat"],
+        ]),
+      },
+      {
+        // Only offers that have sold, so the chart is not padded with empty bars.
+        id: "offerSales",
+        name: "Offer sales",
+        description: "Offers with at least one paid sale, and how many units sold.",
+        data: data.offers.filter((offer) => offer.sold > 0).map(({ title, sold }) => ({ title, sold })),
+        fields: fields([
+          ["title", "Offer", "textFormat"],
+          ["sold", "Units sold", "integerFormat"],
+        ]),
+      },
+      {
+        // Only physical goods carry stock; services and downloads never run out.
+        id: "offerStock",
+        name: "Stock",
+        description: "Physical goods and how many are left to sell.",
+        data: data.offers.flatMap((offer) => (offer.inStock === null ? [] : [{ title: offer.title, inStock: offer.inStock }])),
+        fields: fields([
+          ["title", "Offer", "textFormat"],
           ["inStock", "In stock", "integerFormat"],
-          ["sold", "Sold", "integerFormat"],
         ]),
       },
     ],

@@ -1,0 +1,54 @@
+/*
+ * Room inside each card. Studio spaces a card's header with var(--ag-spacing) and gives its body
+ * nothing; inside the Insights canvas only, both get the desk's card padding.
+ */
+.insights-canvas .ag-studio-layout-widget-header { margin: 18px 20px 4px; }
+.insights-canvas .ag-studio-layout-widget-body { margin: 0 20px 18px; }
+.insights-canvas .ag-studio-layout-widget-header-hidden + .ag-studio-layout-widget-body,
+.insights-canvas .ag-studio-layout-widget-header-hidden ~ .ag-studio-layout-widget-body { margin-top: 18px; }
+/*
+ * Studio marks the active card with a shadow on its outer gutter, which draws a square frame
+ * 8px outside the rounded card. Mark the card itself instead: a quiet edge when active,
+ * the brand ring for keyboard focus.
+ */
+.insights-canvas .ag-studio-layout-widget { box-shadow: none; }
+.insights-canvas .ag-studio-layout-widget-toolbar-active > .ag-studio-layout-widget-container {
+  box-shadow: 0 0 0 1px var(--color-line-strong);
+}
+.insights-canvas .ag-studio-layout-widget:focus-visible > .ag-studio-layout-widget-container {
+  box-shadow: 0 0 0 2px var(--color-brand);
+}
+
+/* Seller Desk's own Studio widgets, in the desk's tokens. */
+.insights-empty { padding: 12px 4px; color: var(--color-ink-2); font-size: 14px; }
+.insights-queue { display: grid; gap: 2px; overflow: auto; height: 100%; }
+.insights-queue li:last-child { border-bottom: 0; }
+.insights-queue li { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 12px 0; border-bottom: 1px solid var(--color-line); }
+.insights-queue-dot { flex: none; width: 8px; height: 8px; border-radius: 999px; background: var(--color-attention); }
+.insights-queue-text { flex: 1; min-width: 0; color: var(--color-ink); font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.insights-queue-open { flex: none; padding: 6px 12px; border-radius: 8px; box-shadow: 0 0 0 1px var(--color-line-strong); font-size: 13px; font-weight: 600; color: var(--color-ink); }
+.insights-queue-open:hover { background: var(--color-sunken); }
+.insights-split { display: grid; gap: 12px; height: 100%; align-content: center; }
+.insights-split-bar { display: flex; gap: 8px; min-height: 84px; }
+.insights-split-part { display: grid; align-content: center; justify-items: start; gap: 2px; min-width: 120px; padding: 14px 20px; border-radius: 10px; text-align: left; cursor: pointer; transition: box-shadow 150ms ease, opacity 150ms ease; }
+.insights-split-part[data-tone="assistant"] { background: color-mix(in oklch, var(--color-brand) 20%, var(--color-surface)); color: var(--color-brand); }
+.insights-split-part[data-tone="owner"] { background: var(--color-attention-soft); color: var(--color-attention); }
+.insights-split-part[aria-pressed="true"] { box-shadow: 0 0 0 2px currentColor; }
+.insights-split-bar:has([aria-pressed="true"]) .insights-split-part[aria-pressed="false"] { opacity: 0.5; }
+.insights-split-number { font-size: 26px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.insights-split-label { font-size: 13px; font-weight: 500; }
+.insights-split-note { color: var(--color-ink-2); font-size: 13.5px; }
+
+.insights-summary { display: grid; gap: 16px; height: 100%; align-content: center; }
+.insights-summary-figures { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 0; }
+.insights-summary-figures > div { padding: 2px 28px; border-left: 1px solid var(--color-line); }
+.insights-summary-figures > div:first-child { padding-left: 0; border-left: 0; }
+.insights-summary-figures dt { font-size: 13px; font-weight: 500; color: var(--color-ink-2); }
+.insights-summary-figures dd { margin-top: 8px; line-height: 1; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.insights-summary-figures [data-lead] dd { font-size: 34px; color: var(--color-brand); }
+.insights-summary-figures [data-attention] dd { color: var(--color-attention); }
+.insights-summary-rule { padding-top: 14px; border-top: 1px solid var(--color-line); font-size: 13px; color: var(--color-ink-3); }
+@media (max-width: 720px) {
+  .insights-summary-figures { grid-template-columns: repeat(2, 1fr); row-gap: 14px; }
+  .insights-summary-figures > div:nth-child(3) { padding-left: 2px; border-left: 0; }
+}

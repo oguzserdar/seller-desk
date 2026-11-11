@@ -13,7 +13,7 @@ const KIND_LABEL = { goods: "Pickup item", service: "Service", digital: "Downloa
 /** One paid order: money in major units, so sums read as dollars. */
 export type InsightOrder = { id: string; ref: string; date: string; product: string; kind: string; amount: number; currency: string; nextStep: string; needsYou: string };
 /** One customer conversation and who is handling it. */
-export type InsightConversation = { id: string; date: string; handledBy: string; waitingForYou: string; topic: string };
+export type InsightConversation = { id: string; customer: string; date: string; handledBy: string; waitingForYou: string; topic: string };
 /** One offer and how it is selling. */
 export type InsightOffer = { id: string; title: string; kind: string; price: number | null; inStock: number | null; sold: number };
 
@@ -52,8 +52,10 @@ export async function loadInsights(owner: OwnerPrincipal): Promise<InsightsData>
     asOf: new Date().toISOString(),
     currency: orders[0]?.currency ?? "USD",
     orders,
-    conversations: conversations.map((item) => ({
+    // Shoppers are anonymous; a short label lets the owner and the analyst tell them apart.
+    conversations: conversations.map((item, index) => ({
       id: item.id,
+      customer: `Customer ${conversations.length - index}`,
       date: new Date(item.updatedAt).toISOString(),
       handledBy: item.handler === "seller" ? "You" : "Assistant",
       waitingForYou: askedIn.has(item.id) ? "Waiting for you" : "Answered",

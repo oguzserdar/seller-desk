@@ -35,7 +35,10 @@ export async function proxy(request: NextRequest) {
   const response = NextResponse.next();
   response.headers.set(
     "Content-Security-Policy",
-    `frame-ancestors ${frameAncestors(path, origins)}; base-uri 'self'; object-src 'none'`,
+    `frame-ancestors ${frameAncestors(path, origins)}; base-uri 'self'; object-src 'none'` +
+      // Insights hosts an AI analyst: images there load only from this site, so injected text cannot
+      // make the page send its data to another address.
+      (path.startsWith("/owner/insights") ? "; img-src 'self' data: blob:" : ""),
   );
   if (!frameable) response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");

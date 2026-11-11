@@ -27,11 +27,15 @@ const PANELS: Record<Panel, AgPanelConfig> = {
 };
 import "./insights.css";
 
-// Our widgets join Studio's own, in their own group of the widget menu.
+type MenuGroup = { label?: string; widgetIds?: string[] };
+// Our widgets join Studio's own in their own menu group. The image widget is left out: it loads
+// any address it is given, which a prompt-injected analyst could use to send data off the page.
 const widgets = (defaults: { menu: unknown[] }) =>
   createWidgets({
     additionalTypes: SELLER_DESK_WIDGETS,
-    menu: [...defaults.menu, { label: "Seller Desk", widgetIds: SELLER_DESK_WIDGETS.map((widget) => (widget as unknown as { id: string }).id) }],
+    menu: [
+      ...(defaults.menu as MenuGroup[]).map((group) => (group.widgetIds ? { ...group, widgetIds: group.widgetIds.filter((id) => id !== "image") } : group)),
+      { label: "Seller Desk", widgetIds: SELLER_DESK_WIDGETS.map((widget) => (widget as unknown as { id: string }).id) }],
   } as never);
 
 /**
