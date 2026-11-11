@@ -195,7 +195,7 @@ export async function SellerDeskHome() {
         <section aria-labelledby="desk" className="about-section mx-auto grid w-full max-w-[1180px] gap-10 px-4 sm:px-6 lg:grid-cols-[6fr_5fr] lg:items-center">
           <Image
             src="/about/desk.webp"
-            alt="The owner's desk: orders with the next step each one needs"
+            alt="The owner's desk: paid orders, and the customer questions waiting for the owner"
             width={1440}
             height={1000}
             sizes="(min-width: 1024px) 600px, 92vw"
@@ -211,6 +211,31 @@ export async function SellerDeskHome() {
               A WordPress plugin or one script tag puts the assistant on the website a seller already has.
             </p>
           </div>
+        </section>
+
+        <section aria-labelledby="insights" className="about-section mx-auto grid w-full max-w-[1180px] gap-10 px-4 sm:px-6 lg:grid-cols-[5fr_6fr] lg:items-center">
+          <div>
+            <h2 id="insights" className="about-h2 font-display">Ask your own numbers</h2>
+            <p className="text-ink-2 mt-4 max-w-[46ch] leading-relaxed">
+              Insights puts sales, conversations and stock on one dashboard, built on AG Studio. Tap a bar to see that
+              product&apos;s orders. Ask the analyst how the shop is doing and it reads the shop&apos;s own figures, or asks
+              Studio&apos;s agents to add a chart.
+            </p>
+            <p className="text-ink-2 mt-3 max-w-[46ch] leading-relaxed">
+              It reads and arranges. It has no tool that touches a price, an order or a payment, and it shows what it did.
+            </p>
+            <Link href="/owner/insights" className="text-ink mt-4 inline-flex min-h-11 items-center text-[15px] font-semibold underline underline-offset-4">
+              Open Insights
+            </Link>
+          </div>
+          <Image
+            src="/about/insights.webp"
+            alt="Insights: revenue through PayPal, revenue by product, and the orders still owing work"
+            width={1440}
+            height={1000}
+            sizes="(min-width: 1024px) 640px, 92vw"
+            className="about-shot"
+          />
         </section>
 
         <section aria-labelledby="refused" className="about-section mx-auto w-full max-w-[1180px] px-4 sm:px-6">
