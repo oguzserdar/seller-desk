@@ -38,7 +38,7 @@
     "dev:cloudflare": "vite dev --host localhost --port 4310",
     "build:cloudflare": "vite build",
     "preview:cloudflare": "vite preview --host localhost --port 4310",
-    "deploy:cloudflare": "vinext-cloudflare deploy",
+    "deploy:cloudflare": "pnpm check && vinext-cloudflare deploy",
     "package:wordpress": "tsx scripts/package-wordpress.ts",
     "d1:admin": "tsx scripts/d1-admin.ts",
     "demo:d1": "tsx scripts/demo-d1.ts",
@@ -46,7 +46,8 @@
     "trial:schema": "tsx scripts/trial-schema.ts",
     "build:vercel": "tsx scripts/build-vercel.ts",
     "build:cloudflare:install": "tsx scripts/build-cloudflare-install.ts",
-    "deploy": "tsx scripts/deploy-cloudflare-install.ts"
+    "deploy": "tsx scripts/deploy-cloudflare-install.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.87",
@@ -117,6 +118,7 @@
     "embedded-postgres": "18.4.0-beta.17",
     "fflate": "0.8.3",
     "happy-dom": "20.14.6",
+    "husky": "9.1.7",
     "miniflare": "5.20261006.2-beta",
     "postcss": "8.5.29",
     "tailwindcss": "4.3.3",
