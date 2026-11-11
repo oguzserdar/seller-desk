@@ -6,6 +6,7 @@
  * when the owner presses its button, through the same server code as the desk.
  */
 import { Message } from "@/components/assistant/message";
+import { answerText, CopyAction, MessageActions } from "@/components/assistant/message-actions";
 import { useChat } from "@ai-sdk/react";
 import { isToolUIPart } from "ai";
 import { useAction } from "next-safe-action/hooks";
@@ -274,6 +275,11 @@ export function DeskAssistant({
                     }
                     return null;
                   })}
+                  {answerText(message.parts) && !(streaming && message.id === last?.id) ? (
+                    <MessageActions>
+                      <CopyAction text={answerText(message.parts)} />
+                    </MessageActions>
+                  ) : null}
                 </div>
               ),
             )}

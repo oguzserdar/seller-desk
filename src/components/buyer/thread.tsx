@@ -6,6 +6,7 @@ import { isValidElement, type ReactNode } from "react";
 import { sellerReplyOf } from "@/lib/conversation-messages";
 import { AssistantAnswer } from "@/components/assistant/conversation";
 import { Message } from "@/components/assistant/message";
+import { answerText, CopyAction, MessageActions } from "@/components/assistant/message-actions";
 import { Button } from "@/components/arc/button/button";
 import { Alert } from "@/components/arc/alert/alert";
 import { formatQuoteAmount } from "@/lib/money";
@@ -566,6 +567,11 @@ export function Thread({
                 return null;
               }),
             )}
+            {answerText(message.parts) && !(status === "streaming" && message.id === last?.id) ? (
+              <MessageActions>
+                <CopyAction text={answerText(message.parts)} />
+              </MessageActions>
+            ) : null}
           </div>
         ),
       )}
