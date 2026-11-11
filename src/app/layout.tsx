@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { ModeBanner } from "@/components/mode-banner";
+import { StaleBuildReload } from "@/components/stale-build-reload";
 import "@/components/arc/foundation.css";
 import "./globals.css";
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh antialiased">
         <ModeBanner />
         {children}
+        <StaleBuildReload />
       </body>
     </html>
   );
