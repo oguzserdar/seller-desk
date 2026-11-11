@@ -64,7 +64,7 @@ function QuestionCard({ item, readOnly }: { item: CustomerQuestion; readOnly: bo
                 <Link href={`/owner/conversations?conversation=${item.conversationId}`} className="text-ink-2 decoration-line-strong font-medium underline underline-offset-4 hover:text-ink">Open conversation</Link>
               </p>
             </div>
-            <p className="mt-3 max-w-[60ch] text-[20px] leading-snug font-semibold tracking-[-0.01em]">{item.question}</p>
+            <p className="mt-3 max-w-[60ch] text-[17px] leading-snug font-semibold tracking-[-0.01em] sm:text-[20px]">{item.question}</p>
             {details.length ? (
               <ul aria-label="What the customer told the assistant" className="bg-sunken divide-line mt-4 flex flex-col divide-y rounded-[10px] px-4 text-[15px]">
                 {details.map((line, index) => (
