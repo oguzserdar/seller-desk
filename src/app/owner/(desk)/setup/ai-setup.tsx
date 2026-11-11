@@ -7,8 +7,11 @@ export function AiSetup({
   routing,
   routine,
   connection,
+  readOnly = false,
 }: {
   connection: AiConnectionView;
+  /** A demo visitor sees what is connected; preparing a new connection and its key field are the owner's. */
+  readOnly?: boolean;
   reply: string;
   routing: string;
   routine: string;
@@ -32,7 +35,19 @@ export function AiSetup({
         </p>
       </div>
       <div className="px-5 pt-6 sm:px-7">
-        <AiSettings connection={connection} />
+        {readOnly ? (
+          <dl className="grid gap-3 pb-6 text-[14px] sm:grid-cols-[140px_1fr]">
+            <dt className="text-ink-3">Connection</dt>
+            <dd>{connection.provider ? connection.provider.charAt(0).toUpperCase() + connection.provider.slice(1) : "Not connected"}</dd>
+            <dt className="text-ink-3">Reply model</dt>
+            <dd className="break-words">{connection.modelId ?? "None"}</dd>
+            <dt className="text-ink-3">Key</dt>
+            <dd>{connection.keyMask ? "Set, hidden in the demo" : "Not set"}</dd>
+            <dd className="text-ink-3 sm:col-span-2 text-[13px]">The owner connects their own AI provider and key here.</dd>
+          </dl>
+        ) : (
+          <AiSettings connection={connection} />
+        )}
       </div>
       <div className="border-line border-t bg-canvas px-5 sm:px-7">
         <details>

@@ -45,6 +45,7 @@ export default async function SetupPage() {
         <ReadinessList readiness={readiness} />
       </div>
       <AiSetup
+        readOnly={viewer}
         // A demo visitor sees that a key is set, never any part of it.
         connection={viewer ? { ...connection, keyMask: connection.keyMask ? "hidden in the demo" : null } : connection}
         reply={
