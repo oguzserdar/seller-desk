@@ -253,8 +253,11 @@ export function KnowledgeEditor({
   removedEntries,
   products,
   expiredIds,
+  readOnly = false,
 }: {
   expiredIds: string[];
+  /** A demo visitor reads the facts; adding, editing and history are the owner's. */
+  readOnly?: boolean;
   entries: GuideInput[];
   removedEntries: GuideInput[];
   products: { id: string; title: string }[];
@@ -266,15 +269,14 @@ export function KnowledgeEditor({
     <div className="mt-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-ink-2 text-[14px]">
-          {
-            entries.filter(
-              (entry) =>
-                entry.published && !expiredIds.includes(entry.id ?? ""),
-            ).length
-          }{" "}
-          published · {entries.length} of {GUIDE_LIMIT} entries
+          {(() => {
+            const live = entries.filter((entry) => entry.published && !expiredIds.includes(entry.id ?? "")).length;
+            const other = entries.length - live;
+            // One clear count, then the limit only for the person who can add more.
+            return `${live} published${other ? `, ${other} not live` : ""}${readOnly ? "" : ` · up to ${GUIDE_LIMIT} entries`}`;
+          })()}
         </p>
-        {!editing ? (
+        {!editing && !readOnly ? (
           <Button
             type="button"
             variant="secondary"
@@ -311,7 +313,9 @@ export function KnowledgeEditor({
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-ink-3 text-[13px]">
-                    {GUIDE_LABELS[entry.topic]}
+                    {GUIDE_LABELS[entry.topic]} ·{" "}
+                    {entry.productId ? (products.find((product) => product.id === entry.productId)?.title ?? "Selected product") : "Whole shop"}
+                    {entry.validUntil ? ` · Expires ${entry.validUntil.replace("T", " ").replace(":00.000Z", " UTC")}` : ""}
                   </span>
                   <Badge
                     tone={
@@ -327,16 +331,6 @@ export function KnowledgeEditor({
                       : "Draft"}
                   </Badge>
                 </div>
-                <p className="text-ink-3 mt-2 text-[13px]">
-                  {entry.productId
-                    ? (products.find(
-                        (product) => product.id === entry.productId,
-                      )?.title ?? "Selected product")
-                    : "Whole shop"}
-                  {entry.validUntil
-                    ? ` · Expires ${entry.validUntil.replace("T", " ").replace(":00.000Z", " UTC")}`
-                    : ""}
-                </p>
                 <h2 className="mt-2 text-[18px] font-semibold [overflow-wrap:anywhere]">
                   {entry.title}
                 </h2>
@@ -349,7 +343,7 @@ export function KnowledgeEditor({
                   </p>
                 ) : null}
               </div>
-              <div className="flex gap-1">
+              {readOnly ? null : <div className="flex gap-1">
                 <Button
                   type="button"
                   variant="ghost"
@@ -369,7 +363,7 @@ export function KnowledgeEditor({
                 >
                   History
                 </Button>
-              </div>
+              </div>}
             </li>
           ))}
         </ul>
@@ -398,7 +392,7 @@ export function KnowledgeEditor({
           }}
         />
       ) : null}
-      {removedEntries.length ? (
+      {removedEntries.length > 0 && !readOnly ? (
         <details className="border-line mt-6 border-t pt-3">
           <summary className="text-ink-2 min-h-11 cursor-pointer py-3 text-[14px] font-semibold">
             Removed entries ({removedEntries.length})
