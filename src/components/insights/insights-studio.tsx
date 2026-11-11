@@ -1,21 +1,22 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AgStudioAiModule, createAiHarness, type AgPanelConfig, type AgReportState, type AgStudioApi } from "ag-studio";
+import { AgStudioAiModule, type AgPanelConfig, type AgReportState, type AgStudioApi } from "ag-studio";
 import { AgStudio, AgStudioProvider, createWidgets } from "ag-studio-react";
 import type { InsightsData } from "@/server/domain/insights";
 import { studioData } from "./studio-data";
 import { INSIGHT_PAGES, PHONE_WIDTH, insightsReport, pageHeight, phonePageHeight, stackForPhone } from "./studio-report";
 import { deskStudioTheme } from "./studio-theme";
 import { SELLER_DESK_WIDGETS } from "./studio-widgets";
-import { sellerDeskAdapter } from "./studio-adapter";
+import { SELLER_DESK_TOOL_DISPLAY, sellerDeskHarness } from "./seller-desk-agent";
 
 const MODULES = [AgStudioAiModule];
 
 // Questions a shop owner asks about the week; each one runs against this page's data.
 const STARTERS = [
-  { label: "What sold best?", prompt: "Which products brought in the most revenue, and how much each?" },
+  { label: "How is the shop doing?", prompt: "How is the shop doing? Give me the headline numbers and one thing to act on." },
   { label: "Who is waiting?", prompt: "Which customers are waiting for my answer, and what do they want?" },
+  { label: "What needs restocking?", prompt: "What is running low, and how fast is it selling?" },
   { label: "Add a chart", prompt: "Add a chart of units sold by product to this page." },
 ];
 
@@ -122,7 +123,8 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
             widgets={widgets as never}
             initialState={insightsReport}
             mode={panel === "none" ? "view" : "edit"}
-            ai={({ api: studio }) => createAiHarness(studio as AgStudioApi, { adapter: sellerDeskAdapter(), promptStarters: STARTERS })}
+            ai={({ api: studio }) => sellerDeskHarness(studio as AgStudioApi, data, STARTERS)}
+            aiToolDisplay={SELLER_DESK_TOOL_DISPLAY}
             onStateUpdated={(event) => {
               const next = Object.fromEntries(event.state.pages.map((item) => [item.id, { wide: pageHeight(item), phone: phonePageHeight(item) }]));
               setHeights((current) => (JSON.stringify(current) === JSON.stringify(next) ? current : next));

@@ -52,3 +52,13 @@
   .insights-summary-figures { grid-template-columns: repeat(2, 1fr); row-gap: 14px; }
   .insights-summary-figures > div:nth-child(3) { padding-left: 2px; border-left: 0; }
 }
+
+/* The analyst's tool results, inside Studio's chat. */
+.insights-tool-note { font-size: 13px; color: var(--color-ink-3); }
+.insights-tool-pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin: 4px 0; }
+.insights-tool-pairs dt { font-size: 12px; color: var(--color-ink-3); }
+.insights-tool-pairs dd { margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.insights-tool-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 4px 0; }
+.insights-tool-table th { padding: 6px 8px 6px 0; text-align: left; font-weight: 500; color: var(--color-ink-3); border-bottom: 1px solid var(--color-line); }
+.insights-tool-table td { padding: 6px 8px 6px 0; vertical-align: top; color: var(--color-ink); border-bottom: 1px solid var(--color-line); font-variant-numeric: tabular-nums; }
+.insights-tool-table tr:last-child td { border-bottom: 0; }
