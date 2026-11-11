@@ -55,10 +55,13 @@ const SPLIT_ICON =
 
 /** Customers waiting for the owner, newest first, each with a way into the conversation. */
 function WaitingQueue(params: AgWidgetParams) {
-  const { rows, fields, ready } = useMapped(params, ["conversation", "status", "message"]);
+  const { rows, fields, ready } = useMapped(params, ["conversation", "status", "message", "since"]);
   if (!ready) return null;
-  const [id, status, message] = fields as [AgWidgetField, AgWidgetField, AgWidgetField];
-  const waiting = (rows ?? []).filter((row) => String(row[status.key]) === "Waiting for you");
+  const [id, status, message, since] = fields as [AgWidgetField, AgWidgetField, AgWidgetField, AgWidgetField];
+  // Newest first, by the conversation's own time, whatever order the rows arrive in.
+  const waiting = (rows ?? [])
+    .filter((row) => String(row[status.key]) === "Waiting for you")
+    .sort((a, b) => String(b[since.key] ?? "").localeCompare(String(a[since.key] ?? "")));
   if (rows && waiting.length === 0) {
     return <p className="insights-empty">Nobody is waiting. The assistant is answering everyone it can.</p>;
   }
@@ -127,8 +130,9 @@ export const waitingQueueWidget = {
     conversation: field("category", null, "The conversation id, used to open it."),
     status: field("category", null, "Whether the customer is waiting for the owner."),
     message: field("category", null, "The latest message, shown as the row's text."),
+    since: field("category", null, "When the conversation last changed; the newest is listed first."),
   },
-  form: form([["conversation", "Conversation"], ["status", "Waiting"], ["message", "Latest message"]]),
+  form: form([["conversation", "Conversation"], ["status", "Waiting"], ["message", "Latest message"], ["since", "Last message"]]),
   comp: WaitingQueue,
   defaultSize: { width: 640, height: 280 },
   minSize: { width: 320, height: 160 },

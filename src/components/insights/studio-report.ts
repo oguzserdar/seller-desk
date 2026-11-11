@@ -75,7 +75,8 @@ const assistant: AgPageState = {
     } as never,
     "conversations-by-day": {
       type: "column-chart-stacked",
-      dataMapping: { categoryKey: [{ id: "calendar::day" }], valueKey: [{ id: "answeredAlone" }, { id: "waitingCount" }] },
+      // Only days with conversations, oldest first (the source is ordered by date), labelled "Oct 21".
+      dataMapping: { categoryKey: [{ id: "conversations.dayLabel" }], valueKey: [{ id: "answeredAlone" }, { id: "waitingCount" }] },
       format: { ...titled("Conversations by day"), style: { theme: { common: { legend: { enabled: true } } } } },
     },
     "analyst-work": { type: "seller-desk-analyst-work", dataMapping: {}, format: titled("What the analyst did") } as never,
@@ -85,6 +86,7 @@ const assistant: AgPageState = {
         conversation: [{ id: "conversations.id" }],
         status: [{ id: "conversations.waitingForYou" }],
         message: [{ id: "conversations.topic" }],
+        since: [{ id: "conversations.date" }],
       },
       format: titled("Waiting for your answer"),
     } as never,

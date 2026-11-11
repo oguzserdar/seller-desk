@@ -22,14 +22,20 @@ const fieldsIn = (currency: string) => (list: Field[]): AgFieldDefinition[] =>
     ...(format === "currencyFormat"
       ? { formatOptions: { format: new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }) } }
       : {}),
+    // A day reads "Oct 21" on chart axes, not "10/21/2026".
+    ...(format === "dateFormat" ? { formatOptions: { format: new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }) } } : {}),
     ...(hidden ? { hide: true } : {}),
   }));
 
 /** Each conversation counts once; the flags make "share handled by the assistant" a plain ratio. */
 function conversationRows(data: InsightsData) {
-  return data.conversations.map((row) => ({
+  // Oldest first: a chart category axis keeps data order, so day charts read left to right in time.
+  return [...data.conversations].sort((a, b) => a.date.localeCompare(b.date)).map((row) => ({
     ...row,
     date: wallClock(row.date),
+    // The local calendar day, so a chart can show only the days that had conversations.
+    day: wallClock(row.date).slice(0, 10),
+    dayLabel: new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(wallClock(row.date))),
     one: 1,
     // Answered by the assistant means it needed nobody: not taken over, and not waiting on the owner.
     byAssistant: row.handledBy === "Assistant" && row.waitingForYou !== "Waiting for you" ? 1 : 0,
@@ -82,6 +88,8 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
           ["id", "Conversation ID", "textFormat", true],
           ["customer", "Customer", "textFormat"],
           ["date", "Last message", "dateTimeFormat"],
+          ["day", "Day", "dateFormat", true],
+          ["dayLabel", "Day", "textFormat"],
           ["handledBy", "Handled by", "textFormat"],
           ["waitingForYou", "Waiting", "textFormat"],
           ["topic", "Question or latest message", "textFormat"],
