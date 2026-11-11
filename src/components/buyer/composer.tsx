@@ -1,8 +1,6 @@
 "use client";
 
-import { Square } from "lucide-react";
 import { ChatComposer } from "@/components/arc/chat-thread/chat-thread";
-import { Button } from "@/components/arc/button/button";
 
 /** Connects Arc's actual composer and stop control to the live buyer conversation. */
 export function Composer({
@@ -23,7 +21,7 @@ export function Composer({
   autoFocus?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2" data-buyer-composer>
+    <div data-buyer-composer>
       <ChatComposer
         onSend={({ text }) => {
           if (!disabled && !streaming) onSend(text);
@@ -35,19 +33,9 @@ export function Composer({
         disabled={disabled}
         // A disabled box drops keyboard focus; while streaming it stays editable and only sending waits.
         holdSend={streaming}
+        onStop={onStop}
         placeholder={placeholder}
       />
-      {streaming ? (
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onStop}
-          aria-label="Stop the reply"
-          className="self-end"
-        >
-          <Square aria-hidden size={14} /> Stop reply
-        </Button>
-      ) : null}
     </div>
   );
 }

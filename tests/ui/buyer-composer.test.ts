@@ -62,6 +62,8 @@ it("stopping a reply cannot send an extra customer message", async () => {
     );
     expect(stop).toHaveBeenCalledOnce();
     expect(send).not.toHaveBeenCalled();
+    // As in AI Elements' PromptInputSubmit, the stop control takes the send button's place.
+    expect(host.querySelector('[aria-label="Send"]')).toBeNull();
     await act(async () =>
       host.querySelector<HTMLButtonElement>('[aria-label="Send"]')?.click(),
     );

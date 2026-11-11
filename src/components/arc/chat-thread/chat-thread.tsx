@@ -4,7 +4,7 @@ import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useLayo
 import type { ClipboardEvent as ReactClipboardEvent, DragEvent as ReactDragEvent, KeyboardEvent as ReactKeyboardEvent, ReactNode, RefObject } from "react";
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "motion/react";
 import type { Transition } from "motion/react";
-import { ArrowDown, ArrowUp, FileText, Paperclip, RotateCw, SmilePlus, X } from "lucide-react";
+import { ArrowDown, ArrowUp, FileText, Paperclip, RotateCw, SmilePlus, Square, X } from "lucide-react";
 import { motionTokens } from "@/components/arc/lib/motion-tokens";
 import styles from "./chat-thread.module.css";
 
@@ -282,12 +282,16 @@ export interface ChatComposerProps {
   autoFocus?: boolean;
   /** Keeps the box editable and focused but not sendable, for example while a reply streams. */
   holdSend?: boolean;
+  /** While a reply streams, the send button becomes a stop button that calls this (AI Elements' PromptInputSubmit). */
+  onStop?: () => void;
+  /** Accessible name for the stop button. */
+  stopLabel?: string;
 }
 
 export interface ChatComposerHandle { focus: () => void }
 
 /** The message box on its own: autosizing text, attachments by button, paste, or drop, and a send button that morphs when there is something to send. */
-export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function ChatComposer({ onSend, placeholder = "Message", allowAttachments = true, accept, disabled, labels, className, maxLength, ariaLabel, autoFocus, holdSend = false }, ref) {
+export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function ChatComposer({ onSend, placeholder = "Message", allowAttachments = true, accept, disabled, labels, className, maxLength, ariaLabel, autoFocus, holdSend = false, onStop, stopLabel = "Stop the reply" }, ref) {
   const t = withDefaults(COMPOSER_LABELS, labels);
   const reduced = !!useReducedMotion();
   const [text, setText] = useState("");
@@ -380,6 +384,11 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
         <textarea ref={areaRef} className={styles.textarea} value={text} rows={1} placeholder={placeholder} disabled={disabled} aria-label={ariaLabel ?? placeholder} maxLength={maxLength} autoFocus={autoFocus}
           onChange={event => setText(event.target.value)} onKeyDown={onKeyDown} onPaste={onPaste} />
       </motion.div>
+      {holdSend && onStop ? (
+        <button type="button" className={styles.send} data-ready aria-label={stopLabel} onClick={onStop}>
+          <span className={styles.sendIcon}><Square size={12} strokeWidth={0} fill="currentColor" /></span>
+        </button>
+      ) : (
       <button type="button" className={styles.send} data-ready={ready || undefined} aria-label={t.send} aria-disabled={!ready} onClick={send}>
         <AnimatePresence initial={false} mode="popLayout">
           <motion.span key={sent} className={styles.sendIcon}
@@ -389,6 +398,7 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
           </motion.span>
         </AnimatePresence>
       </button>
+      )}
       </div>
     </div>
   </div>;
