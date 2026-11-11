@@ -149,11 +149,16 @@
 .refused-verdict { display: inline-flex; width: fit-content; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 10px; background: var(--color-danger-soft); color: var(--color-danger); font-weight: 600; font-size: 12.5px; }
 .refused-verdict svg { flex: none; }
 /* Same height for every title (two lines) and every description (four lines), so the row lines up. */
-.refused-tried { margin: 20px 8px 0; min-height: calc(2 * 1.3em); font-size: 17px; font-weight: 600; line-height: 1.3; }
-.refused-ends { margin: 8px 8px 0; min-height: calc(4 * 1.6em); color: var(--color-ink-2); font-size: 15px; line-height: 1.6; }
+.refused-tried { margin: 18px 8px 0; font-size: 17px; font-weight: 600; line-height: 1.3; }
+.refused-ends { margin: 8px 8px 0; color: var(--color-ink-2); font-size: 15px; line-height: 1.6; }
 @keyframes refused-pulse { 50% { opacity: 0.25; } }
 @media (min-width: 720px) { .refused-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1100px) { .refused-cards { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (min-width: 1100px) {
+  .refused-cards { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  /* Side by side, every title takes two lines and every description four, so the row lines up. */
+  .refused-tried { min-height: calc(2 * 1.3em); }
+  .refused-ends { min-height: calc(4 * 1.6em); }
+}
 @media (prefers-reduced-motion: reduce) {
   .refused-attempt, .refused-check, .refused-verdict { transition: none; }
   .refused-check span { animation: none; }

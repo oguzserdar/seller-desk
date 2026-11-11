@@ -48,7 +48,7 @@ const CASES: Case[] = [
     ],
     verdict: "No second charge",
     icon: "lock",
-    tried: "The buyer pays twice",
+    tried: "The buyer tries to pay twice",
     ends: "The second checkout finds the order that is already paid. The buyer is charged once.",
   },
 ];
