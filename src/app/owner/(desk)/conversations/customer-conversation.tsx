@@ -23,8 +23,11 @@ import {
 /** One customer conversation with deliberate human ownership and exact-word replies. */
 export function CustomerConversation({
   initial,
+  readOnly = false,
 }: {
   initial: SellerConversation;
+  /** A demo visitor reads the conversation; taking over and replying are the owner's. */
+  readOnly?: boolean;
 }) {
   const [view, setView] = useState(initial);
   const [draft, setDraft] = useState("");
@@ -149,7 +152,7 @@ export function CustomerConversation({
               : "The assistant is handling this conversation."}
           </p>
         </div>
-        <Button
+        {readOnly ? null : <Button
           variant={human ? "secondary" : "primary"}
           loading={control.isPending}
           disabled={reply.isPending}
@@ -162,7 +165,7 @@ export function CustomerConversation({
           }
         >
           {human ? "Return to assistant" : "Take over"}
-        </Button>
+        </Button>}
       </header>
       <div className="min-h-0 flex-1 py-6">
         <ShopConversation shopName="Customer">
@@ -200,7 +203,7 @@ export function CustomerConversation({
             <p className="mt-1 text-ink-2">{view.pending.question}</p>
           </div>
         ) : null}
-        {human ? (
+        {human && !readOnly ? (
           <form
             onSubmit={(event) => {
               event.preventDefault();
@@ -273,8 +276,9 @@ export function CustomerConversation({
           </form>
         ) : (
           <p className="text-[14px] text-ink-2">
-            Take over to reply yourself. Returning control lets the assistant
-            answer the customer’s next message.
+            {readOnly
+              ? "The owner can take over here and reply in their own words, then hand the conversation back to the assistant."
+              : "Take over to reply yourself. Returning control lets the assistant answer the customer’s next message."}
           </p>
         )}
         {problem || refreshProblem ? (

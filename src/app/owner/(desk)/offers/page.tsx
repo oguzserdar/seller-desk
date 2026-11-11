@@ -16,7 +16,7 @@ const KIND: Record<string, string> = { goods: "Pickup item", service: "Service",
 
 /** Shows the owner's catalog, publication requirements and import entry. */
 export default async function OffersPage() {
-  const { owner, seller } = await requireOwner(await headers());
+  const { owner, seller, viewer } = await requireOwner(await headers());
   const offers = await listOwnerOffers(owner);
   const published = offers.filter(({ row }) => row.published).length;
   return (
@@ -28,12 +28,15 @@ export default async function OffersPage() {
             {published} of {offers.length} published. Buyers see published offers only; fixed prices and your reviewed custom quotes are the only prices the assistant can use.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <LinkButton href="/owner/offers/import" variant="secondary">
-            Import offers
-          </LinkButton>
-          <LinkButton href="/owner/offers/new">New offer</LinkButton>
-        </div>
+        {/* A demo visitor browses the catalog; adding and importing are the owner's. */}
+        {viewer ? null : (
+          <div className="flex flex-wrap gap-2">
+            <LinkButton href="/owner/offers/import" variant="secondary">
+              Import offers
+            </LinkButton>
+            <LinkButton href="/owner/offers/new">New offer</LinkButton>
+          </div>
+        )}
       </div>
       {offers.length === 0 ? (
         <Alert tone="info" className="mt-6" title="No offers yet">
@@ -59,7 +62,7 @@ export default async function OffersPage() {
                       {row.requiresScopeReview ? <Badge tone="neutral">You confirm the work first</Badge> : null}
                     </div>
                     <p className="text-ink-2 tabular mt-1 text-[14px]">
-                      {formatQuoteAmount(row.unitAmountMinor, row.currency)}
+                      {row.unitAmountMinor === null ? "Quoted per job" : formatQuoteAmount(row.unitAmountMinor, row.currency)}
                       {stock ? `, ${available} available, ${stock.held} held for checkouts, ${stock.sold} sold` : ""}
                       {row.kind === "digital" ? `, ${assetName ?? "no file yet"}, access for ${row.accessDays ?? "?"} days` : ""}
                     </p>
@@ -70,9 +73,9 @@ export default async function OffersPage() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <LinkButton href={`/owner/offers/${row.id}`} variant="secondary">
-                      Edit
+                      {viewer ? "View" : "Edit"}
                     </LinkButton>
-                    <PublishToggle offerId={row.id} revision={row.revision} published={row.published} blocked={blockers.length > 0} title={row.title} />
+                    {viewer ? null : <PublishToggle offerId={row.id} revision={row.revision} published={row.published} blocked={blockers.length > 0} title={row.title} />}
                   </div>
                 </section>
               </li>

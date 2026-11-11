@@ -29,7 +29,7 @@ export default async function ConversationsPage({
 }: {
   searchParams: Promise<{ conversation?: string }>;
 }) {
-  const { owner } = await requireOwner(await headers());
+  const { owner, viewer } = await requireOwner(await headers());
   const requested = (await searchParams).conversation;
   if (requested && !z.uuid().safeParse(requested).success) notFound();
   const [listed, questions] = await Promise.all([listSellerConversations(owner), openQuestions(owner)]);
@@ -140,12 +140,13 @@ export default async function ConversationsPage({
             <CustomerConversation
               key={selected.control.id}
               initial={selected}
+              readOnly={viewer}
             />
           ) : (
             <div className="hidden border-l border-line lg:block">
               <EmptyState
                 title="Choose a conversation"
-                description="Read the customer’s messages, review the assistant’s reply, or step in yourself."
+                description={viewer ? "Read the customer’s messages and the assistant’s replies." : "Read the customer’s messages, review the assistant’s reply, or step in yourself."}
                 icon={<MessageSquare size={24} aria-hidden />}
               />
             </div>

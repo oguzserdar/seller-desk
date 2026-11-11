@@ -128,3 +128,13 @@ it("does not silently apply an already checked answer to a revised customer requ
   );
   expect(container.textContent).toContain("The request changed");
 });
+
+it("a demo visitor reads an owner-held conversation without Take over or a reply form", async () => {
+  await act(async () => {
+    root.render(createElement(CustomerConversation, { initial: view, readOnly: true }));
+  });
+  expect(container.querySelector("form")).toBeNull();
+  expect(container.querySelector("textarea")).toBeNull();
+  expect([...container.querySelectorAll("button")].some((button) => /Take over|Return to assistant/.test(button.textContent ?? ""))).toBe(false);
+  expect(container.textContent).toContain("The owner can take over here");
+});
