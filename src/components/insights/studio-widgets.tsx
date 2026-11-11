@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import type { AgWidgetField, AgWidgetParams } from "ag-studio";
 import type { AgWidgetDefinition } from "ag-studio-react";
+import { analystWorkWidget } from "./analyst-receipt";
 
 type Row = Record<string, unknown>;
 
@@ -200,4 +201,4 @@ export const salesSummaryWidget = {
   ai: { description: "The shop's paid revenue, order count, average order and orders still owing work, from PayPal-confirmed payments only." },
 } as unknown as AgWidgetDefinition;
 
-export const SELLER_DESK_WIDGETS = [salesSummaryWidget, waitingQueueWidget, whoAnsweredWidget];
+export const SELLER_DESK_WIDGETS = [salesSummaryWidget, waitingQueueWidget, whoAnsweredWidget, analystWorkWidget];

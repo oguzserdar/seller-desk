@@ -152,6 +152,19 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
         isMeasure: true,
         expression: { operator: "coalesce", inputs: [{ id: "orders.amount", aggregation: "sum" }] },
       },
+      // Named counts, so charts and legends say "Answered by the assistant", not "... (sum)".
+      ...([
+        ["conversationCount", "Conversations", "conversations.one", "Customer conversations."],
+        ["answeredAlone", "Answered by the assistant", "conversations.byAssistant", "Conversations the assistant answered without needing the owner."],
+        ["waitingCount", "Waiting for you", "conversations.waiting", "Conversations waiting for the owner's answer."],
+      ] as const).map(([id, name, field, description]) => ({
+        id,
+        name,
+        description,
+        format: "integerFormat" as const,
+        isMeasure: true,
+        expression: { operator: "coalesce" as const, inputs: [{ id: field, aggregation: "sum" as const }] },
+      })),
       {
         id: "assistantShare",
         name: "Handled by the assistant",

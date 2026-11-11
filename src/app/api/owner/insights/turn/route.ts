@@ -30,10 +30,10 @@ export async function POST(request: Request): Promise<Response> {
     if (size > MAX_TURN_CHARS) throw invalid("That conversation is too long. Start a new chat.");
     if (viewer) {
       const address = clientKey(request.headers);
-      await requireUsage("insights_demo", address, VIEWER_PER_ADDRESS.windowSeconds, VIEWER_PER_ADDRESS.turns, "The demo analyst is resting. Try again in a few minutes.");
+      await requireUsage("insights_demo", address, VIEWER_PER_ADDRESS.windowSeconds, VIEWER_PER_ADDRESS.turns, "The demo analyst is resting.");
       await requireUsage("insights_demo_day", seller.id, 86_400, VIEWER_DAILY_TOTAL, "The demo analyst has answered enough questions for today.");
     } else {
-      await requireUsage("insights_ai", owner.userId, 600, 40, "You are asking quickly. Try again in a few minutes.");
+      await requireUsage("insights_ai", owner.userId, 600, 40, "You are asking quickly.");
       await requireUsage("seller_ai_day", seller.id, 86_400, seller.sellerDailyAiTurns, "The assistant has reached today's limit.");
     }
     const assistant = await getAssistantModel();

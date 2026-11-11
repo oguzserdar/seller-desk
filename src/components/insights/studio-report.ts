@@ -35,7 +35,8 @@ const sales: AgPageState = {
       type: "bar-chart-grouped",
       dataMapping: { categoryKey: [{ id: "orders.product" }], valueKey: [sum("orders.amount")] },
       sort: [{ field: sum("orders.amount"), direction: "desc" }],
-      format: titled("Revenue by product"),
+      // Studio's charts cross-filter the page: a tapped bar narrows the order list to that product.
+      format: { ...titled("Revenue by product"), caption: { enabled: true, text: "Tap a bar to see that product's orders below." } },
     },
     "revenue-by-kind": {
       type: "donut-chart",
@@ -63,9 +64,9 @@ const assistant: AgPageState = {
   id: "assistant",
   layout: PAGE_LAYOUT,
   widgets: {
-    conversations: tile("Conversations", sum("conversations.one")),
+    conversations: tile("Conversations", { id: "conversationCount" }),
     share: tile("Answered by the assistant", { id: "assistantShare" }),
-    waiting: tile("Waiting for your answer", sum("conversations.waiting")),
+    waiting: tile("Waiting for your answer", { id: "waitingCount" }),
     // Seller Desk's own widgets (./studio-widgets.tsx); Studio's types list only its built-in ones.
     "who-answers": {
       type: "seller-desk-who-answered",
@@ -74,9 +75,10 @@ const assistant: AgPageState = {
     } as never,
     "conversations-by-day": {
       type: "column-chart-stacked",
-      dataMapping: { categoryKey: [{ id: "calendar::day" }], valueKey: [sum("conversations.byAssistant"), sum("conversations.waiting")] },
+      dataMapping: { categoryKey: [{ id: "calendar::day" }], valueKey: [{ id: "answeredAlone" }, { id: "waitingCount" }] },
       format: { ...titled("Conversations by day"), style: { theme: { common: { legend: { enabled: true } } } } },
     },
+    "analyst-work": { type: "seller-desk-analyst-work", dataMapping: {}, format: titled("What the analyst did") } as never,
     "waiting-list": {
       type: "seller-desk-waiting",
       dataMapping: {
@@ -94,6 +96,7 @@ const assistant: AgPageState = {
     "who-answers": at(0, 8, 24, 10),
     "waiting-list": at(0, 18, 12, 22),
     "conversations-by-day": at(12, 18, 12, 22),
+    "analyst-work": at(0, 40, 24, 12),
   },
 };
 

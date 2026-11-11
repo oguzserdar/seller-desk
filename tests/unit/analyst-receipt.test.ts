@@ -11,7 +11,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { addEvent, toolKind, type Receipt } from "@/components/insights/analyst-receipt";
 import { browserHistory } from "@/components/insights/analyst-history";
 
-const zero: Receipt = { questions: 0, lookups: 0, changes: 0, handoffs: 0, failed: 0, tokens: 0 };
+const zero: Receipt = { questions: 0, lookups: 0, changes: 0, handoffs: 0, failed: 0, tokens: 0, steps: [] };
 const trace = (parentRunId?: string) => ({ threadId: "t", runId: "r", agentId: "a", ...(parentRunId ? { parentRunId } : {}) });
 const event = (value: object) => ({ timestamp: 0, trace: trace(), ...value }) as AgAiTelemetryEvent;
 
@@ -38,7 +38,15 @@ describe("analyst receipt", () => {
       event({ type: "tool_execution_finished", toolCallId: "3", name: "execute_query", kind: "client", ok: false }),
       event({ type: "turn_finished", usage: { inputTokens: 900, outputTokens: 100 } }),
     ];
-    expect(steps.reduce(addEvent, zero)).toEqual({ questions: 0, lookups: 1, changes: 1, handoffs: 0, failed: 1, tokens: 1000 });
+    expect(steps.reduce(addEvent, zero)).toEqual({ questions: 0, lookups: 1, changes: 1, handoffs: 0, failed: 1, tokens: 1000, steps: [{ text: "Ranked top sellers", kind: "lookup" }, { text: "Added a chart", kind: "change" }] });
+  });
+});
+
+describe("analyst steps", () => {
+  it("keeps the last four steps in plain words and skips housekeeping", () => {
+    const names = ["shop_pulse", "rename_thread", "delegate_to", "add_widget", "top_sellers", "restock_watch", "configure_widget"];
+    const receipt = names.map((name, i) => event({ type: "tool_execution_finished", toolCallId: String(i), name, kind: "client", ok: true })).reduce(addEvent, zero);
+    expect(receipt.steps.map((step) => step.text)).toEqual(["Added a chart", "Ranked top sellers", "Checked stock", "Set up a chart"]);
   });
 });
 

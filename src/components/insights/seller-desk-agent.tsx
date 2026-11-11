@@ -170,18 +170,31 @@ function ToolResult({ result }: AgAiToolDetailParams) {
   );
 }
 
+const STUDIO_AGENTS: Record<string, string> = { page: "Page", widget: "Widget", data: "Data", planning: "Planning" };
+
 /** How our tools appear in the analyst's chat: a plain label, a status pill, and the figures. */
-export const SELLER_DESK_TOOL_DISPLAY: Record<string, AgAiToolDisplay> = Object.fromEntries(
-  Object.entries(LABELS).map(([name, text]) => [
-    name,
-    {
-      label: (params: AgAiToolLabelParams) => ({
-        text,
-        pill: params.status === "done" ? (params.result?.success ? ((params.result.data as { summary?: string })?.summary ?? "Done") : "Unavailable") : "Reading",
-      }),
-      detail: ToolResult,
+export const SELLER_DESK_TOOL_DISPLAY: Record<string, AgAiToolDisplay> = {
+  ...Object.fromEntries(
+    Object.entries(LABELS).map(([name, text]) => [
+      name,
+      {
+        label: (params: AgAiToolLabelParams) => ({
+          text,
+          pill: params.status === "done" ? (params.result?.success ? ((params.result.data as { summary?: string })?.summary ?? "Done") : "Unavailable") : "Reading",
+        }),
+        detail: ToolResult,
+      },
+    ]),
+  ),
+  // A hand-off reads as a person would say it, not as Studio's internal task text with field references.
+  delegate_to: {
+    label: (params: AgAiToolLabelParams) => {
+      // Studio passes the target as { id }; older calls pass the id alone.
+      const target = (params.args as { type?: string | { id?: string } }).type;
+      const type = typeof target === "string" ? target : (target?.id ?? "");
+      return { text: `Asked Studio's ${STUDIO_AGENTS[type] ?? "specialist"} agent`, pill: params.status === "done" ? (params.result?.success ? "Done" : "Stopped") : "Working" };
     },
-  ]),
-);
+  },
+};
 
 export type { Facts };

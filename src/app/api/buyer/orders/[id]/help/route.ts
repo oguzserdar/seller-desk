@@ -7,7 +7,7 @@ import { invalid } from "@/server/domain/errors";
 
 /** Buyer session or signed receipt access; the route chooses the target, never a client-provided shop. */
 export const POST = route<{ params: Promise<{ id: string }> }>(async (request, requestId, { params }) => {
-  await requireUsage("order_help_client", clientKey(request.headers), 600, 30, "Too many messages from this connection. Try again shortly.");
+  await requireUsage("order_help_client", clientKey(request.headers), 600, 30, "Too many messages from this connection.");
   const buyer = await optionalBuyer(request).catch(() => null);
   const { id } = await params;
   const body = BuyerOrderFollowupInput.parse(await readJson(request, 6000));

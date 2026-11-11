@@ -10,7 +10,7 @@ import { deskStudioTheme } from "./studio-theme";
 import { SELLER_DESK_WIDGETS } from "./studio-widgets";
 import { SELLER_DESK_TOOL_DISPLAY, sellerDeskHarness } from "./seller-desk-agent";
 import { browserHistory } from "./analyst-history";
-import { AnalystReceipt, createReceipt } from "./analyst-receipt";
+import { AnalystReceipt, visitReceipt } from "./analyst-receipt";
 import { createCellRenderer } from "./studio-cells";
 
 const MODULES = [AgStudioAiModule];
@@ -52,8 +52,8 @@ const widgets = (defaults: { menu: unknown[] }) =>
  * Our tabs choose the page; Edit lets the owner rearrange or add widgets for this visit.
  */
 export function InsightsStudio({ data, licenseKey, viewer = false }: { data: InsightsData; licenseKey?: string; viewer?: boolean }) {
-  // One receipt and one conversation history per visit; the owner and demo visitors keep separate histories.
-  const receipt = useMemo(() => createReceipt(), []);
+  // One receipt per visit (shared with the canvas widget) and one conversation history; the owner and demo visitors keep separate histories.
+  const receipt = visitReceipt;
   const history = useMemo(() => browserHistory(`seller-desk.analyst.${viewer ? "visitor" : "owner"}`), [viewer]);
   const api = useRef<AgStudioApi | null>(null);
   const [page, setPage] = useState<string>(insightsReport.selectedPageId ?? INSIGHT_PAGES[0].id);

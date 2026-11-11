@@ -98,15 +98,7 @@ export async function requireUsage(
 ): Promise<void> {
   const usage = await consumeUsage(feature, principal, windowSeconds, limit);
   if (!usage.allowed) {
-    const minutes = Math.max(
-      1,
-      Math.ceil((usage.resetsAt.getTime() - Date.now()) / 60_000),
-    );
-    throw new DomainError(
-      "rate_limited",
-      `${message} Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`,
-      ["browse_manually"],
-    );
+    throw new DomainError("rate_limited", `${message} ${tryAgainIn(usage.resetsAt.getTime() - Date.now())}`, ["browse_manually"]);
   }
 }
 
@@ -118,4 +110,17 @@ export function clientKey(headers: Headers): string {
     : headers.get("x-forwarded-for");
   const first = raw?.split(",")[0]?.trim();
   return first && first.length <= 64 ? first : "unknown-client";
+}
+
+/**
+ * When a limited person can try again, in words: minutes for a short wait, hours for a long one.
+ *
+ * @param waitMs - Milliseconds until the window resets
+ * @returns One sentence, such as "Try again in about 9 minutes." or "Try again in about 5 hours."
+ */
+export function tryAgainIn(waitMs: number): string {
+  const minutes = Math.max(1, Math.ceil(waitMs / 60_000));
+  if (minutes <= 90) return `Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+  const hours = Math.round(minutes / 60);
+  return `Try again in about ${hours} hours.`;
 }
