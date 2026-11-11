@@ -367,3 +367,15 @@ body:has(> [role="note"]) { --banner-h: 33px; }
 .demo-guide-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 999px; background: var(--color-brand-soft); color: var(--color-brand); font-size: 13px; font-weight: 600; }
 .demo-guide-link { font-size: 15px; font-weight: 600; color: var(--color-brand); text-decoration: underline; text-underline-offset: 3px; }
 @media (min-width: 860px) { .demo-guide-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Disclosure rows: one chevron that turns when open, instead of the browser's default triangle.
+   A summary that draws its own marker opts out with .list-none. */
+summary:not(.list-none) { display: flex; align-items: center; gap: 10px; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary:not(.list-none)::before {
+  content: ""; flex: none; width: 7px; height: 7px; margin: 0 2px 0 1px;
+  border-right: 1.75px solid currentColor; border-bottom: 1.75px solid currentColor;
+  opacity: 0.6; transform: rotate(-45deg); transition: transform 150ms ease;
+}
+details[open] > summary:not(.list-none)::before { transform: rotate(45deg) translate(-1px, -1px); }
+@media (prefers-reduced-motion: reduce) { summary:not(.list-none)::before { transition: none; } }
