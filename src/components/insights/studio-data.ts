@@ -30,7 +30,8 @@ function conversationRows(data: InsightsData) {
   return data.conversations.map((row) => ({
     ...row,
     one: 1,
-    byAssistant: row.handledBy === "Assistant" ? 1 : 0,
+    // Answered by the assistant means it needed nobody: not taken over, and not waiting on the owner.
+    byAssistant: row.handledBy === "Assistant" && row.waitingForYou !== "Waiting for you" ? 1 : 0,
     waiting: row.waitingForYou === "Waiting for you" ? 1 : 0,
   }));
 }
@@ -77,9 +78,9 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
           ["date", "Last message", "dateTimeFormat"],
           ["handledBy", "Handled by", "textFormat"],
           ["waitingForYou", "Waiting", "textFormat"],
-          ["topic", "Latest message", "textFormat"],
+          ["topic", "Question or latest message", "textFormat"],
           ["one", "Conversations", "integerFormat"],
-          ["byAssistant", "Handled by assistant", "integerFormat"],
+          ["byAssistant", "Answered by the assistant", "integerFormat"],
           ["waiting", "Waiting for you", "integerFormat"],
         ]),
       },
@@ -114,7 +115,7 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
       {
         id: "assistantShare",
         name: "Handled by the assistant",
-        description: "Share of conversations the assistant is answering without the owner.",
+        description: "Share of conversations the assistant answered without needing the owner.",
         format: "percentageFormat",
         isMeasure: true,
         expression: { operator: "divide", inputs: [{ id: "conversations.byAssistant", aggregation: "sum" }, { id: "conversations.one", aggregation: "sum" }] },

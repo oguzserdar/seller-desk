@@ -2,11 +2,20 @@
 
 import { useMemo, useRef, useState } from "react";
 import type { AgReportState, AgStudioApi, AgStudioMode } from "ag-studio";
-import { AgStudio, AgStudioProvider } from "ag-studio-react";
+import { AgStudio, AgStudioProvider, createWidgets } from "ag-studio-react";
 import type { InsightsData } from "@/server/domain/insights";
 import { studioData } from "./studio-data";
 import { INSIGHT_PAGES, insightsReport } from "./studio-report";
 import { deskStudioTheme } from "./studio-theme";
+import { SELLER_DESK_WIDGETS } from "./studio-widgets";
+import "./insights.css";
+
+// Our widgets join Studio's own, in their own group of the widget menu.
+const widgets = (defaults: { menu: unknown[] }) =>
+  createWidgets({
+    additionalTypes: SELLER_DESK_WIDGETS,
+    menu: [...defaults.menu, { label: "Seller Desk", widgetIds: SELLER_DESK_WIDGETS.map((widget) => (widget as unknown as { id: string }).id) }],
+  } as never);
 
 /**
  * The owner's Insights dashboard: AG Studio over the shop's own orders, conversations and offers.
@@ -54,7 +63,7 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
           {mode === "view" ? "Edit dashboard" : "Done editing"}
         </button>
       </div>
-      <div className="h-[980px] flex-none">
+      <div className="h-[900px] flex-none">
         <AgStudioProvider licenseKey={licenseKey}>
           <AgStudio
             style={{ height: "100%", width: "100%" }}
@@ -63,6 +72,7 @@ export function InsightsStudio({ data, licenseKey }: { data: InsightsData; licen
             // No side panel while reading; editing brings the data and widget panels.
             panels={{ view: { left: [], right: [] }, edit: { right: ["edit", "data"] } }}
             data={sources}
+            widgets={widgets as never}
             initialState={insightsReport}
             mode={mode}
             onApiReady={(event) => {

@@ -33,7 +33,8 @@ export async function loadInsights(owner: OwnerPrincipal): Promise<InsightsData>
     listOwnerOffers(owner),
     openQuestions(owner),
   ]);
-  const waitingIds = new Set(waiting.map((question) => question.conversationId));
+  // For a customer waiting on the owner, the useful line is what they asked, not the assistant's reply.
+  const askedIn = new Map(waiting.map((question) => [question.conversationId, question.question]));
   const orders: InsightOrder[] = desk.rows
     .filter((row) => row.kind === "order" && row.totalMinor !== null)
     .map((row) => ({
@@ -55,8 +56,8 @@ export async function loadInsights(owner: OwnerPrincipal): Promise<InsightsData>
       id: item.id,
       date: new Date(item.updatedAt).toISOString(),
       handledBy: item.handler === "seller" ? "You" : "Assistant",
-      waitingForYou: waitingIds.has(item.id) ? "Waiting for you" : "Answered",
-      topic: (item.preview ?? "").slice(0, 120) || "Customer conversation",
+      waitingForYou: askedIn.has(item.id) ? "Waiting for you" : "Answered",
+      topic: (askedIn.get(item.id) ?? item.preview ?? "").slice(0, 280) || "Customer conversation",
     })),
     offers: offers.map(({ row, stock }) => ({
       id: row.id,

@@ -22,78 +22,72 @@ const tile = (text: string, value: { id: string; aggregation?: "sum" | "avg" | "
 const sales: AgPageState = {
   id: "sales",
   widgets: {
-    period: { type: "date-filter", dataMapping: { value: [{ id: "orders.date" }] }, format: { style: { filterType: "relative" } } },
-    revenue: tile("Revenue through PayPal", sum("orders.amount"), "calendar::day"),
-    orders: tile("Paid orders", count("orders.id"), "calendar::day"),
-    average: tile("Average order", average("orders.amount")),
-    "assistant-share": tile("Conversations the assistant handled", { id: "assistantShare" }),
-    "revenue-by-week": {
-      type: "column-chart-grouped",
-      dataMapping: { categoryKey: [{ id: "calendar::week" }], valueKey: [sum("orders.amount")] },
-      format: titled("Revenue by week"),
-    },
-    "revenue-by-kind": {
-      type: "donut-chart",
-      dataMapping: { categoryKey: [{ id: "orders.kind" }], valueKey: [sum("orders.amount")] },
-      format: { ...titled("Revenue by kind"), style: { custom: { pieDataLabel: { enabled: true } } } },
-    },
+    summary: {
+      type: "seller-desk-summary",
+      dataMapping: { status: [{ id: "orders.needsYou" }], revenue: [sum("orders.amount")], orders: [count("orders.id")] },
+      format: { title: { enabled: false } },
+    } as never,
     "revenue-by-product": {
       type: "bar-chart-grouped",
       dataMapping: { categoryKey: [{ id: "orders.product" }], valueKey: [sum("orders.amount")] },
       sort: [{ field: sum("orders.amount"), direction: "desc" }],
       format: titled("Revenue by product"),
     },
+    "revenue-by-kind": {
+      type: "donut-chart",
+      dataMapping: { categoryKey: [{ id: "orders.kind" }], valueKey: [sum("orders.amount")] },
+      format: { ...titled("Revenue by kind"), style: { custom: { pieDataLabel: { enabled: false } } } },
+    },
     "order-list": {
       type: "grid",
       dataMapping: {
-        cols: [{ id: "orders.ref" }, { id: "orders.product" }, sum("orders.amount"), { id: "orders.needsYou" }, { id: "orders.nextStep" }],
+        cols: [{ id: "orders.ref" }, { id: "orders.product" }, { id: "orders.kind" }, sum("orders.amount"), { id: "orders.needsYou" }, { id: "orders.nextStep" }],
       },
-      format: titled("Every paid order and what is still owed"),
+      format: titled("Paid orders and what is still owed"),
     },
   },
   widgetLayout: {
-    period: at(0, 0, 24, 4),
-    revenue: at(0, 4, 6, 8),
-    orders: at(6, 4, 6, 8),
-    average: at(12, 4, 6, 8),
-    "assistant-share": at(18, 4, 6, 8),
-    "revenue-by-week": at(0, 12, 16, 18),
-    "revenue-by-kind": at(16, 12, 8, 18),
-    "revenue-by-product": at(0, 30, 10, 20),
-    "order-list": at(10, 30, 14, 20),
+    summary: at(0, 0, 24, 8),
+    "revenue-by-product": at(0, 8, 15, 18),
+    "revenue-by-kind": at(15, 8, 9, 18),
+    "order-list": at(0, 26, 24, 22),
   },
 };
 
 const assistant: AgPageState = {
   id: "assistant",
   widgets: {
-    conversations: tile("Conversations", sum("conversations.one"), "calendar::day"),
-    share: tile("Handled by the assistant alone", { id: "assistantShare" }),
+    conversations: tile("Conversations", sum("conversations.one")),
+    share: tile("Answered by the assistant", { id: "assistantShare" }),
     waiting: tile("Waiting for your answer", sum("conversations.waiting")),
+    // Seller Desk's own widgets (./studio-widgets.tsx); Studio's types list only its built-in ones.
     "who-answers": {
-      type: "donut-chart",
-      dataMapping: { categoryKey: [{ id: "conversations.handledBy" }], valueKey: [sum("conversations.one")] },
-      format: { ...titled("Who is answering"), style: { custom: { pieDataLabel: { enabled: true } } } },
-    },
+      type: "seller-desk-who-answered",
+      dataMapping: { status: [{ id: "conversations.waitingForYou" }], count: [sum("conversations.one")] },
+      format: titled("Who answered"),
+    } as never,
     "conversations-by-day": {
       type: "column-chart-stacked",
       dataMapping: { categoryKey: [{ id: "calendar::day" }], valueKey: [sum("conversations.byAssistant"), sum("conversations.waiting")] },
-      format: { ...titled("Conversations by day: handled by the assistant, and waiting for you"), style: { theme: { common: { legend: { enabled: true } } } } },
+      format: { ...titled("Conversations by day"), style: { theme: { common: { legend: { enabled: true } } } } },
     },
     "waiting-list": {
-      type: "grid",
-      dataMapping: { cols: [{ id: "conversations.waitingForYou" }, { id: "conversations.handledBy" }, { id: "conversations.topic" }] },
-      sort: [{ field: sum("conversations.waiting"), direction: "desc" }],
-      format: titled("Latest conversations"),
-    },
+      type: "seller-desk-waiting",
+      dataMapping: {
+        conversation: [{ id: "conversations.id" }],
+        status: [{ id: "conversations.waitingForYou" }],
+        message: [{ id: "conversations.topic" }],
+      },
+      format: titled("Waiting for your answer"),
+    } as never,
   },
   widgetLayout: {
     conversations: at(0, 0, 8, 8),
     share: at(8, 0, 8, 8),
     waiting: at(16, 0, 8, 8),
-    "who-answers": at(0, 8, 9, 20),
-    "conversations-by-day": at(9, 8, 15, 20),
-    "waiting-list": at(0, 28, 24, 20),
+    "who-answers": at(0, 8, 24, 10),
+    "waiting-list": at(0, 18, 12, 22),
+    "conversations-by-day": at(12, 18, 12, 22),
   },
 };
 
