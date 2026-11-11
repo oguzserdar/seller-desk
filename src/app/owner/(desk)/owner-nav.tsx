@@ -7,6 +7,7 @@ import { useRef, type ComponentType, type RefAttributes } from "react";
 import {
   ConversationsIcon,
   DeskIcon,
+  InsightsIcon,
   InstallIcon,
   KnowledgeIcon,
   OffersIcon,
@@ -28,6 +29,7 @@ type AnimatedIcon = ComponentType<{ size?: number; className?: string; "aria-hid
 const ITEMS: { href: string; label: string; icon: AnimatedIcon }[] = [
   { href: "/owner/orders", label: "Desk", icon: DeskIcon },
   { href: "/owner/conversations", label: "Conversations", icon: ConversationsIcon },
+  { href: "/owner/insights", label: "Insights", icon: InsightsIcon },
   { href: "/owner/offers", label: "Offers", icon: OffersIcon },
   { href: "/owner/knowledge", label: "Knowledge", icon: KnowledgeIcon },
   { href: "/owner/setup", label: "Setup", icon: SetupIcon },

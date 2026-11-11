@@ -129,6 +129,7 @@ const EnvSchema = z.object({
   AI_PRICE_PER_MILLION_TOKENS: optionalText,
   PUBLIC_DEMO: z.preprocess(blankToUndefined, z.enum(["true", "false"]).optional()),
   PAYPAL_AGENT_TOOLKIT: z.preprocess(blankToUndefined, z.enum(["on", "off"]).optional()),
+  AG_STUDIO_LICENSE: z.preprocess(blankToUndefined, z.string().max(2000).optional()),
   TYPESAFE_AI_API_KEY: optionalText,
   AI_GATEWAY_API_KEY: optionalText,
   VERCEL_OIDC_TOKEN: optionalText,
@@ -221,6 +222,8 @@ export type ServerConfig = {
   publicDemo: boolean;
   /** The owner's desk assistant may read the PayPal account through PayPal's Agent Toolkit. Read-only. */
   paypalAgentToolkit: boolean;
+  /** AG Studio licence key for the Insights dashboard; without one Studio shows its trial notice. */
+  agStudioLicense?: string;
   paypal: PayPalConfig;
   store: WooStoreConfig | null;
 };
@@ -413,6 +416,7 @@ export function parseServerConfig(
     paypal: resolvePayPal(env),
     publicDemo: env.PUBLIC_DEMO === "true",
     paypalAgentToolkit: env.PAYPAL_AGENT_TOOLKIT === "on",
+    agStudioLicense: env.AG_STUDIO_LICENSE,
     ...(env.AI_REASONING ? { aiReasoning: env.AI_REASONING } : {}),
     ...(env.AI_BUDGET_USD ? { aiBudgetUsd: env.AI_BUDGET_USD } : {}),
     ...(env.AI_PRICE_PER_MILLION_TOKENS ? { aiPricePerMillionTokens: env.AI_PRICE_PER_MILLION_TOKENS } : {}),

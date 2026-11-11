@@ -139,3 +139,22 @@ export const InstallIcon = deskIcon("InstallIcon", (move) => (
     )}
   </>
 ));
+
+/** Insights: the columns rise from the baseline, the tallest last. */
+export const InsightsIcon = deskIcon("InsightsIcon", (move) => (
+  <>
+    <path d="M3.5 20.5h17" />
+    {move(
+      { origin: "50% 100%", play: { scaleY: [0.4, 1], transition: { duration: 0.32, ease: "easeOut" } } },
+      <path d="M6.5 17.5v-5" />,
+    )}
+    {move(
+      { origin: "50% 100%", play: { scaleY: [0.4, 1], transition: { duration: 0.38, delay: 0.06, ease: "easeOut" } } },
+      <path d="M12 17.5v-9" />,
+    )}
+    {move(
+      { origin: "50% 100%", play: { scaleY: [0.4, 1], transition: { duration: 0.44, delay: 0.12, ease: "easeOut" } } },
+      <path d="M17.5 17.5V5" />,
+    )}
+  </>
+));
