@@ -4,11 +4,13 @@
 
 It answers customers from your catalog, asks you only what it can't know, and closes the sale with a verified PayPal payment.
 
+**Who it's for:** a one-person shop that takes PayPal and answers every customer message itself, such as a bike repairer, a maker or a tutor. A question that arrives at 9 pm and waits until morning is often a sale lost.
+
 **The one rule:** the AI talks, the server decides money. The model cannot set a price, change a total or mark anything paid. A haggler, a fake "system" message, a tampered amount, a forged webhook and a double payment all end the same way: refused, or one order and one payment.
 
 [Live demo](https://sellerdesk.dev) · [Try the shop](https://sellerdesk.dev/buy) · [How to test it](docs/how-to-test.md) · [How it learns](#it-learns-from-the-answers-you-give) · [Install](#deploy) · [Guide](docs/guide.md)
 
-![The current catalog, quote, service order and seller desk in the original exploded-view animation](docs/media/hero.gif)
+![Seller Desk in motion: the shop catalog, a quote with Pay with PayPal, a service order and the owner's desk](docs/media/hero.gif)
 
 ## For judges: pick your time
 
@@ -44,7 +46,8 @@ the appointment time and the work stay open until you finish them.
 ![The current service order, showing its payment and unfinished work; captured with a simulated local payment](docs/media/service-order.png)
 
 **4. You see what needs you.** Questions, pickups, service work and payments to check stay
-visible in one desk. The desk assistant can read order records when you ask what needs attention.
+visible in one desk, with the orders in an AG Grid table you can sort, search and export. The
+desk assistant can read order records when you ask what needs attention.
 
 <picture>
   <source media="(max-width: 600px)" srcset="docs/media/seller-desk-mobile.png">
@@ -235,6 +238,15 @@ shop data and simulated local purchases; explanatory diagrams are examples, not 
 Checkout covers pickup goods, quoted services and small downloads. Shipping, refunds and
 booking stay in your existing tools. See [what works today](docs/readiness.md) and the
 [verification record](docs/proof-matrix.md) for completed checks and unfinished work.
+
+## Built with
+
+PayPal Orders v2, PayPal webhooks and PayPal's Agent Toolkit · Vercel AI SDK 7 with Claude
+(Anthropic), and any OpenAI, Google or gateway model · Model Context Protocol and Agent Skills ·
+Next.js 16 and React · AG Grid Community · Drizzle ORM on Cloudflare D1 or PostgreSQL · Better
+Auth · Cloudflare Workers or Vercel.
+
+Built for the PayPal AI Hackathon 2026. Not made by or affiliated with PayPal.
 
 ## License
 
