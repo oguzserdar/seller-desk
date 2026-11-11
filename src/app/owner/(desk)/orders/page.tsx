@@ -156,7 +156,7 @@ export default async function DeskPage({
             </div>
           </dl>
           {waiting > 0 ? (
-            <NeedsYou questions={decisions} orders={ordersNeedingYou} />
+            <NeedsYou questions={decisions} orders={ordersNeedingYou} readOnly={viewer} />
           ) : null}
           <TeachCard count={toTeach} />
           <div className="mt-12 flex flex-wrap items-center justify-between gap-3">

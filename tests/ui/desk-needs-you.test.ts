@@ -46,6 +46,13 @@ it("shows the question as the headline and each detail as its own row", async ()
   expect(send.disabled).toBe(true);
 });
 
+it("a demo visitor sees the question without an answer form that can never send", async () => {
+  const container = await render({ questions: [question], orders: [], readOnly: true });
+  expect(container.querySelector("textarea")).toBeNull();
+  expect([...container.querySelectorAll("button")].some((b) => b.textContent?.includes("Send to customer"))).toBe(false);
+  expect(container.textContent).toContain("The owner answers here");
+});
+
 it("says plainly when nothing needs the owner", async () => {
   const container = await render({ questions: [], orders: [] });
   expect(container.textContent).toContain("Nothing needs you");

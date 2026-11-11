@@ -26,7 +26,7 @@ export type NeedsYouOrder = { id: string; ref: string; items: string; amount: st
 const ASKED: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" };
 const enter = { duration: motionTokens.duration.standard, ease: [...motionTokens.ease.enter] } as const;
 
-function QuestionCard({ item }: { item: CustomerQuestion }) {
+function QuestionCard({ item, readOnly }: { item: CustomerQuestion; readOnly: boolean }) {
   const router = useRouter();
   const reduce = useReducedMotion();
   const [answer, setAnswer] = useState("");
@@ -77,15 +77,22 @@ function QuestionCard({ item }: { item: CustomerQuestion }) {
                 Review quote and answer together
               </Link>
             ) : null}
-            <div className="mt-4">
-              <Textarea label="Your answer to the customer" rows={3} maxLength={1000} value={answer} onChange={(event) => setAnswer(event.target.value)} />
-            </div>
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-ink-3 text-[13px]">The assistant passes on your words. It promises nothing more.</p>
-              <Button type="submit" variant="primary" loading={send.isPending} disabled={answer.trim().length === 0}>
-                Send to customer
-              </Button>
-            </div>
+            {/* A demo visitor sees the question, not a form that can never send. */}
+            {readOnly ? (
+              <p className="text-ink-3 mt-4 text-[13px]">The owner answers here, in their own words. The assistant passes the answer on and promises nothing more.</p>
+            ) : (
+              <>
+                <div className="mt-4">
+                  <Textarea label="Your answer to the customer" rows={3} maxLength={1000} value={answer} onChange={(event) => setAnswer(event.target.value)} />
+                </div>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-ink-3 text-[13px]">The assistant passes on your words. It promises nothing more.</p>
+                  <Button type="submit" variant="primary" loading={send.isPending} disabled={answer.trim().length === 0}>
+                    Send to customer
+                  </Button>
+                </div>
+              </>
+            )}
             {send.result.serverError ? (
               <Alert tone="danger" className="mt-3" title={send.result.serverError} />
             ) : null}
@@ -114,7 +121,7 @@ function OrderRow({ order }: { order: NeedsYouOrder }) {
 }
 
 /** Everything that waits on the owner, under one count: customer questions first, then orders. */
-export function NeedsYou({ questions, orders }: { questions: CustomerQuestion[]; orders: NeedsYouOrder[] }) {
+export function NeedsYou({ questions, orders, readOnly = false }: { questions: CustomerQuestion[]; orders: NeedsYouOrder[]; readOnly?: boolean }) {
   const count = questions.length + orders.length;
   return (
     <section aria-label={`Needs you: ${count}`} className="mt-8">
@@ -126,7 +133,7 @@ export function NeedsYou({ questions, orders }: { questions: CustomerQuestion[];
         <p className="text-ink-2 mt-3 text-[15px]">{needsYouLabel(0)}. New questions and orders that need you appear here.</p>
       ) : (
         <ul className="mt-3 flex flex-col gap-3">
-          {questions.map((item) => <QuestionCard key={item.id} item={item} />)}
+          {questions.map((item) => <QuestionCard key={item.id} item={item} readOnly={readOnly} />)}
           {orders.map((order) => <OrderRow key={order.id} order={order} />)}
         </ul>
       )}
