@@ -34,6 +34,8 @@ export default async function ConversationsPage({
   const [listed, questions] = await Promise.all([listSellerConversations(owner), openQuestions(owner)]);
   // A customer waiting on the owner's answer comes first, whatever its age.
   const waiting = new Set(questions.map((question) => question.conversationId));
+  // For a waiting customer, the useful line is what they asked, not the assistant's last reply.
+  const asked = new Map(questions.map((question) => [question.conversationId, question.question]));
   const items = [...listed.filter((item) => waiting.has(item.id)), ...listed.filter((item) => !waiting.has(item.id))];
   const aiStatus = (await getEffectiveConfig()).ai.status;
   let selected = null;
@@ -115,7 +117,7 @@ export default async function ConversationsPage({
                         <LocalTime value={item.updatedAt} options={DAY_MONTH} />
                       </span>
                       <p className="mt-2 line-clamp-3 text-[15px] leading-snug [overflow-wrap:anywhere]">
-                        {item.preview || "Customer conversation"}
+                        {asked.get(item.id) || item.preview || "Customer conversation"}
                       </p>
                     </Link>
                   </li>
