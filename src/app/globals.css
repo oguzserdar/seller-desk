@@ -356,3 +356,14 @@ body:has(> [role="note"]) { --banner-h: 33px; }
   button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, label[for], select { cursor: pointer; }
   button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
 }
+
+/* The public demo's guide above the shop: says who the visitor is and what to try. */
+.demo-guide { padding: 20px 22px; border-radius: 16px; background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-line); max-width: 760px; }
+.demo-guide-kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-brand); }
+.demo-guide-lede { margin-top: 6px; font-size: 17px; line-height: 1.5; color: var(--color-ink); }
+.demo-guide-steps { display: grid; gap: 10px; margin-top: 14px; font-size: 15px; line-height: 1.5; color: var(--color-ink-2); }
+.demo-guide-steps li { display: flex; gap: 12px; align-items: flex-start; }
+.demo-guide-steps strong { color: var(--color-ink); font-weight: 600; }
+.demo-guide-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 999px; background: var(--color-brand-soft); color: var(--color-brand); font-size: 13px; font-weight: 600; }
+.demo-guide-link { font-size: 15px; font-weight: 600; color: var(--color-brand); text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width: 860px) { .demo-guide-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

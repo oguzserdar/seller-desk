@@ -132,12 +132,14 @@ export function ShopWindow({
   return (
     <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-4 py-8 sm:px-6">
       <div className="flex min-w-0 flex-col">
+        {demoIntro ? <DemoGuide shopName={shopName} /> : null}
         <h1 className="text-[34px] leading-[1.08] font-semibold tracking-[-0.03em] sm:text-[46px]">
           {assistantOn ? "What are you looking for?" : `Browse ${shopName}`}
         </h1>
         <p className="text-ink-2 mt-4 max-w-[58ch] text-[17px] leading-relaxed">
-          {demoIntro ??
-            (assistantOn
+          {demoIntro
+            ? demoIntro
+            : (assistantOn
               ? `Ask in your own words. ${shopName} answers from its published offers and shop information.`
               : "Add what you need, then pay with PayPal.")}
         </p>
@@ -170,5 +172,38 @@ export function ShopWindow({
         busy={busy}
       />
     </main>
+  );
+}
+
+/**
+ * On a public demo: who you are here, what to try in order, and the way to the owner's side.
+ * A first-time visitor should know within one glance that this is a pretend shop and they are the customer.
+ */
+function DemoGuide({ shopName }: { shopName: string }) {
+  const steps = [
+    ["Ask", "Type what a customer would: a repair, a part, a deadline, a budget."],
+    ["Get a quote", "Prices come from the shop\u2019s catalog. A custom job goes to the owner first."],
+    ["Pay with PayPal", "Use a PayPal sandbox buyer account. No real money moves."],
+  ] as const;
+  return (
+    <section aria-label="About this demo shop" className="demo-guide mb-8">
+      <p className="demo-guide-kicker">Demo shop</p>
+      <p className="demo-guide-lede">
+        You are a customer at <strong>{shopName}</strong>, a made-up bike repair shop running Seller Desk.
+      </p>
+      <ol className="demo-guide-steps">
+        {steps.map(([title, body], index) => (
+          <li key={title}>
+            <span className="demo-guide-number" aria-hidden>{index + 1}</span>
+            <span>
+              <strong>{title}.</strong> {body}
+            </span>
+          </li>
+        ))}
+      </ol>
+      <form method="post" action="/owner/demo" className="mt-4">
+        <button type="submit" className="demo-guide-link">Then see the same sale from the owner&rsquo;s desk &rarr;</button>
+      </form>
+    </section>
   );
 }

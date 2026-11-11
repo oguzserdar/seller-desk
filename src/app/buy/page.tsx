@@ -31,7 +31,7 @@ export default async function BuyPage() {
         // The public demo says plainly what this shop is, so a first-time visitor is not guessing.
         demoIntro={
           getServerConfig().publicDemo
-            ? `${seller.displayName} is a small bike repair shop, made up to show Seller Desk. Ask what a customer would ask: a repair, a part, a price. Payments run in the PayPal sandbox, so no real money moves.`
+            ? "Ask in your own words. The assistant answers from the shop's published offers and terms, and asks the owner when it cannot know."
             : undefined
         }
       />
