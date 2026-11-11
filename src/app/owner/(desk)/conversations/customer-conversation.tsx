@@ -20,6 +20,16 @@ import {
   replyToConversationAction,
 } from "./actions";
 
+/**
+ * The one-line state under a conversation's title, matching the inbox label: a question the
+ * assistant handed to the owner comes first, because that is what the owner has to act on.
+ */
+export function conversationStatus({ ownerReplying, waitingOnOwner }: { ownerReplying: boolean; waitingOnOwner: boolean }): string {
+  if (ownerReplying) return "You’re replying. The assistant is paused.";
+  if (waitingOnOwner) return "Waiting for your answer. The assistant told the customer it asked you.";
+  return "The assistant is handling this conversation.";
+}
+
 /** One customer conversation with deliberate human ownership and exact-word replies. */
 export function CustomerConversation({
   initial,
@@ -147,9 +157,7 @@ export function CustomerConversation({
             {customerLabel(view.control.id)}
           </h2>
           <p role="status" className="mt-1 text-[14px] text-ink-2">
-            {human
-              ? "You’re replying. The assistant is paused."
-              : "The assistant is handling this conversation."}
+            {conversationStatus({ ownerReplying: human, waitingOnOwner: Boolean(view.pending) })}
           </p>
         </div>
         {readOnly ? null : <Button

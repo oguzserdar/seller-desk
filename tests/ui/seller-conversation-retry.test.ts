@@ -138,3 +138,10 @@ it("a demo visitor reads an owner-held conversation without Take over or a reply
   expect([...container.querySelectorAll("button")].some((button) => /Take over|Return to assistant/.test(button.textContent ?? ""))).toBe(false);
   expect(container.textContent).toContain("The owner can take over here");
 });
+
+it("names the conversation's state the way the inbox does", async () => {
+  const { conversationStatus } = await import("../../src/app/owner/(desk)/conversations/customer-conversation");
+  expect(conversationStatus({ ownerReplying: false, waitingOnOwner: true })).toMatch(/^Waiting for your answer/);
+  expect(conversationStatus({ ownerReplying: true, waitingOnOwner: true })).toMatch(/^You’re replying/);
+  expect(conversationStatus({ ownerReplying: false, waitingOnOwner: false })).toMatch(/assistant is handling/);
+});
