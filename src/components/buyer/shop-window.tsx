@@ -8,26 +8,22 @@ import { formatQuoteAmount } from "@/lib/money";
 import type { PublicOffer } from "@/server/domain/offers";
 import { OFFER_CARD_CLASS, OfferMedia } from "./offer-tile";
 
-/** Starter questions drawn from what this shop actually sells. */
+/**
+ * Starter questions drawn from what this shop actually sells, phrased the way a customer would ask
+ * this shop: a booking for a priced service, stock of a short-named product, then a quote or a download.
+ */
 export function suggestionsFor(offers: PublicOffer[]): string[] {
   const out: string[] = [];
-  const goods = offers.filter(
-    (offer) => offer.kind === "goods" && offer.available !== 0,
-  );
-  if (goods.length > 0) {
-    const ceiling =
-      Math.ceil(
-        Math.max(...goods.map((offer) => offer.unitAmountMinor ?? 0)) / 2500,
-      ) * 2500;
-    out.push(
-      `A gift under ${formatQuoteAmount(ceiling, goods[0]!.currency).replace(/\.00$/, "")}`,
-    );
-  }
-  const service = offers.find((offer) => offer.kind === "service");
-  if (service) out.push(`I need a ${service.title.toLowerCase()}`);
-  if (offers.some((offer) => offer.kind === "digital"))
-    out.push("Something I can download today");
-  return out;
+  const service = offers.find((offer) => offer.kind === "service" && offer.unitAmountMinor !== null);
+  if (service) out.push(`Can you do a ${service.title.toLowerCase()} this week?`);
+  const goods = offers
+    .filter((offer) => offer.kind === "goods" && offer.available !== 0)
+    .sort((left, right) => left.title.length - right.title.length)[0];
+  if (goods) out.push(`Is the ${goods.title.toLowerCase()} in stock?`);
+  if (offers.some((offer) => offer.kind === "service" && offer.unitAmountMinor === null))
+    out.push("Can you quote a job for me?");
+  else if (offers.some((offer) => offer.kind === "digital")) out.push("Something I can download today");
+  return out.slice(0, 3);
 }
 
 /**
@@ -105,6 +101,7 @@ function Mosaic({
 /** First view: one question, the ask box, and the shop's photos. */
 export function ShopWindow({
   shopName,
+  demoIntro,
   offers,
   composer,
   assistantOn,
@@ -115,6 +112,8 @@ export function ShopWindow({
   busy,
 }: {
   shopName: string;
+  /** On a public demo, one plain paragraph saying what this shop is and that payments are sandbox. */
+  demoIntro?: string;
   offers: PublicOffer[];
   composer: ReactNode;
   assistantOn: boolean;
@@ -131,10 +130,11 @@ export function ShopWindow({
         <h1 className="text-[34px] leading-[1.08] font-semibold tracking-[-0.03em] sm:text-[46px]">
           {assistantOn ? "What are you looking for?" : `Browse ${shopName}`}
         </h1>
-        <p className="text-ink-2 mt-4 max-w-[44ch] text-[17px] leading-relaxed">
-          {assistantOn
-            ? `Ask in your own words. ${shopName} answers from its published offers and shop information.`
-            : "Add what you need, then pay with PayPal."}
+        <p className="text-ink-2 mt-4 max-w-[58ch] text-[17px] leading-relaxed">
+          {demoIntro ??
+            (assistantOn
+              ? `Ask in your own words. ${shopName} answers from its published offers and shop information.`
+              : "Add what you need, then pay with PayPal.")}
         </p>
         {assistantOn ? (
           <>

@@ -65,9 +65,12 @@ function chatErrorText(
 export function ShopAssistant({
   entry,
   shopName,
+  demoIntro,
 }: {
   entry: "page" | "widget";
   shopName: string;
+  /** Shown above the shop on a public demo instead of the usual line. */
+  demoIntro?: string;
 }) {
   const widget = entry === "widget";
   const { state: session, restart } = useBuyerSession(entry);
@@ -619,6 +622,7 @@ export function ShopAssistant({
       ) : (
         <ShopWindow
           shopName={shopName}
+          demoIntro={demoIntro}
           offers={offers}
           assistantOn={assistant === "on"}
           composer={composer(true)}
