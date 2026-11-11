@@ -9,7 +9,7 @@ let reduced = false;
 vi.mock("next/navigation", () => ({ usePathname: () => "/owner/orders" }));
 vi.mock("motion/react", async (importOriginal) => ({ ...(await importOriginal<object>()), useReducedMotion: () => reduced }));
 vi.mock("../../src/components/desk-icons", () => Object.fromEntries(
-  ["DeskIcon", "ConversationsIcon", "OffersIcon", "KnowledgeIcon", "SetupIcon", "InstallIcon"].map((name) => [name, forwardRef((_props, ref) => {
+  ["DeskIcon", "ConversationsIcon", "InsightsIcon", "OffersIcon", "KnowledgeIcon", "SetupIcon", "InstallIcon"].map((name) => [name, forwardRef((_props, ref) => {
     useImperativeHandle(ref, () => ({ startAnimation: () => calls.push(`start ${name}`), stopAnimation: () => calls.push(`stop ${name}`) }));
     return createElement("span", { "data-icon": name });
   })]),
