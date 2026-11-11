@@ -16,6 +16,22 @@ No install and no AI key. The assistant runs on the demo's own server.
 The shop is a fictional bike shop. Try sections 3 and 4 below on it. The assistant has a
 spending limit so the demo stays available until judging ends.
 
+### Insights, built on AG Studio
+
+Open the read-only desk (no login), then **Insights** in the sidebar, or go to
+<https://sellerdesk.dev/owner/insights>.
+
+| Try this | You should see |
+| --- | --- |
+| On **Sales**, tap the **Brake service** bar | The whole page filters to that product: its orders, its revenue. Tap again to clear |
+| Press **Ask the analyst**, then **How is the shop doing?** | An answer from the shop's own figures, with each figure it read listed as a step |
+| Ask: "Add a chart of units sold by product to this page." | The analyst hands the job to Studio's Page and Widget agents and a new chart appears |
+| Open the **Assistant** tab | **What the analyst did** counts questions, figures read, dashboard changes and hand-offs, and states that no money changed |
+| Press **Edit dashboard** | Studio's own editor and data panels; changes last for your visit only |
+
+The analyst can read figures and arrange the dashboard. It has no tool that touches a price,
+an order or a payment.
+
 To connect your own AI app to the owner's desk, open **Setup → Your AI apps** and paste the
 **Line for a coding agent** into Claude Code, Codex or Cursor, or add the connector address
 in ChatGPT or Claude. The app can read the desk; it cannot message customers or change

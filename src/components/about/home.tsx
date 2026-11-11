@@ -122,7 +122,7 @@ export async function SellerDeskHome() {
           </ol>
         </section>
 
-        <section aria-labelledby="judges" className="mx-auto mt-10 w-full max-w-[1180px] px-4 sm:px-6">
+        <section id="judging" aria-labelledby="judges" className="mx-auto mt-10 w-full max-w-[1180px] scroll-mt-10 px-4 sm:px-6">
           <div className="about-judges">
             <div>
               <h2 id="judges" className="about-judges-title">Judging this entry?</h2>
