@@ -102,3 +102,4 @@
   .insights-work-steps { flex-wrap: wrap; }
   .insights-work-steps ol { flex-wrap: wrap; }
 }
+.insights-cell-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

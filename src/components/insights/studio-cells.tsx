@@ -39,7 +39,16 @@ function StockCell(props: Props) {
   return Number.isFinite(left) && left <= 2 ? <span className="insights-pill" data-tone="attention">{left} left</span> : <span>{stock}</span>;
 }
 
+/** A long name keeps the grid's ellipsis and shows in full on hover, as spreadsheets do. */
+function NameCell(props: Props) {
+  const name = text(props.valueFormatted ?? props.value);
+  if (isTotals(props) || !name) return plain(props);
+  return <span className="insights-cell-name" title={name}>{name}</span>;
+}
+
 const BY_FIELD: Record<string, ComponentType<Props>> = {
+  "offers.title": NameCell,
+  "orders.product": NameCell,
   "orders.needsYou": StatusCell,
   "orders.ref": OrderCell,
   "offers.stockLabel": StockCell,
