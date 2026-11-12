@@ -7,6 +7,7 @@ import { ownerAction } from "@/server/actions/safe-action";
 import { resumeAfterAnswer } from "@/server/ai/resume";
 import { draftLearningReview } from "@/server/ai/learning-review";
 import { draftOwnerReply } from "@/server/ai/owner-reply";
+import { hasBlanks } from "@/lib/reply-blanks";
 import { retryAccess } from "@/server/domain/digital";
 import { CompletePickupInput, completePickup, recordServiceFollowUp, ServiceFollowUpInput } from "@/server/domain/orders";
 import { DecideInput, decideProposal } from "@/server/domain/proposals";
@@ -80,7 +81,7 @@ export const decideProposalAction = ownerAction.inputSchema(DecideInput).action(
 });
 
 export const answerQuestionAction = ownerAction
-  .inputSchema(z.object({ questionId: z.uuid(), expectedRevision: z.number().int().min(1), answer: z.string().trim().min(1).max(1000) }).strict())
+  .inputSchema(z.object({ questionId: z.uuid(), expectedRevision: z.number().int().min(1), answer: z.string().trim().min(1).max(1000).refine((text) => !hasBlanks(text), "Fill in the parts in [brackets] before sending.") }).strict())
   .action(async ({ parsedInput, ctx }) => {
     const answered = await answerQuestion(ctx.owner, parsedInput);
     // The customer's conversation continues after this response is sent; if that run fails, the job runner retries it.

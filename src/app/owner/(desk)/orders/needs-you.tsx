@@ -17,7 +17,8 @@ import { GraduationCap } from "lucide-react";
 import { Alert } from "@/components/arc/alert/alert";
 import { needsYouLabel } from "@/server/domain/desk-count";
 import { answerQuestionAction, draftReplyAction } from "../actions";
-import { Sparkles } from "lucide-react";
+import { WritingPen } from "@/components/writing-pen";
+import { hasBlanks } from "@/lib/reply-blanks";
 import type { CustomerQuestion } from "../customer-questions";
 
 /** An order that waits on the owner, as one Desk row. */
@@ -39,13 +40,8 @@ function QuestionCard({ item, readOnly, drafts }: { item: CustomerQuestion; read
       router.refresh();
     },
   });
-  const [missing, setMissing] = useState<string | null>(null);
-  const draft = useAction(draftReplyAction, {
-    onSuccess: ({ data }) => {
-      if (!data) return;
-      if (data.reply) { setAnswer(data.reply); setMissing(null); } else setMissing(data.missing);
-    },
-  });
+  const draft = useAction(draftReplyAction, { onSuccess: ({ data }) => { if (data) setAnswer(data.reply); } });
+  const blanks = hasBlanks(answer);
   const details = [item.customerGoal, ...item.knownFacts].filter((line) => line.trim().length > 0);
   return (
     <li data-needs-you-item className="surface">
@@ -87,14 +83,8 @@ function QuestionCard({ item, readOnly, drafts }: { item: CustomerQuestion; read
             ) : null}
             {/* A demo visitor sees the real answer box, switched off, with the reason and the way in. */}
             {draft.result.serverError ? <Alert tone="danger" className="mt-3" title={draft.result.serverError} /> : null}
-            {/* Like a mail app's "help me write": the assistant drafts inside the box; a gap in the shop's facts is named above it. */}
+            {/* Like a mail app's "help me write": the assistant fills the box; facts the shop has not given stay as [blanks] to fill. */}
             <div className="relative mt-4">
-              {missing ? (
-                <p role="status" className="text-ink-2 mb-2 flex items-start gap-2 text-[14px]">
-                  <Sparkles size={15} aria-hidden className="text-ink-3 mt-0.5 shrink-0" />
-                  <span>Your shop has not said this yet: <span className="text-ink font-medium">{missing.replace(/[.\s]+$/, "")}</span>. Your answer teaches it.</span>
-                </p>
-              ) : null}
               <Textarea
                 label="Your answer to the customer"
                 rows={3}
@@ -112,7 +102,7 @@ function QuestionCard({ item, readOnly, drafts }: { item: CustomerQuestion; read
                   disabled={draft.isPending}
                   className="bg-sunken text-ink-2 hover:text-ink absolute bottom-2.5 left-2.5 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors disabled:opacity-70"
                 >
-                  <Sparkles size={14} aria-hidden className={draft.isPending ? "animate-pulse" : undefined} />
+                  <WritingPen writing={draft.isPending} size={15} />
                   {draft.isPending ? "Writing…" : "Help me write"}
                 </button>
               ) : null}
@@ -123,9 +113,9 @@ function QuestionCard({ item, readOnly, drafts }: { item: CustomerQuestion; read
                   <Link href="/owner/login" className="text-ink decoration-line-strong font-medium underline underline-offset-4">Sign in as the owner</Link> to answer. Your words go to the customer, and the assistant promises nothing more.
                 </p>
               ) : (
-                <p className="text-ink-3 text-[13px]">The assistant passes on your words. It promises nothing more.</p>
+                <p className="text-ink-3 text-[13px]">{blanks ? "Fill in the parts in [brackets], then send." : "The assistant passes on your words. It promises nothing more."}</p>
               )}
-              <Button type="submit" variant="primary" loading={send.isPending} disabled={readOnly || answer.trim().length === 0}>
+              <Button type="submit" variant="primary" loading={send.isPending} disabled={readOnly || answer.trim().length === 0 || blanks}>
                 Send to customer
               </Button>
             </div>
