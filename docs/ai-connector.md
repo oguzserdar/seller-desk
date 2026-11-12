@@ -8,7 +8,7 @@ and drafts; nothing reaches a buyer until the owner sends it from Seller Desk.
 One HTTPS endpoint, `/api/mcp`, speaking the Model Context Protocol (streamable HTTP, stateless). The
 owner pastes its address into the AI app once; Seller Desk shows its sign-in, then a consent page that
 names the AI app and what it may do. The AI gets a short-lived token bound to this endpoint. The owner
-can remove an AI app from Setup at any time.
+can remove an AI app from Setup at any time. Whether a connected app may answer a customer's waiting question as the owner is set under Setup → Who answers (off until the owner turns it on); every answer it sends is drafted as shop knowledge for the owner to approve, like an answer typed on the desk.
 
 ## Groundings
 

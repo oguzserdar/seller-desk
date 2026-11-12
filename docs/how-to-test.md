@@ -79,7 +79,9 @@ in a new browser window.
 | On the **Desk**, open the customer's request, press **Review quote and answer together**, enter the price and exact work, then **Send quote and answer** | The answer and the priced quote appear in the customer's chat by themselves |
 | After paying, ask the assistant: "Did my payment go through?" | An answer from the payment record: paid, no need to pay again |
 | On the desk, ask: "What needs me today?" | A short answer naming the order and what is still owed |
-| Open **Knowledge → Review your seller answers**, press **Review this answer**, then **Edit for future customers**, tick the confirmation and press **Approve for future customers** | The reusable fact is published; a one-off favour is labelled **This customer only**, with nothing to approve |
+| When a question waits on the **Desk**, press **Help me write** inside the answer box | The box fills with a reply from the shop's own facts. Anything the shop has not said stays as a [bracketed blank]; **Send to customer** stays off until every blank is filled |
+| Send an answer, then open **Knowledge → Review your seller answers** | The answer is already reviewed for you. Press **Edit for future customers**, tick the confirmation and press **Approve for future customers** |
+| (Old step, still works) Press **Review this answer** on an answer that has no review yet, then approve it as above | The reusable fact is published; a one-off favour is labelled **This customer only**, with nothing to approve |
 | In a new browser window, ask the same question as a new customer | The answer comes straight away, without asking the shop again (model replies vary) |
 
 ## 4. What it should refuse

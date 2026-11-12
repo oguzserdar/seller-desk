@@ -53,7 +53,7 @@ const QUESTIONS = [
   { q: "Which PayPal APIs does it use?", a: "PayPal Orders v2 to create, retrieve and capture the payment, and verified webhooks as a backup. The owner's desk assistant can also read orders, transactions, invoices and disputes through PayPal's own Agent Toolkit. The hosted demo runs in the PayPal sandbox, so no real money moves." },
   { q: "Why not let the AI call PayPal to take the payment?", a: "Because a model that can create or capture a payment decides money. Seller Desk uses PayPal's Agent Toolkit for reading and its own server code for checkout, where the amount comes from a saved quote and the merchant, amount and currency are checked before an order exists." },
   { q: "Which AI models does it work with?", a: "It uses the Vercel AI SDK, so the owner chooses: Anthropic, OpenAI, Google, OpenRouter or Vercel AI Gateway. Without an AI key the shop still sells as a plain catalog with PayPal checkout." },
-  { q: "Can my own AI app work with my shop?", a: "Yes. Each installation is a connector (MCP) and an Agent Skill. Claude, ChatGPT, Codex or Cursor can read who is waiting, conversations, orders and offers. The connector is read-only: it cannot message customers, change prices or move money." },
+  { q: "Can my own AI app work with my shop?", a: "Yes. Each installation is a connector (MCP) and an Agent Skill. Claude, ChatGPT, Codex or Cursor can read who is waiting, conversations, orders and offers. It reads by default. If you turn it on in Setup, it can also answer a customer's waiting question as you. It can never change prices or move money." },
   { q: "How do I run my own copy?", a: "It installs in your own Cloudflare or Vercel account with your own PayPal account and AI key, or runs locally with one command. The source is MIT licensed." },
 ];
 
@@ -178,7 +178,7 @@ export async function SellerDeskHome() {
                 Paste one line into Claude Code, Codex or Cursor, or add the connector in ChatGPT or
                 Claude. It reads who is waiting, conversations, orders and offers.
               </p>
-              <p className="about-dark-text mt-3 max-w-[46ch]">The connector is read-only. It cannot message customers, change prices or move money.</p>
+              <p className="about-dark-text mt-3 max-w-[46ch]">It reads your desk, and answers waiting customers only if you turn that on. It can never change prices or move money.</p>
             </div>
             <AgentDemo />
           </div>
