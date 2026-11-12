@@ -17,7 +17,6 @@ export function CheckoutReturn() {
   const attemptId = params.get("attempt");
   const [view, setView] = useState<PaymentView | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
-  const [orderId, setOrderId] = useState<string | null>(null);
   const started = useRef(false);
 
   useEffect(() => {
@@ -48,7 +47,6 @@ export function CheckoutReturn() {
   // A verified payment needs no extra click: go straight to the order.
   useEffect(() => {
     if (view?.state !== "paid" || !view.order) return;
-    setOrderId(view.order.id);
     router.replace(`/order/${view.order.id}`);
   }, [router, view]);
 
@@ -63,7 +61,7 @@ export function CheckoutReturn() {
           </LinkButton>
         </>
       ) : view ? (
-        <PaymentStatus view={view} onChange={setView} orderHref={orderId ? `/order/${orderId}` : null} />
+        <PaymentStatus view={view} onChange={setView} />
       ) : (
         <p role="status" className="text-ink-2 text-[17px]">
           PayPal is confirming it now. This takes a few seconds, so please do not pay again.

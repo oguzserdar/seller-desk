@@ -20,11 +20,9 @@ const HEADLINE_TONE: Record<PaymentView["tone"], string> = {
 export function PaymentStatus({
   view,
   onChange,
-  orderHref,
 }: {
   view: PaymentView;
   onChange: (next: PaymentView) => void;
-  orderHref?: string | null;
 }) {
   const [busy, setBusy] = useState<"check" | "cancel" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -60,7 +58,7 @@ export function PaymentStatus({
             Cancel this checkout
           </Button>
         ) : null}
-        {view.next.includes("view_order") && orderHref ? <LinkButton href={orderHref}>View your order</LinkButton> : null}
+        {view.next.includes("view_order") && view.order ? <LinkButton href={`/order/${view.order.id}`}>View your order</LinkButton> : null}
         {view.next.includes("requote") ? (
           <LinkButton variant="secondary" href="/buy">
             Back to the shop

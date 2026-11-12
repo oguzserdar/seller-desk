@@ -75,6 +75,8 @@ export function QuoteReview({ quoteId }: { quoteId: string }) {
     if (!result.data) {
       setBusy(null);
       setMessage(result.message);
+      // The quote changed or expired: show the current one, as the shop panel does.
+      if (result.httpStatus === 409) void load();
       return;
     }
     setPayment(result.data);
@@ -197,7 +199,7 @@ export function QuoteReview({ quoteId }: { quoteId: string }) {
         </Alert>
       ) : null}
       {message ? <Alert tone="danger" title={message} /> : null}
-      {payment ? <PaymentStatus view={payment} onChange={setPayment} orderHref={quote.order ? `/order/${quote.order.id}` : null} /> : null}
+      {payment ? <PaymentStatus view={payment} onChange={setPayment} /> : null}
 
       <details className="text-[15px]">
         <summary className="text-ink-2 hover:text-ink cursor-pointer font-medium select-none">Terms you agree to by paying</summary>
