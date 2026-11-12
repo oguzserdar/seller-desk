@@ -31,16 +31,20 @@ export function CheckoutReturn() {
       return;
     }
     void (async () => {
+      // A failed check may be a dropped connection while PayPal already took the money: keep the last
+      // status PayPal gave and keep checking. Only a page that never got a status shows the error.
+      let shown = false;
+      let lastProblem: string | null = null;
       for (let i = 0; i <= AUTO_CHECKS; i += 1) {
         const result = await api<PaymentView>("/api/buyer/capture", { method: "POST", json: { attemptId } });
-        if (!result.data) {
-          setProblem(result.message);
-          return;
-        }
-        setView(result.data);
-        if (result.data.tone !== "progress") return;
-        await new Promise((resolve) => setTimeout(resolve, CHECK_INTERVAL_MS));
+        if (result.data) {
+          shown = true;
+          setView(result.data);
+          if (result.data.tone !== "progress") return;
+        } else lastProblem = result.message;
+        if (i < AUTO_CHECKS) await new Promise((resolve) => setTimeout(resolve, CHECK_INTERVAL_MS));
       }
+      if (!shown && lastProblem) setProblem(lastProblem);
     })();
   }, [attemptId]);
 
