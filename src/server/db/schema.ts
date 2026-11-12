@@ -95,6 +95,8 @@ export const installation = pgTable(
     aiCheckedAt: ts("ai_checked_at"),
     /** AI connection saved in Setup, sealed with SETTINGS_ENCRYPTION_KEY; never readable without it. */
     aiSettingsSealed: text("ai_settings_sealed"),
+    /** The owner let connected AI apps answer customers' waiting questions as them; off until they turn it on in Setup. */
+    connectorMayAnswer: boolean("connector_may_answer").default(false).notNull(),
     createdAt: createdAt(),
   },
   (t) => [

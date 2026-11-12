@@ -25,7 +25,7 @@ export function setupPrompt(appUrl: string): string {
   const mcp = `${origin}/api/mcp`;
   const skill = `${origin}/.well-known/agent-skills/${SKILL_NAME}/SKILL.md`;
   const fetchSkill = (dir: string) => `mkdir -p ${dir}/${SKILL_NAME} && curl -fsSL ${skill} -o ${dir}/${SKILL_NAME}/SKILL.md`;
-  return `These are the setup instructions for Seller Desk at ${origin}. Seller Desk is the user's shop desk. Once connected you can see which buyers are waiting, read conversations, orders, payments and offers, and draft answers. You cannot message buyers or change anything; the user sends replies from Seller Desk.
+  return `These are the setup instructions for Seller Desk at ${origin}. Seller Desk is the user's shop desk. Once connected you can see which buyers are waiting, read conversations, orders, payments and offers, and draft answers. You can send an answer to a waiting customer only if the user turned that on in Seller Desk Setup and asks you to; you cannot change offers, prices, stock, orders or payments.
 
 Complete the steps for your agent yourself by running the commands. Do not ask the user to run them. Sign-in happens in the browser with the shop owner's account the first time you use a Seller Desk tool, and the owner approves your access there.
 

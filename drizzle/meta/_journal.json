@@ -204,6 +204,13 @@
       "when": 1792810465917,
       "tag": "20261024025425_ai_connector",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1794460581481,
+      "tag": "20261112051621_connector_may_answer",
+      "breakpoints": true
     }
   ]
 }

@@ -26,6 +26,7 @@ import { createD1LearningPublication } from "./learning-publication";
 import { createD1LearningReviews } from "./learning-review";
 import { createD1ModelCheckStorage } from "./model-check";
 import { createD1AiSettingsStorage } from "./ai-settings";
+import { createD1ConnectorSettings } from "./connector-settings";
 import { createD1OrderFollowup } from "./order-followup";
 import { createD1OrderReads } from "./order-read";
 import { createD1OrderWrites } from "./order-write";
@@ -138,5 +139,6 @@ export function createD1Storage(db: D1Db) {
     usage: createD1UsageStorage(db),
     modelCheck: createD1ModelCheckStorage(db),
     aiSettings: createD1AiSettingsStorage(db),
+    connectorSettings: createD1ConnectorSettings(db),
   };
 }

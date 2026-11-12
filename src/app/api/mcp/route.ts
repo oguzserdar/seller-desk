@@ -2,7 +2,8 @@
  * The Seller Desk connector for the owner's own ChatGPT, Claude, Claude Code or Codex (MCP over
  * streamable HTTP, stateless). Better Auth's protected-resource handler checks the bearer token
  * (signature, issuer, audience = this endpoint, expiry) and answers 401 with the RFC 9728 challenge,
- * which makes the AI app start sign-in. The tools are read-only; see src/server/connector/tools.ts.
+ * which makes the AI app start sign-in. The tools read the desk, and answer a customer only when
+ * the owner allowed it in Setup; see src/server/connector/tools.ts.
  *
  * The signing keys are read from this installation's own Better Auth rather than fetched from its
  * /jwks URL: a Worker requesting its own hostname does not reach itself, and there is no reason to

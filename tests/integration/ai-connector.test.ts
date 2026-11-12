@@ -1,18 +1,35 @@
 /**
  * @fileoverview The AI connector end to end on a real D1 runtime: an AI app registers, asks for
  * access, the owner signs in and allows it, the app trades the code for a token and reads the desk
- * over MCP; removing the app stops its next call.
+ * over MCP; removing the app stops its next call. answer_question answers a waiting customer only
+ * after the owner turns it on in Setup, and the demo visitor cannot turn it on.
  */
-import { afterEach, beforeEach, expect, it } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
+const request = vi.hoisted(() => ({ headers: new Headers(), resumed: [] as string[] }));
+vi.mock("server-only", () => ({}));
+vi.mock("next/headers", () => ({ headers: async () => request.headers }));
+// The desk resumes the customer's conversation after answering; record that instead of running a model turn.
+vi.mock("next/server", async (original) => ({ ...(await original<object>()), after: (work: () => unknown) => { request.resumed.push(String(work)); } }));
 import { POST as mcp } from "@/app/api/mcp/route";
+import { setConnectorAnswersAction } from "@/app/owner/(desk)/setup/actions";
 import { connectorResumeUrl } from "@/lib/connector-resume";
 import { getAuth } from "@/server/auth/auth";
 import { bootstrapOwner } from "@/server/auth/bootstrap";
 import { allowedApps, removeApp } from "@/server/connector/access";
 import { answerConsent } from "@/server/connector/consent";
+import { ANSWER_REFUSAL } from "@/server/connector/tools";
+import { ensureConversation } from "@/server/ai/conversation";
+import { VIEWER_REFUSAL } from "@/server/auth/owner";
+import { VIEWER_COOKIE, issueViewerPass } from "@/server/auth/viewer-pass";
+import { connectorMayAnswer, setConnectorMayAnswer } from "@/server/domain/connector-settings";
+import { findSellerForUser } from "@/server/domain/seller";
+import { askSeller, openQuestions } from "@/server/domain/seller-questions";
+import { resetServerConfigForTests } from "@/server/env";
 import { discoveryRoute } from "@/server/connector/discovery";
 import { withD1Database } from "@/server/request-scope";
 import { newD1TestDatabase } from "../support/d1";
+import { newBuyer } from "../support/shop";
 
 const APP = "http://localhost:4310";
 const RESOURCE = `${APP}/api/mcp`;
@@ -24,11 +41,19 @@ let local: Awaited<ReturnType<typeof newD1TestDatabase>>;
 let userId = "";
 beforeEach(async () => {
   local = await newD1TestDatabase();
+  // The Cloudflare installer writes this row; the D1 test binding starts without it.
+  await local.binding.prepare("INSERT INTO installation(singleton, environment) VALUES (1, 'sandbox') ON CONFLICT(singleton) DO NOTHING").run();
   const created = await inScope(() => bootstrapOwner({ email: EMAIL, password: PASSWORD, displayName: "Sample shop", country: "US", currency: "USD" }));
   if (created.outcome !== "created") throw new Error("Owner was not created");
   userId = created.userId;
 });
-afterEach(async () => local?.close());
+afterEach(async () => {
+  vi.unstubAllEnvs();
+  resetServerConfigForTests();
+  request.headers = new Headers();
+  request.resumed = [];
+  await local?.close();
+});
 
 const inScope = <T>(work: () => Promise<T>) => withD1Database(local.db, work);
 const auth = (request: Request) => inScope(() => getAuth().handler(request));
@@ -98,10 +123,10 @@ it("tells an unsigned AI app where to sign in", async () => {
   expect(((await metadata.json()) as { resource: string }).resource).toBe(RESOURCE);
 });
 
-it("lets an allowed AI app read the desk with read-only tools, and stops it once removed", async () => {
+it("lets an allowed AI app read the desk, and stops it once removed", async () => {
   const { token } = await connect();
   const tools = await rpcResult(await rpc(token, "tools/list"));
-  expect(tools.result!.tools!.map((t) => t.name).sort()).toEqual(["list_conversations", "list_offers", "list_orders", "list_waiting", "read_conversation"]);
+  expect(tools.result!.tools!.map((t) => t.name).sort()).toEqual(["answer_question", "list_conversations", "list_offers", "list_orders", "list_waiting", "read_conversation"]);
   const waiting = await rpcResult(await rpc(token, "tools/call", { name: "list_waiting", arguments: {} }));
   expect(waiting.result!.content![0]!.text).toContain("No buyer is waiting on a question.");
 
@@ -109,4 +134,56 @@ it("lets an allowed AI app read the desk with read-only tools, and stops it once
   expect(app!.name).toBe("Claude Code");
   expect(await inScope(() => removeApp(userId, app!.consentId))).toBe(true);
   expect((await rpc(token, "tools/list")).status).toBe(401);
+});
+
+/** One customer question waiting for the owner, asked through the buyer side of this D1 shop. */
+async function waitingQuestion() {
+  return inScope(async () => {
+    const buyer = await newBuyer();
+    await ensureConversation(buyer);
+    return (await askSeller(buyer, { question: "Can this be ready Friday?", customerGoal: "Collect Friday", knownFacts: [] })).question;
+  });
+}
+
+const owner = async () => ({ kind: "owner" as const, userId, sellerId: (await inScope(() => findSellerForUser(userId)))!.id });
+const answer = (token: string, questionId: string) =>
+  rpc(token, "tools/call", { name: "answer_question", arguments: { question_id: questionId, answer: "Yes, it will be ready Friday after 10." } }).then(rpcResult);
+
+it("refuses answer_question until the owner turns answering on, and leaves the question waiting", async () => {
+  const { token } = await connect();
+  const question = await waitingQuestion();
+  const refused = await answer(token, question.id);
+  expect(refused.result!.content![0]!.text).toBe(ANSWER_REFUSAL);
+  const stillOpen = await inScope(async () => openQuestions(await owner()));
+  expect(stillOpen.map((q) => q.id)).toEqual([question.id]);
+  expect(request.resumed).toEqual([]);
+});
+
+it("answers a waiting customer through the desk's path once the owner turns it on", async () => {
+  const { token } = await connect();
+  const question = await waitingQuestion();
+  const principal = await owner();
+  await inScope(() => setConnectorMayAnswer(principal, true));
+  const waiting = await rpcResult(await rpc(token, "tools/call", { name: "list_waiting", arguments: {} }));
+  expect(waiting.result!.content![0]!.text).toContain(`question ${question.id}`);
+
+  const answered = await answer(token, question.id);
+  expect(answered.result!.content![0]!.text).toContain("Yes, it will be ready Friday after 10.");
+  expect(await inScope(() => openQuestions(principal))).toEqual([]);
+  // The customer's conversation continues exactly as after a desk answer.
+  expect(request.resumed).toHaveLength(1);
+  expect(request.resumed[0]).toContain("resumeAfterAnswer");
+
+  await inScope(() => setConnectorMayAnswer(principal, false));
+  const again = await answer(token, question.id);
+  expect(again.result!.content![0]!.text).toBe(ANSWER_REFUSAL);
+});
+
+it("does not let the demo visitor turn answering on", async () => {
+  vi.stubEnv("PUBLIC_DEMO", "true");
+  resetServerConfigForTests();
+  request.headers = new Headers({ cookie: `${VIEWER_COOKIE}=${await inScope(() => issueViewerPass())}` });
+  const result = await inScope(() => setConnectorAnswersAction({ allowed: true }));
+  expect(result?.serverError).toBe(VIEWER_REFUSAL);
+  expect(await inScope(() => connectorMayAnswer())).toBe(false);
 });

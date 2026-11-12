@@ -18,6 +18,7 @@ import { AiApps } from "./ai-apps";
 import { setupLine } from "@/lib/agent-setup";
 import { allowedApps } from "@/server/connector/access";
 import { connectorResource } from "@/server/auth/connector";
+import { connectorMayAnswer } from "@/server/domain/connector-settings";
 
 export const metadata: Metadata = { title: "Setup" };
 
@@ -29,7 +30,7 @@ export default async function SetupPage() {
   const readiness = viewer
     ? { ...checked, checks: checked.checks.map((check) => (check.key === "owner" ? { ...check, detail: "You are looking around as a demo visitor. The owner signs in to change anything." } : check)) }
     : checked;
-  const [config, connection, apps, assistant] = await Promise.all([getEffectiveConfig(), describeAiConnection(), allowedApps(owner.userId), getAssistantModel()]);
+  const [config, connection, apps, assistant, mayAnswer] = await Promise.all([getEffectiveConfig(), describeAiConnection(), allowedApps(owner.userId), getAssistantModel(), connectorMayAnswer()]);
   const deskTheme = deskThemeId(
     (await cookies()).get(DESK_THEME_COOKIE)?.value,
   );
@@ -70,7 +71,7 @@ export default async function SetupPage() {
               : "Off; using the reply model for all answers"
         }
       />
-      <AiApps address={connectorResource(config.appUrl)} agentLine={setupLine(config.appUrl)} apps={viewer ? [] : apps} />
+      <AiApps address={connectorResource(config.appUrl)} agentLine={setupLine(config.appUrl)} apps={viewer ? [] : apps} mayAnswer={mayAnswer} readOnly={viewer} />
       {/* The demo desk shows every setting; nothing in these forms can be sent. */}
       <fieldset disabled={viewer} className="min-w-0">
       <PayPalSetup

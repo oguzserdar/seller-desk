@@ -1,0 +1,1 @@
+ALTER TABLE "installation" ADD COLUMN "connector_may_answer" boolean DEFAULT false NOT NULL;

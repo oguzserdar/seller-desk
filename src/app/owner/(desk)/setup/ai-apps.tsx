@@ -3,14 +3,16 @@ import { Badge } from "@/components/arc/badge/badge";
 import { CONNECTOR_CAN, CONNECTOR_CANNOT } from "@/lib/connector-scope";
 import type { AllowedApp } from "@/server/connector/access";
 import { CopyField } from "../install/copy-field";
+import { ConnectorAnswersSwitch } from "./connector-answers-switch";
 import { RemoveAiAppButton } from "./remove-ai-app-button";
 
 /**
  * How the owner connects their own AI apps: one line for a coding agent first (it sets itself up),
  * the connector address for chat apps second, what a connected app can and can never do, and the
- * apps allowed so far. The can/cannot lists are the consent page's own, so both say the same thing.
+ * whether they may answer customers, and the apps allowed so far. The can/cannot lists are the
+ * consent page's own, so both say the same thing. A demo visitor (readOnly) sees the switch disabled.
  */
-export function AiApps({ address, agentLine, apps }: { address: string; agentLine: string; apps: AllowedApp[] }) {
+export function AiApps({ address, agentLine, apps, mayAnswer, readOnly }: { address: string; agentLine: string; apps: AllowedApp[]; mayAnswer: boolean; readOnly: boolean }) {
   return (
     <section id="ai-apps" aria-labelledby="ai-apps-heading" className="surface mt-8 scroll-mt-40 sm:scroll-mt-28 px-5 py-6 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -18,7 +20,7 @@ export function AiApps({ address, agentLine, apps }: { address: string; agentLin
         <Badge tone="neutral">{apps.length ? `${apps.length} connected` : "None connected"}</Badge>
       </div>
       <p className="text-ink-2 mt-2 max-w-2xl text-[15px]">
-        Ask your own AI what needs you today. It reads your desk; you still send every reply from here.
+        Ask your own AI what needs you today. It reads your desk; it answers a customer only if you turn that on below.
       </p>
 
       <div className="bg-sunken mt-5 rounded-xl px-4 py-4">
@@ -62,6 +64,8 @@ export function AiApps({ address, agentLine, apps }: { address: string; agentLin
           </ul>
         </div>
       </div>
+
+      <ConnectorAnswersSwitch allowed={mayAnswer} readOnly={readOnly} />
 
       {apps.length ? (
         <>

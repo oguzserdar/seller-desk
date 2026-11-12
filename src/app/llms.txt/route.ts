@@ -32,10 +32,10 @@ Facts:
 
 - [Setup instructions](${home}/agent-setup/prompt.md): how a coding agent connects itself to this desk
 - [Agent Skills index](${home}/.well-known/agent-skills/index.json): the Seller Desk skill for this installation
-- [Connector (MCP)](${home}/api/mcp): read-only tools for who is waiting, conversations, orders and offers; the owner signs in and approves each app
+- [Connector (MCP)](${home}/api/mcp): tools for who is waiting, conversations, orders and offers, and answering a waiting customer when the owner allows it; the owner signs in and approves each app
 - [Connector metadata](${home}/.well-known/oauth-protected-resource): OAuth protected resource metadata
 
-The connector is read-only. No tool sends a message to a customer, changes an offer, a price, an order or a payment.
+The connector reads the desk. It answers a waiting customer only if the owner turned that on in Setup. No tool changes an offer, a price, an order or a payment.
 `;
   return new Response(text, { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }

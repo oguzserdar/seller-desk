@@ -1,0 +1,1 @@
+ALTER TABLE `installation` ADD `connector_may_answer` integer DEFAULT false NOT NULL CONSTRAINT "installation_connector_may_answer_storage" CHECK("connector_may_answer" is null or (typeof("connector_may_answer") = 'integer' and "connector_may_answer" in (0, 1)));
