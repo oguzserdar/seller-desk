@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: seller_desk
+          POSTGRES_DB: seller_desk_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U seller_desk"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Types, trial schema and source guard
+        run: pnpm check
+      - name: Tests (UI, unit, integration on PostgreSQL)
+        run: pnpm exec vitest run tests/ui tests/unit tests/integration
