@@ -6,12 +6,18 @@ import { expect, it } from "vitest";
 import { hasBlanks } from "@/lib/reply-blanks";
 
 it("finds a blank the owner still has to fill in", () => {
-  expect(hasBlanks("We [do or don't] ship to Canada.")).toBe(true);
-  expect(hasBlanks("Thanks. [Which items, and the cost.]")).toBe(true);
+  expect(hasBlanks("We [[do or don't]] ship to Canada.")).toBe(true);
+  expect(hasBlanks("Thanks. [[Which items, and the cost.]]")).toBe(true);
 });
 
 it("lets a finished reply through", () => {
   expect(hasBlanks("Yes, we ship to Canada for $25.")).toBe(false);
-  expect(hasBlanks("Use the code [] at checkout")).toBe(false);
+  expect(hasBlanks("Use the code [[]] at checkout")).toBe(false);
   expect(hasBlanks("")).toBe(false);
+});
+
+it("lets ordinary brackets through: links, codes, [sic]", () => {
+  expect(hasBlanks("See [our size guide](https://shop.test/size).")).toBe(false);
+  expect(hasBlanks("Use code [SPRING10] at checkout.")).toBe(false);
+  expect(hasBlanks("Pick up at [Unit 4].")).toBe(false);
 });

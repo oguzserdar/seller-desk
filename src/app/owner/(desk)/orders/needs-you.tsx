@@ -83,29 +83,17 @@ function QuestionCard({ item, readOnly, drafts }: { item: CustomerQuestion; read
             ) : null}
             {/* A demo visitor sees the real answer box, switched off, with the reason and the way in. */}
             {draft.result.serverError ? <Alert tone="danger" className="mt-3" title={draft.result.serverError} /> : null}
-            {/* Like a mail app's "help me write": the assistant fills the box; facts the shop has not given stay as [blanks] to fill. */}
+            {/* Like a mail app's "help me write" (under the box, next to Send): the assistant fills the box; facts the shop has not given stay as [[blanks]] to fill. */}
             <div className="relative mt-4">
               <Textarea
                 label="Your answer to the customer"
-                rows={3}
+                rows={4}
                 maxLength={1000}
                 value={answer}
                 onChange={(event) => setAnswer(event.target.value)}
                 disabled={readOnly}
-                className={drafts && !readOnly ? "pb-12" : undefined}
                 placeholder={readOnly ? "In the demo desk you can read this question but not answer it." : "Write it the way you would tell the customer."}
               />
-              {drafts && !readOnly ? (
-                <button
-                  type="button"
-                  onClick={() => draft.execute({ questionId: item.id })}
-                  disabled={draft.isPending}
-                  className="bg-sunken text-ink-2 hover:text-ink absolute bottom-2.5 left-2.5 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors disabled:opacity-70"
-                >
-                  <WritingPen writing={draft.isPending} size={15} />
-                  {draft.isPending ? "Writing…" : "Help me write"}
-                </button>
-              ) : null}
             </div>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
               {readOnly ? (
@@ -113,7 +101,20 @@ function QuestionCard({ item, readOnly, drafts }: { item: CustomerQuestion; read
                   <Link href="/owner/login" className="text-ink decoration-line-strong font-medium underline underline-offset-4">Sign in as the owner</Link> to answer. Your words go to the customer, and the assistant promises nothing more.
                 </p>
               ) : (
-                <p className="text-ink-3 text-[13px]">{blanks ? "Fill in the parts in [brackets], then send." : "The assistant passes on your words. It promises nothing more."}</p>
+                <div className="flex min-w-0 flex-wrap items-center gap-3">
+                  {drafts && !readOnly ? (
+                <button
+                  type="button"
+                  onClick={() => draft.execute({ questionId: item.id })}
+                  disabled={draft.isPending}
+                  className="bg-sunken text-ink-2 hover:text-ink inline-flex shrink-0 h-8 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors disabled:opacity-70"
+                >
+                  <WritingPen writing={draft.isPending} size={15} />
+                  {draft.isPending ? "Writing…" : "Help me write"}
+                </button>
+              ) : null}
+                <p className="text-ink-3 text-[13px]">{blanks ? "Fill in the parts in [[double brackets]], then send." : "The assistant passes on your words. It promises nothing more."}</p>
+                </div>
               )}
               <Button type="submit" variant="primary" loading={send.isPending} disabled={readOnly || answer.trim().length === 0 || blanks}>
                 Send to customer

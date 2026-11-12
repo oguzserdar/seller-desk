@@ -31,7 +31,7 @@ export function AnswerSettings({ drafts, mayAnswer, readOnly }: { drafts: boolea
         onValueChange={(next) => { setMode(next); save.execute({ on: next === "draft" }); }}
         options={[
           { value: "owner", label: "Only me", description: "I write every reply on the desk." },
-          { value: "draft", label: "My assistant drafts, I approve", description: "Help me write fills your answer from your shop knowledge, terms and catalog. Anything your shop has not said is left as a [blank] for you to fill in before you send." },
+          { value: "draft", label: "My assistant drafts, I approve", description: "Help me write fills your answer from your shop knowledge, terms and catalog. Anything your shop has not said is left as a [[blank]] for you to fill in before you send." },
         ]}
       />
       {save.result.serverError ? <p role="alert" className="text-danger mt-2 text-[13px]">{save.result.serverError}</p> : null}
