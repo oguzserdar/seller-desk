@@ -7,7 +7,7 @@
 
 /** What a connected AI app can do. */
 export const CONNECTOR_CAN = [
-  "See buyers and questions waiting for you",
+  "See customers and questions waiting for you",
   "Read conversations, orders and your offers",
   "Answer a customer's waiting question, only if you turn that on in Setup",
 ] as const;
