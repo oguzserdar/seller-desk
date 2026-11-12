@@ -19,6 +19,7 @@ import { DeskChatProvider } from "../desk-chat-context";
 import { DeskAssistant } from "../desk-assistant";
 import { MobileAssistant } from "../mobile-assistant";
 import { DeskGrid } from "./desk-grid";
+import { assistantDraftsAnswers } from "@/server/domain/connector-settings";
 import { ViewSelect } from "./view-select";
 
 export const metadata: Metadata = { title: "Desk" };
@@ -45,7 +46,7 @@ export default async function DeskPage({
     requested !== "needs_attention"
       ? (requested as DeskView)
       : "all_orders";
-  const [result, attention, questions, history, quotesToReview, toTeach] =
+  const [result, attention, questions, history, quotesToReview, toTeach, drafts] =
     await Promise.all([
       queryDesk(owner, { view }),
       queryDesk(owner, { view: "needs_attention" }),
@@ -53,6 +54,7 @@ export default async function DeskPage({
       loadOwnerHistory(owner),
       listQuotesAwaitingReview(owner),
       answersToTeach(owner),
+      assistantDraftsAnswers(),
     ]);
   const allOrders =
     view === "all_orders"
@@ -156,7 +158,7 @@ export default async function DeskPage({
             </div>
           </dl>
           {waiting > 0 ? (
-            <NeedsYou questions={decisions} orders={ordersNeedingYou} readOnly={viewer} />
+            <NeedsYou questions={decisions} orders={ordersNeedingYou} readOnly={viewer} drafts={drafts} />
           ) : null}
           <TeachCard count={toTeach} />
           <div className="mt-12 flex flex-wrap items-center justify-between gap-3">

@@ -211,6 +211,13 @@
       "when": 1794460581481,
       "tag": "20261112051621_connector_may_answer",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1794470912443,
+      "tag": "20261112080832_assistant_drafts_answers",
+      "breakpoints": true
     }
   ]
 }

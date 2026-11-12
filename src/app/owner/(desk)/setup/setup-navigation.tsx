@@ -2,6 +2,7 @@ import { Button } from "@/components/shadcn/button";
 
 const SECTIONS = [
   ["overview", "Overview"],
+  ["answers", "Who answers"],
   ["assistant", "Assistant"],
   ["ai-apps", "AI apps"],
   ["paypal", "PayPal"],

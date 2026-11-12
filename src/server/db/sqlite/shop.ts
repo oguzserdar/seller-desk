@@ -35,6 +35,8 @@ export const installation = sqliteTable(
     aiSettingsSealed: text("ai_settings_sealed"),
     /** The owner let connected AI apps answer customers' waiting questions as them; off until they turn it on in Setup. */
     connectorMayAnswer: boolean("connector_may_answer").default(false).notNull(),
+    // On: the assistant drafts the owner's reply to a waiting question for the owner to send. Off: the owner writes every reply.
+    assistantDraftsAnswers: boolean("assistant_drafts_answers").default(true).notNull(),
     createdAt: createdAt(),
   },
   (t) => [

@@ -12,7 +12,8 @@ vi.mock("next/headers", () => ({ headers: async () => request.headers }));
 // The desk resumes the customer's conversation after answering; record that instead of running a model turn.
 vi.mock("next/server", async (original) => ({ ...(await original<object>()), after: (work: () => unknown) => { request.resumed.push(String(work)); } }));
 import { POST as mcp } from "@/app/api/mcp/route";
-import { setConnectorAnswersAction } from "@/app/owner/(desk)/setup/actions";
+import { setAssistantDraftsAction, setConnectorAnswersAction } from "@/app/owner/(desk)/setup/actions";
+import { draftOwnerReply } from "@/server/ai/owner-reply";
 import { connectorResumeUrl } from "@/lib/connector-resume";
 import { getAuth } from "@/server/auth/auth";
 import { bootstrapOwner } from "@/server/auth/bootstrap";
@@ -22,7 +23,7 @@ import { ANSWER_REFUSAL } from "@/server/connector/tools";
 import { ensureConversation } from "@/server/ai/conversation";
 import { VIEWER_REFUSAL } from "@/server/auth/owner";
 import { VIEWER_COOKIE, issueViewerPass } from "@/server/auth/viewer-pass";
-import { connectorMayAnswer, setConnectorMayAnswer } from "@/server/domain/connector-settings";
+import { assistantDraftsAnswers, connectorMayAnswer, setAssistantDraftsAnswers, setConnectorMayAnswer } from "@/server/domain/connector-settings";
 import { findSellerForUser } from "@/server/domain/seller";
 import { askSeller, openQuestions } from "@/server/domain/seller-questions";
 import { resetServerConfigForTests } from "@/server/env";
@@ -171,8 +172,10 @@ it("answers a waiting customer through the desk's path once the owner turns it o
   expect(answered.result!.content![0]!.text).toContain("Yes, it will be ready Friday after 10.");
   expect(await inScope(() => openQuestions(principal))).toEqual([]);
   // The customer's conversation continues exactly as after a desk answer.
-  expect(request.resumed).toHaveLength(1);
+  // ...and, like a desk answer, the answer is drafted as shop knowledge for the owner to approve.
+  expect(request.resumed).toHaveLength(2);
   expect(request.resumed[0]).toContain("resumeAfterAnswer");
+  expect(request.resumed[1]).toContain("draftLearningReview");
 
   await inScope(() => setConnectorMayAnswer(principal, false));
   const again = await answer(token, question.id);
@@ -186,4 +189,24 @@ it("does not let the demo visitor turn answering on", async () => {
   const result = await inScope(() => setConnectorAnswersAction({ allowed: true }));
   expect(result?.serverError).toBe(VIEWER_REFUSAL);
   expect(await inScope(() => connectorMayAnswer())).toBe(false);
+});
+
+it("starts with the assistant drafting replies, and refuses a draft once the owner chooses only me", async () => {
+  const question = await waitingQuestion();
+  const principal = await owner();
+  expect(await inScope(() => assistantDraftsAnswers())).toBe(true);
+  await inScope(() => setAssistantDraftsAnswers(principal, false));
+  expect(await inScope(() => assistantDraftsAnswers())).toBe(false);
+  await expect(inScope(() => draftOwnerReply(principal, question.id))).rejects.toThrow("Drafting is off");
+  await inScope(() => setAssistantDraftsAnswers(principal, true));
+  expect(await inScope(() => assistantDraftsAnswers())).toBe(true);
+});
+
+it("does not let the demo visitor change who answers", async () => {
+  vi.stubEnv("PUBLIC_DEMO", "true");
+  resetServerConfigForTests();
+  request.headers = new Headers({ cookie: `${VIEWER_COOKIE}=${await inScope(() => issueViewerPass())}` });
+  const result = await inScope(() => setAssistantDraftsAction({ on: false }));
+  expect(result?.serverError).toBe(VIEWER_REFUSAL);
+  expect(await inScope(() => assistantDraftsAnswers())).toBe(true);
 });

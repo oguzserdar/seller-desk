@@ -6,7 +6,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { NeedsYou, TeachCard } from "../../src/app/owner/(desk)/orders/needs-you";
 import { needsYouLabel } from "../../src/server/domain/desk-count";
 
-const actions = vi.hoisted(() => ({ answerQuestionAction: vi.fn() }));
+const actions = vi.hoisted(() => ({ answerQuestionAction: vi.fn(), draftReplyAction: vi.fn() }));
 vi.mock("../../src/app/owner/(desk)/actions", () => actions);
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 vi.mock("next-safe-action/hooks", () => ({ useAction: () => ({ execute: vi.fn(), isPending: false, result: {} }) }));

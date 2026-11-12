@@ -16,7 +16,8 @@ import { LinkButton } from "@/components/link-button";
 import { GraduationCap } from "lucide-react";
 import { Alert } from "@/components/arc/alert/alert";
 import { needsYouLabel } from "@/server/domain/desk-count";
-import { answerQuestionAction } from "../actions";
+import { answerQuestionAction, draftReplyAction } from "../actions";
+import { Sparkles } from "lucide-react";
 import type { CustomerQuestion } from "../customer-questions";
 
 /** An order that waits on the owner, as one Desk row. */
@@ -26,7 +27,7 @@ export type NeedsYouOrder = { id: string; ref: string; items: string; amount: st
 const ASKED: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" };
 const enter = { duration: motionTokens.duration.standard, ease: [...motionTokens.ease.enter] } as const;
 
-function QuestionCard({ item, readOnly }: { item: CustomerQuestion; readOnly: boolean }) {
+function QuestionCard({ item, readOnly, drafts }: { item: CustomerQuestion; readOnly: boolean; drafts: boolean }) {
   const router = useRouter();
   const reduce = useReducedMotion();
   const [answer, setAnswer] = useState("");
@@ -36,6 +37,13 @@ function QuestionCard({ item, readOnly }: { item: CustomerQuestion; readOnly: bo
       // Runs in the browser after the send, so the owner's own clock is right.
       setSentAt(new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date()));
       router.refresh();
+    },
+  });
+  const [missing, setMissing] = useState<string | null>(null);
+  const draft = useAction(draftReplyAction, {
+    onSuccess: ({ data }) => {
+      if (!data) return;
+      if (data.reply) { setAnswer(data.reply); setMissing(null); } else setMissing(data.missing);
     },
   });
   const details = [item.customerGoal, ...item.knownFacts].filter((line) => line.trim().length > 0);
@@ -78,7 +86,15 @@ function QuestionCard({ item, readOnly }: { item: CustomerQuestion; readOnly: bo
               </Link>
             ) : null}
             {/* A demo visitor sees the real answer box, switched off, with the reason and the way in. */}
-            <div className="mt-4">
+            {draft.result.serverError ? <Alert tone="danger" className="mt-3" title={draft.result.serverError} /> : null}
+            {/* Like a mail app's "help me write": the assistant drafts inside the box; a gap in the shop's facts is named above it. */}
+            <div className="relative mt-4">
+              {missing ? (
+                <p role="status" className="text-ink-2 mb-2 flex items-start gap-2 text-[14px]">
+                  <Sparkles size={15} aria-hidden className="text-ink-3 mt-0.5 shrink-0" />
+                  <span>Your shop has not said this yet: <span className="text-ink font-medium">{missing.replace(/[.\s]+$/, "")}</span>. Your answer teaches it.</span>
+                </p>
+              ) : null}
               <Textarea
                 label="Your answer to the customer"
                 rows={3}
@@ -86,8 +102,20 @@ function QuestionCard({ item, readOnly }: { item: CustomerQuestion; readOnly: bo
                 value={answer}
                 onChange={(event) => setAnswer(event.target.value)}
                 disabled={readOnly}
+                className={drafts && !readOnly ? "pb-12" : undefined}
                 placeholder={readOnly ? "In the demo desk you can read this question but not answer it." : "Write it the way you would tell the customer."}
               />
+              {drafts && !readOnly ? (
+                <button
+                  type="button"
+                  onClick={() => draft.execute({ questionId: item.id })}
+                  disabled={draft.isPending}
+                  className="bg-sunken text-ink-2 hover:text-ink absolute bottom-2.5 left-2.5 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors disabled:opacity-70"
+                >
+                  <Sparkles size={14} aria-hidden className={draft.isPending ? "animate-pulse" : undefined} />
+                  {draft.isPending ? "Writing…" : "Help me write"}
+                </button>
+              ) : null}
             </div>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
               {readOnly ? (
@@ -129,7 +157,7 @@ function OrderRow({ order }: { order: NeedsYouOrder }) {
 }
 
 /** Everything that waits on the owner, under one count: customer questions first, then orders. */
-export function NeedsYou({ questions, orders, readOnly = false }: { questions: CustomerQuestion[]; orders: NeedsYouOrder[]; readOnly?: boolean }) {
+export function NeedsYou({ questions, orders, readOnly = false, drafts = false }: { questions: CustomerQuestion[]; orders: NeedsYouOrder[]; readOnly?: boolean; drafts?: boolean }) {
   const count = questions.length + orders.length;
   return (
     <section aria-label={`Needs you: ${count}`} className="mt-8">
@@ -141,7 +169,7 @@ export function NeedsYou({ questions, orders, readOnly = false }: { questions: C
         <p className="text-ink-2 mt-3 text-[15px]">{needsYouLabel(0)}. New questions and orders that need you appear here.</p>
       ) : (
         <ul className="mt-3 flex flex-col gap-3">
-          {questions.map((item) => <QuestionCard key={item.id} item={item} readOnly={readOnly} />)}
+          {questions.map((item) => <QuestionCard key={item.id} item={item} readOnly={readOnly} drafts={drafts} />)}
           {orders.map((order) => <OrderRow key={order.id} order={order} />)}
         </ul>
       )}

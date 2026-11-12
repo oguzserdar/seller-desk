@@ -3,7 +3,6 @@ import { Badge } from "@/components/arc/badge/badge";
 import { CONNECTOR_CAN, CONNECTOR_CANNOT } from "@/lib/connector-scope";
 import type { AllowedApp } from "@/server/connector/access";
 import { CopyField } from "../install/copy-field";
-import { ConnectorAnswersSwitch } from "./connector-answers-switch";
 import { RemoveAiAppButton } from "./remove-ai-app-button";
 
 /**
@@ -12,7 +11,7 @@ import { RemoveAiAppButton } from "./remove-ai-app-button";
  * whether they may answer customers, and the apps allowed so far. The can/cannot lists are the
  * consent page's own, so both say the same thing. A demo visitor (readOnly) sees the switch disabled.
  */
-export function AiApps({ address, agentLine, apps, mayAnswer, readOnly }: { address: string; agentLine: string; apps: AllowedApp[]; mayAnswer: boolean; readOnly: boolean }) {
+export function AiApps({ address, agentLine, apps, readOnly }: { address: string; agentLine: string; apps: AllowedApp[]; readOnly: boolean }) {
   return (
     <section id="ai-apps" aria-labelledby="ai-apps-heading" className="surface mt-8 scroll-mt-40 sm:scroll-mt-28 px-5 py-6 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -65,7 +64,7 @@ export function AiApps({ address, agentLine, apps, mayAnswer, readOnly }: { addr
         </div>
       </div>
 
-      <ConnectorAnswersSwitch allowed={mayAnswer} readOnly={readOnly} />
+      <p className="text-ink-2 mt-6 text-[14px]">Whether a connected app may answer customers is set under <a href="#answers" className="text-ink font-medium underline underline-offset-4">Who answers customers&apos; waiting questions</a>.</p>
 
       {apps.length ? (
         <>

@@ -5,6 +5,8 @@ import { after } from "next/server";
 import { z } from "zod";
 import { ownerAction } from "@/server/actions/safe-action";
 import { resumeAfterAnswer } from "@/server/ai/resume";
+import { draftLearningReview } from "@/server/ai/learning-review";
+import { draftOwnerReply } from "@/server/ai/owner-reply";
 import { retryAccess } from "@/server/domain/digital";
 import { CompletePickupInput, completePickup, recordServiceFollowUp, ServiceFollowUpInput } from "@/server/domain/orders";
 import { DecideInput, decideProposal } from "@/server/domain/proposals";
@@ -83,6 +85,14 @@ export const answerQuestionAction = ownerAction
     const answered = await answerQuestion(ctx.owner, parsedInput);
     // The customer's conversation continues after this response is sent; if that run fails, the job runner retries it.
     after(() => resumeAfterAnswer(answered.id));
+    // Like a support team's knowledge drafts: the answer is drafted as shop knowledge for the owner to
+    // approve, so the next customer can get it from the assistant. A failed draft leaves the answer sent.
+    after(() => draftLearningReview(ctx.owner, answered.id).catch(() => undefined));
     revalidatePath("/owner", "layout");
     return { state: answered.state };
   });
+
+/** Drafts a reply to a waiting question from the shop's own facts; the owner reads and sends it. */
+export const draftReplyAction = ownerAction
+  .inputSchema(z.object({ questionId: z.uuid() }).strict())
+  .action(async ({ parsedInput, ctx }) => draftOwnerReply(ctx.owner, parsedInput.questionId));

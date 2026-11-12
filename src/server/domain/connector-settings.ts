@@ -1,7 +1,8 @@
 /**
- * Whether the owner lets connected AI apps answer customers' waiting questions as them.
+ * Who answers customers' waiting questions: whether the assistant drafts the owner's reply, and whether
+ * connected AI apps may answer as the owner.
  *
- * Off until the owner turns it on in Setup. The connector reads it on every call, so turning it
+ * Drafting is on by default and connected apps are off until the owner turns them on in Setup. The connector reads it on every call, so turning it
  * off stops the next answer at once. Every change is audited.
  */
 import { getDb, transaction } from "@/server/db/client";
@@ -33,6 +34,35 @@ export async function setConnectorMayAnswer(owner: OwnerPrincipal, allowed: bool
       actor: "owner",
       actorId: owner.userId,
       operation: allowed ? "allow_connector_answers" : "stop_connector_answers",
+      targetType: "installation",
+      outcome: "ok",
+    });
+  });
+}
+
+/** True when the assistant drafts the owner's reply to a waiting question (the owner still sends it). */
+export async function assistantDraftsAnswers(): Promise<boolean> {
+  const backend = getStorage();
+  if (backend.kind === "d1") return backend.connectorSettings.readAssistantDraftsAnswers();
+  const [row] = await getDb().select({ on: installation.assistantDraftsAnswers }).from(installation);
+  return row?.on ?? true;
+}
+
+/**
+ * Chooses between "only I answer" (off) and "my assistant drafts, I approve" (on), with an audit entry.
+ *
+ * @param owner - The signed-in owner (never the demo visitor; the action refuses it first)
+ * @param on - True lets the assistant draft replies for the owner to send
+ */
+export async function setAssistantDraftsAnswers(owner: OwnerPrincipal, on: boolean): Promise<void> {
+  const backend = getStorage();
+  if (backend.kind === "d1") return backend.connectorSettings.writeAssistantDraftsAnswers(owner, on);
+  await transaction(getDb(), async (tx) => {
+    await tx.update(installation).set({ assistantDraftsAnswers: on });
+    await recordAudit(tx, {
+      actor: "owner",
+      actorId: owner.userId,
+      operation: on ? "assistant_drafts_answers" : "owner_writes_answers",
       targetType: "installation",
       outcome: "ok",
     });

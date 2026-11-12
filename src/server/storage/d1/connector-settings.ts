@@ -4,7 +4,8 @@ import { sql } from "drizzle-orm";
 import type { D1Db } from "./client";
 import { batchGuard, clearBatchGuards, ownerScope } from "./guards";
 
-/** Whether connected AI apps may answer customers, on the installation row, with its audit in the same batch. */
+/** Who answers waiting questions (assistant drafts, connected apps), on the installation row, with each change audited in the same batch.
+ * Earlier: whether connected AI apps may answer customers, on the installation row, with its audit in the same batch. */
 export function createD1ConnectorSettings(db: D1Db) {
   return {
     async readConnectorMayAnswer(): Promise<boolean> {
@@ -13,6 +14,31 @@ export function createD1ConnectorSettings(db: D1Db) {
         .from(installation)
         .where(sql`${installation.singleton}=1`);
       return row?.allowed ?? false;
+    },
+    async readAssistantDraftsAnswers(): Promise<boolean> {
+      const [row] = await db
+        .select({ on: installation.assistantDraftsAnswers })
+        .from(installation)
+        .where(sql`${installation.singleton}=1`);
+      return row?.on ?? true;
+    },
+    async writeAssistantDraftsAnswers(owner: OwnerPrincipal, on: boolean): Promise<void> {
+      const execution = crypto.randomUUID();
+      await db.batch([
+        batchGuard(db, `${execution}:owner`, ownerScope(owner)),
+        db
+          .update(installation)
+          .set({ assistantDraftsAnswers: on })
+          .where(sql`${installation.singleton}=1`),
+        db.insert(auditEvent).values({
+          actor: "owner",
+          actorId: owner.userId,
+          operation: on ? "assistant_drafts_answers" : "owner_writes_answers",
+          targetType: "installation",
+          outcome: "ok",
+        }),
+        clearBatchGuards(db, execution),
+      ]);
     },
     async writeConnectorMayAnswer(owner: OwnerPrincipal, allowed: boolean): Promise<void> {
       const execution = crypto.randomUUID();

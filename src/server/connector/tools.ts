@@ -9,6 +9,7 @@ import { after } from "next/server";
 import * as z from "zod";
 import { conversationText } from "@/lib/conversation-messages";
 import { formatMoney } from "@/lib/money";
+import { draftLearningReview } from "@/server/ai/learning-review";
 import { resumeAfterAnswer } from "@/server/ai/resume";
 import { connectorMayAnswer } from "@/server/domain/connector-settings";
 import { DESK_VIEWS, queryDesk } from "@/server/domain/desk";
@@ -117,6 +118,7 @@ export function buildConnectorServer(owner: OwnerPrincipal): McpServer {
       const answered = await answerQuestion(owner, { questionId: question.id, expectedRevision: question.revision, answer });
       // The same follow-up the desk runs: the customer's conversation continues after this response.
       after(() => resumeAfterAnswer(answered.id));
+      after(() => draftLearningReview(owner, answered.id).catch(() => undefined));
       return `Answered. The customer gets: "${answered.answer}"`;
     },
     ANSWER,

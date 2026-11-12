@@ -6,7 +6,7 @@ import { z } from "zod";
 import { DESK_THEME_COOKIE, DESK_THEME_IDS } from "@/lib/desk-themes";
 import { ownerAction } from "@/server/actions/safe-action";
 import { removeApp } from "@/server/connector/access";
-import { setConnectorMayAnswer } from "@/server/domain/connector-settings";
+import { setAssistantDraftsAnswers, setConnectorMayAnswer } from "@/server/domain/connector-settings";
 import { verifyAiSetup } from "@/server/ai/setup-check";
 import { requireUsage } from "@/server/domain/usage";
 import { recordModelCheck } from "@/server/domain/model-check";
@@ -89,4 +89,12 @@ export const setConnectorAnswersAction = ownerAction.inputSchema(z.object({ allo
   await setConnectorMayAnswer(ctx.owner, parsedInput.allowed);
   revalidatePath("/owner/setup");
   return { allowed: parsedInput.allowed };
+});
+
+/** Chooses between "only I answer" and "my assistant drafts, I approve". */
+export const setAssistantDraftsAction = ownerAction.inputSchema(z.object({ on: z.boolean() }).strict()).action(async ({ parsedInput, ctx }) => {
+  await setAssistantDraftsAnswers(ctx.owner, parsedInput.on);
+  revalidatePath("/owner/setup");
+  revalidatePath("/owner/orders");
+  return { on: parsedInput.on };
 });

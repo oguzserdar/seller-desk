@@ -1,0 +1,1 @@
+ALTER TABLE "installation" ADD COLUMN "assistant_drafts_answers" boolean DEFAULT true NOT NULL;

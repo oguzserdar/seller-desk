@@ -1,0 +1,1 @@
+ALTER TABLE `installation` ADD `assistant_drafts_answers` integer DEFAULT true NOT NULL CONSTRAINT "installation_assistant_drafts_answers_storage" CHECK("assistant_drafts_answers" is null or (typeof("assistant_drafts_answers") = 'integer' and "assistant_drafts_answers" in (0, 1)));
