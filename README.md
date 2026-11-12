@@ -1,6 +1,6 @@
 # Seller Desk
 
-**A small shop's own AI sales assistant: it answers customers from the shop's real catalog at any hour, learns what the owner teaches it, and closes the sale with a verified PayPal payment.**
+**Your shop's own AI sales assistant: it answers customers from the shop's real catalog at any hour, learns what the owner teaches it, and closes the sale with a verified PayPal payment.**
 
 **Who it's for:** any business that takes PayPal and still answers customers by hand, such as a bike repairer, a maker or a tutor. A question that arrives at 9 pm and waits until morning is often a sale lost.
 
