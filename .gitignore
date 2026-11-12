@@ -37,3 +37,4 @@ design/**/codex.log
 
 # AG Studio licence key, pasted locally, never committed
 .ag-studio-key
+.vercel
