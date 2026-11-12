@@ -34,7 +34,7 @@ export function homeMetadata(indexable: boolean): Metadata {
 }
 
 // The headline's face: a high-contrast serif, set large against the field of squares. Loaded only here.
-const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif", display: "swap" });
+const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif", display: "swap", preload: false });
 
 const SOURCE = "https://github.com/oguzserdar/seller-desk";
 const TEST_GUIDE = `${SOURCE}/blob/main/docs/how-to-test.md`;
