@@ -42,7 +42,7 @@ export function ScopeReview({ quoteId, revision, defaultScope, currency, lines, 
       {customLines.map((line) => (
         <Input key={line.offerId} label={`${line.title}: price per item (${currency})`} description={`Quantity: ${line.quantity}. Include tax according to your shop terms.`} id={`price-${line.offerId}`} inputMode="decimal" placeholder="Enter your price" value={prices[line.offerId] ?? ""} onChange={(event) => setPrices((current) => ({ ...current, [line.offerId]: event.target.value }))} />
       ))}
-      {customLines.length > 0 ? <p className="text-[15px] font-semibold" aria-live="polite">{total === null ? "Enter each price to see the total." : `Total for the buyer: ${formatMoney(total, currency)}`}</p> : null}
+      {customLines.length > 0 ? <p className="text-[15px] font-semibold" aria-live="polite">{total === null ? "Enter each price to see the total." : `Total for the customer: ${formatMoney(total, currency)}`}</p> : null}
       <Textarea label="Confirmed scope" description="Exactly what the price covers. The customer sees this before paying. Do not promise a time here." id="scope" rows={4} value={scope} onChange={(e) => setScope(e.target.value)} maxLength={1000} />
       {questionToAnswer ? <section className="flex flex-col gap-3 border-t border-line pt-4" aria-label="Customer question with this quote">
         <h3 className="text-[15px] font-semibold">They also asked</h3>
