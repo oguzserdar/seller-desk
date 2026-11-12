@@ -35,3 +35,18 @@ it("starts blank and does not apply a typed answer to a refreshed different ques
     expect(container.querySelector<HTMLTextAreaElement>("#quote-answer")!.value).toBe("Tuesday is not confirmed.");
   } finally { await act(async () => root.unmount()); container.remove(); vi.unstubAllGlobals(); vi.resetAllMocks(); }
 });
+
+it("replaces the form with a sent confirmation once the quote is sent, instead of showing the same form again", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  actions.approveScopeAction.mockResolvedValue({ data: { quoteId: "quote-2", revision: 2, status: "review_ready" } });
+  const container = document.createElement("div"); document.body.appendChild(container); const root = createRoot(container);
+  const props = { quoteId: "quote", revision: 1, defaultScope: "Replace the front brake cable", currency: "USD", lines: [{ offerId: "service", title: "Brake service", quantity: 1, unitAmountMinor: 9500 }] };
+  try {
+    await act(async () => { root.render(createElement(ScopeReview, props)); });
+    await act(async () => { named(container, "Send quote to customer")!.click(); });
+    expect(container.textContent).toContain("Quote sent to the customer");
+    expect(container.textContent).toContain("$95.00");
+    expect(container.querySelector<HTMLAnchorElement>('a[href="/owner/quotes/quote-2"]')).not.toBeNull();
+    expect(named(container, "Send quote to customer")).toBeUndefined();
+  } finally { await act(async () => root.unmount()); container.remove(); vi.unstubAllGlobals(); vi.resetAllMocks(); }
+});

@@ -1,7 +1,9 @@
 "use client";
 
 import { useAction } from "next-safe-action/hooks";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CircleCheck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/arc/button/button";
 import { Alert } from "@/components/arc/alert/alert";
@@ -24,9 +26,13 @@ export function ScopeReview({ quoteId, revision, defaultScope, currency, lines, 
   const parsedPrices = customLines.map((line) => ({ offerId: line.offerId, unitAmountMinor: parsePriceInput(prices[line.offerId] ?? "", currency) }));
   const validPrices = parsedPrices.every((price) => price.unitAmountMinor !== null && price.unitAmountMinor <= 10_000_000);
   const total = validPrices ? lines.reduce((sum, line) => sum + (line.unitAmountMinor ?? parsedPrices.find((price) => price.offerId === line.offerId)?.unitAmountMinor ?? 0) * line.quantity, 0) : null;
+  // On success the form gives way to a confirmation (like the desk's answer card). A push to the new
+  // quote here raced the action's own re-render on vinext and left the old form on screen.
+  const [sent, setSent] = useState<{ quoteId: string; at: string; total: string | null } | null>(null);
   const approve = useAction(approveScopeAction, {
     onSuccess: ({ data }) => {
-      if (data) router.push(`/owner/quotes/${data.quoteId}`);
+      if (!data) return;
+      setSent({ quoteId: data.quoteId, at: new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date()), total: total === null ? null : formatMoney(total, currency) });
     },
   });
   const decline = useAction(declineQuoteAction, {
@@ -35,6 +41,18 @@ export function ScopeReview({ quoteId, revision, defaultScope, currency, lines, 
       router.refresh();
     },
   });
+  if (sent) {
+    return (
+      <section role="status" className="surface mt-5 flex flex-col gap-3 p-5">
+        <p className="flex items-center gap-2.5 text-[17px] font-semibold">
+          <CircleCheck aria-hidden className="text-success size-5 shrink-0" />
+          Quote sent to the customer at {sent.at}
+        </p>
+        <p className="text-ink-2 text-[15px]">{sent.total ? `They see ${sent.total} and can pay with PayPal.` : "They can review it and pay with PayPal."} Nothing is charged until they approve in PayPal.</p>
+        <Link href={`/owner/quotes/${sent.quoteId}`} className="text-ink decoration-line-strong self-start text-[15px] font-semibold underline underline-offset-4">View the sent quote</Link>
+      </section>
+    );
+  }
   const error = approve.result.serverError ?? decline.result.serverError ?? (approve.result.validationErrors ? "Check the scope and prices before sending." : null);
   return (
     <section className="surface mt-5 flex flex-col gap-4 p-5">
