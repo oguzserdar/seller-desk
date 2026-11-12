@@ -6,7 +6,7 @@
 
 **The one rule:** the AI talks, the server decides money. The assistant answers from the shop's real prices, stock and terms. It cannot invent a price, change a total or mark anything paid. A haggler, a fake "system" message, a tampered amount, a forged webhook and a double payment all end the same way: refused, or one order and one payment.
 
-[Live demo](https://sellerdesk.dev) · [Demo film (2:47)](https://youtu.be/n_DQS2b5YT4) · [Try the shop](https://sellerdesk.dev/buy) · [How to test it](docs/how-to-test.md) · [How the AI works](#how-the-ai-works) · [How PayPal is used](#how-paypal-is-used) · [Install](#deploy)
+[Live demo](https://sellerdesk.dev) · [Try the shop](https://sellerdesk.dev/buy) · [How to test it](docs/how-to-test.md) · [How the AI works](#how-the-ai-works) · [How PayPal is used](#how-paypal-is-used) · [Install](#deploy)
 
 ![Seller Desk in motion: the shop catalog, a quote with Pay with PayPal, a service order and the owner's desk](docs/media/hero.gif)
 
