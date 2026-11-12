@@ -109,7 +109,7 @@ export default async function DeskPage({
                 href="/owner/setup#assistant"
                 className="text-ink font-medium underline underline-offset-4"
               >
-                Connect AI
+                Connect your assistant
               </Link>{" "}
               when you&apos;re ready.
             </p>

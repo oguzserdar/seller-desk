@@ -30,8 +30,8 @@ export function AiSetup({
           Assistant
         </h2>
         <p className="text-ink-2 mt-2 max-w-xl text-[15px] leading-relaxed">
-          Answer from your catalog and approved shop information. Seller actions
-          still need your approval.
+          Your assistant answers from your offers and approved shop facts.
+          Anything that changes an order still needs your approval.
         </p>
       </div>
       <div className="px-5 pt-6 sm:px-7">

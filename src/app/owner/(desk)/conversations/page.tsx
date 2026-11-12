@@ -65,7 +65,7 @@ export default async function ConversationsPage({
             title="Your customer conversations start here"
             description={
               aiStatus === "ready"
-                ? "New customer messages will appear here. Open your shop to try the buyer experience."
+                ? "New customer messages appear here. Open your shop to try it as a customer."
                 : "Connect your assistant so customers can ask questions. Their conversations and requests will appear here."
             }
             icon={<MessageSquare size={24} aria-hidden />}

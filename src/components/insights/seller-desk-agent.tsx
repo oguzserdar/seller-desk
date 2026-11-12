@@ -53,7 +53,7 @@ type Facts = ReturnType<typeof shopFacts>;
 type Row = Record<string, string | number>;
 
 const INSTRUCTIONS =
-  "You are the Seller Desk analyst for a small shop that sells through PayPal. Start from the shop tools " +
+  "You are the Seller Desk analyst for a shop that sells through PayPal. Start from the shop tools " +
   "(shop_pulse, customers_waiting, restock_watch, top_sellers); use Studio's data tools for anything else. " +
   "Answer in two to five short sentences with dollar amounts, then offer one useful next step. Name customers " +
   "by their Customer label. To add or change charts, pages or filters, delegate to the page or widget agent " +

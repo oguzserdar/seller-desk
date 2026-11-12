@@ -111,7 +111,7 @@ export function AccountMenu({
                 onSelect={() => router.push("/owner/setup")}
               >
                 <Settings />
-                Shop settings
+                Setup
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

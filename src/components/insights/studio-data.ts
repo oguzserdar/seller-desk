@@ -59,7 +59,7 @@ export function studioData(data: InsightsData): AgDataSourcesDefinition {
   const money = new Intl.NumberFormat("en-US", { style: "currency", currency: data.currency });
   return {
     description:
-      `A small shop's sales desk. Seller Desk's AI assistant answers customers, builds quotes and takes payment through PayPal; ` +
+      `A shop's sales desk. Seller Desk's AI assistant answers customers, builds quotes and takes payment through PayPal; ` +
       `the owner answers what it cannot know. Money is in ${data.currency}. Orders are paid orders only: PayPal confirmed each one.`,
     sources: [
       {

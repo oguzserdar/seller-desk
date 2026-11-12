@@ -21,8 +21,8 @@ export type TrialOffer = { id: string; title: string; kind: string; unitAmountMi
 const ACTORS = [
   { value: "customer", label: "Customer follows up" },
   { value: "simulated_customer", label: "Simulated customer plays a part" },
-  { value: "seller_reply", label: "Seller answers a question" },
-  { value: "approve_scope", label: "Seller approves service scope" },
+  { value: "seller_reply", label: "You answer a question" },
+  { value: "approve_scope", label: "You approve the service scope" },
   { value: "pay_quote", label: "Customer pays the exact quote (fictional)" },
 ];
 
@@ -132,6 +132,6 @@ function PurchaseStep({ step, offers, onChange }: { step: Extract<SimulationStep
       if (next) changeLines([...step.expected.lines, { sourceOfferId: next.id, quantity: 1 }]);
     }}>Add another offer</Button>
     <Input label={`Exact full total (${step.expected.currency})`} inputMode="decimal" defaultValue={(step.expected.totalMinor / 100).toFixed(2)} description={totalHint} onChange={e => onChange({ ...step, expected: { ...step.expected, totalMinor: parsePriceInput(e.target.value, step.expected.currency) ?? 0 } })} />
-    {step.kind === "approve_scope" ? <Textarea label="Scope the seller approves" value={step.scope} onChange={e => onChange({ ...step, scope: e.target.value })} minLength={3} maxLength={1000} rows={2} /> : <Select label="Payment condition" value={step.fault} onValueChange={fault => onChange({ ...step, fault: fault as "none" | "lost_capture_and_download" })} options={[{ value: "none", label: "Ordinary fictional checkout" }, { value: "lost_capture_and_download", label: "Lose the capture response and retry download delivery" }]} />}
+    {step.kind === "approve_scope" ? <Textarea label="Scope the seller approves" value={step.scope} onChange={e => onChange({ ...step, scope: e.target.value })} minLength={3} maxLength={1000} rows={2} /> : <Select label="Payment condition" value={step.fault} onValueChange={fault => onChange({ ...step, fault: fault as "none" | "lost_capture_and_download" })} options={[{ value: "none", label: "Ordinary fictional checkout" }, { value: "lost_capture_and_download", label: "PayPal reply lost, download sent again" }]} />}
   </div>;
 }

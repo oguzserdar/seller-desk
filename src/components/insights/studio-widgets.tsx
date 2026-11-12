@@ -115,7 +115,7 @@ function WhoAnswered(params: AgWidgetParams) {
         {part("Waiting for you", "brought to you", needed, "owner")}
       </div>
       <p className="insights-split-note">
-        {all ? `${Math.round((alone / all) * 100)}% of ${all} conversations needed nobody but the assistant.` : "No conversations yet."} Tap a side to
+        {all ? `The assistant handled ${Math.round((alone / all) * 100)}% of ${all} conversations on its own.` : "No conversations yet."} Tap a side to
         filter this page.
       </p>
     </div>

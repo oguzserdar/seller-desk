@@ -263,7 +263,7 @@ export function OfferForm({
           {!quotedPerRequest ? (
             <Input
               label={`Price (${currency})`}
-              description="Includes tax as your tax statement says."
+              description="Include tax the way your tax statement in Setup says."
               id="price"
               inputMode="decimal"
               value={price}
@@ -286,7 +286,7 @@ export function OfferForm({
         {kind === "goods" ? (
           <Input
             label="In stock"
-            description="Units still for sale or held for checkouts in progress count against this."
+            description="Units for sale now, including any held in open checkouts."
             id="stock"
             type="number"
             min={0}

@@ -18,7 +18,7 @@ it("starts blank and does not apply a typed answer to a refreshed different ques
   try {
     await act(async () => { root.render(createElement(ScopeReview, props)); });
     expect(container.querySelector<HTMLTextAreaElement>("#quote-answer")!.value).toBe("");
-    await act(async () => { named(container, "Send quote to buyer")!.click(); });
+    await act(async () => { named(container, "Send quote to customer")!.click(); });
     expect(actions.approveScopeAction.mock.calls[0]?.[0].answer).toBeUndefined();
     actions.approveScopeAction.mockClear();
     await act(async () => {

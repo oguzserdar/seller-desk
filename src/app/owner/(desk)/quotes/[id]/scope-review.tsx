@@ -43,7 +43,7 @@ export function ScopeReview({ quoteId, revision, defaultScope, currency, lines, 
         <Input key={line.offerId} label={`${line.title}: price per item (${currency})`} description={`Quantity: ${line.quantity}. Include tax according to your shop terms.`} id={`price-${line.offerId}`} inputMode="decimal" placeholder="Enter your price" value={prices[line.offerId] ?? ""} onChange={(event) => setPrices((current) => ({ ...current, [line.offerId]: event.target.value }))} />
       ))}
       {customLines.length > 0 ? <p className="text-[15px] font-semibold" aria-live="polite">{total === null ? "Enter each price to see the total." : `Total for the buyer: ${formatMoney(total, currency)}`}</p> : null}
-      <Textarea label="Confirmed scope" description="Exactly what the price covers. The buyer sees this before paying. Do not promise a time here." id="scope" rows={4} value={scope} onChange={(e) => setScope(e.target.value)} maxLength={1000} />
+      <Textarea label="Confirmed scope" description="Exactly what the price covers. The customer sees this before paying. Do not promise a time here." id="scope" rows={4} value={scope} onChange={(e) => setScope(e.target.value)} maxLength={1000} />
       {questionToAnswer ? <section className="flex flex-col gap-3 border-t border-line pt-4" aria-label="Customer question with this quote">
         <h3 className="text-[15px] font-semibold">They also asked</h3>
         <p className="text-[14px] leading-relaxed text-ink-2">{questionToAnswer.question}</p>
@@ -58,10 +58,10 @@ export function ScopeReview({ quoteId, revision, defaultScope, currency, lines, 
           approve.execute({ quoteId, expectedRevision: revision, approvedScope: scope, prices: parsedPrices.map((price) => ({ offerId: price.offerId, unitAmountMinor: price.unitAmountMinor! })), ...(questionToAnswer && answer.trim() ? { answer: { questionId: questionToAnswer.id, expectedRevision: questionToAnswer.revision, answer: answer.trim() } } : {}) });
         }}
       >
-        {questionToAnswer && answer.trim() ? "Send quote and answer" : "Send quote to buyer"}
+        {questionToAnswer && answer.trim() ? "Send quote and answer" : "Send quote to customer"}
       </Button>
       <hr className="border-line" />
-      <Textarea label="Or decline, with a reason the buyer sees" id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} />
+      <Textarea label="Or decline it. The customer sees your reason." id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} />
       <Button
         variant="danger"
         className="self-start"

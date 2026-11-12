@@ -276,7 +276,7 @@ export function PublishFinding({
           options={[
             ...(finding.kind === "product_rule"
               ? []
-              : [{ value: "", label: "All customers" }]),
+              : [{ value: "", label: "The whole shop" }]),
             ...products.map((product) => ({
               value: product.id,
               label: product.title,

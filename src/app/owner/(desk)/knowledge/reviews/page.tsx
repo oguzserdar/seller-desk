@@ -11,7 +11,7 @@ import { ReviewWorkspace } from "./review-workspace";
 
 export const maxDuration = 120;
 
-export const metadata: Metadata = { title: "Review seller answers" };
+export const metadata: Metadata = { title: "Learn from your answers" };
 
 /** Authenticated review workspace; customer source material remains private to the owner. */
 export default async function ReviewsPage() {

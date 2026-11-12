@@ -25,7 +25,7 @@ export default async function OffersPage() {
         <div>
           <h1 className="page-title">Offers</h1>
           <p className="text-ink-2 mt-1">
-            {published} of {offers.length} published. Buyers see published offers only; fixed prices and your reviewed custom quotes are the only prices the assistant can use.
+            {published} of {offers.length} published. Customers see published offers only. The assistant uses only these prices and quotes you approved.
           </p>
         </div>
         {/* A demo visitor browses the catalog; adding and importing are the owner's. */}

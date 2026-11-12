@@ -213,7 +213,7 @@ export async function getReadiness(sellerRow: SellerRow): Promise<Readiness> {
           state: "fail",
           detail:
             "Complete one purchase on the buyer page to prove the whole path.",
-          fix: { label: "Open the buyer page", href: "/buy" },
+          fix: { label: "Open customer shop", href: "/buy" },
         },
   );
 

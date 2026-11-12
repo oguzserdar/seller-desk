@@ -145,7 +145,7 @@ export function DeskGrid({
           data ? <NextStep row={data} /> : null,
       },
       // Kept for the CSV export; the buyer name lives on the order page.
-      { field: "who", headerName: "Buyer", hide: true },
+      { field: "who", headerName: "Customer", hide: true },
       // The payment state in words with a mark, so a paid row never relies on colour alone.
       {
         field: "status",
@@ -244,7 +244,7 @@ export function DeskGrid({
           <SearchField
             label="Search this view"
             id="desk-search"
-            placeholder="Order, buyer or item"
+            placeholder="Order, customer or item"
             value={search}
             onValueChange={setSearch}
           />

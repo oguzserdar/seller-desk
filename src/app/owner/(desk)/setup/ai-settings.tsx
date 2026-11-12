@@ -59,7 +59,7 @@ const PROVIDERS = {
 const ROUTING_CONNECTIONS = {
   off: {
     label: "Off",
-    description: "Your reply model handles each turn directly",
+    description: "The reply model answers each message itself",
     model: "",
     key: "",
     group: "No extra request",

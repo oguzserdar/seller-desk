@@ -25,7 +25,7 @@ function ownerWords(view: PaymentView): { headline: string; detail: string } {
       return { headline: "Waiting for the buyer to approve in PayPal", detail: "Nothing has been charged yet." };
     case "approval_observed":
     case "capture_in_flight":
-      return { headline: "Completing the payment", detail: "The buyer approved in PayPal. Checking confirms whether the capture went through." };
+      return { headline: "Completing the payment", detail: "The customer approved in PayPal. Checking asks PayPal whether the money was taken." };
     case "verification_pending":
       return view.tone === "attention"
         ? { headline: "PayPal's record did not match the quote", detail: "It was not counted as paid and nothing was handed over. Check with PayPal, then contact the buyer." }

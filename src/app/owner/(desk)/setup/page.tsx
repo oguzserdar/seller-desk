@@ -37,7 +37,7 @@ export default async function SetupPage() {
     <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-8">
       <h1 className="page-title">Setup</h1>
       <p className="text-ink-2 mt-1">
-        Check your shop, payments and optional AI assistant. Buyers can browse
+        Check your shop, payments and assistant. Customers can still browse
         and buy without AI.
       </p>
       <SetupNavigation />
@@ -57,7 +57,7 @@ export default async function SetupPage() {
         }
         routing={
           config.routing.status === "off"
-            ? "Off; reply model handles turns directly"
+            ? "Off. The reply model answers each message itself."
             : config.routing.status === "ready"
               ? `${config.routing.modelId} through ${config.routing.provider}. Connection check required.`
               : "Not connected; reply model can still answer"

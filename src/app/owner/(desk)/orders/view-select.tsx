@@ -7,7 +7,7 @@ const LABELS: Record<string, string> = {
   all_orders: "All orders",
   pickup_pending: "Ready for pickup",
   service_followup: "Service work",
-  access_failed: "Downloads unopened",
+  access_failed: "Downloads not opened",
   payments_uncertain: "Payments to check",
   quotes_awaiting_review: "Quotes to review",
   completed: "Fulfilled",

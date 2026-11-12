@@ -97,7 +97,7 @@ export default async function OwnerOrderPage({ params }: { params: Promise<{ id:
 
       <section aria-labelledby="items-heading" className="mt-6">
         <h2 id="items-heading" className="mb-2 text-[17px] font-semibold">
-          What the buyer approved and paid for
+          What the customer approved and paid for
         </h2>
         <section className="surface p-5">
           <ul className="flex flex-col gap-1.5 text-[15px]">

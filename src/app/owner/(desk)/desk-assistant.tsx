@@ -219,8 +219,8 @@ export function DeskAssistant({
           <div className="flex flex-col gap-3">
             <p className="text-ink-2 text-[15px]">
               {assistantOn
-                ? "Ask about orders, money or work. It can suggest one action; nothing runs until you press its button."
-                : "The desk assistant is off: no AI provider is configured."}
+                ? "Ask about orders, payments or work still owed. It can suggest one action. Nothing happens until you press its button."
+                : "Your assistant is off. Connect it in Setup to ask about orders."}
             </p>
             {assistantOn ? (
               <ul className="flex flex-wrap gap-2">

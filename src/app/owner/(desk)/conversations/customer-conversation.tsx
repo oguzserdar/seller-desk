@@ -110,7 +110,7 @@ export function CustomerConversation({
     onError: ({ error }) => {
       setProblem(
         error.serverError ??
-          "Could not change control. Refresh to check who is replying.",
+          "Could not switch who replies. Refresh to see who is replying now.",
       );
       void refresh();
     },
@@ -187,7 +187,7 @@ export function CustomerConversation({
               return (
                 <li key={message.id} className="min-w-0">
                   {sellerReply ? (
-                    <Message variant="card" label="You · Seller">{text}</Message>
+                    <Message variant="card" label="You">{text}</Message>
                   ) : message.role === "user" ? (
                     <Message variant="bubble" align="end" label="Customer">{text}</Message>
                   ) : (
@@ -202,7 +202,7 @@ export function CustomerConversation({
       <div className="border-t border-line pt-4">
         {view.pending ? (
           <div className="mb-4 text-[14px]">
-            <p className="font-semibold">Open request</p>
+            <p className="font-semibold">Open question</p>
             <p className="mt-1 text-ink-2">{view.pending.question}</p>
           </div>
         ) : null}
@@ -248,7 +248,7 @@ export function CustomerConversation({
                   );
                   nonce.current = null;
                 }}
-                label="This also answers the open request above"
+                label="This also answers the open question above"
               />
             ) : null}
             {selectionChanged ? (

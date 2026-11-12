@@ -16,9 +16,9 @@ export const metadata: Metadata = { title: "Review quote" };
 /** Where a quote stands, in the owner's words. */
 const OWNER_QUOTE_STATUS: Record<string, string> = {
   seller_review: "Waiting for you",
-  review_ready: "Sent to the buyer",
+  review_ready: "Sent to the customer",
   needs_information: "Needs a change",
-  accepted: "Buyer is paying",
+  accepted: "Customer is paying",
   consumed: "Paid",
   expired: "Expired",
   replaced: "Replaced by a newer quote",
@@ -76,7 +76,7 @@ export default async function OwnerQuotePage({
           Total {formatQuoteAmount(row.totalMinor, row.currency)}
         </p>
         {row.buyerNote ? (
-          <Alert tone="info" title="What the buyer told you" className="mt-4">
+          <Alert tone="info" title="What the customer told you" className="mt-4">
             {row.buyerNote}
           </Alert>
         ) : (

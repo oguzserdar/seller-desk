@@ -192,8 +192,8 @@ function EntryForm({
         <Checkbox
           checked={value.published}
           onCheckedChange={(checked) => update("published", checked === true)}
-          label="Approved for customer answers"
-          description="Leave unchecked to keep a draft. Changes take effect on the next knowledge check."
+          label="Publish for customers"
+          description="Leave unchecked to keep it as a draft. The assistant uses changes from the next message."
         />
         {error ? <Alert tone="danger" title={error} /> : null}
         <div className="flex flex-wrap items-center gap-3">

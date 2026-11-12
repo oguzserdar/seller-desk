@@ -204,8 +204,8 @@ export function AiDraftForm({
       </h2>
       <p className="text-ink-2 mt-1 text-[16px]">
         Write it the way you would tell a customer. The AI drafts offers and
-        shows its source quotes. Check that each quote belongs to the right
-        offer, and confirm the suggested type. Nothing is published until you
+        shows the words it used from your text. Check each one belongs to the
+        right offer, and confirm the suggested type. Nothing is published until you
         publish it.
       </p>
       {!modelReady ? (

@@ -37,8 +37,8 @@ export type DeskView = (typeof DESK_VIEWS)[number];
 export const DESK_VIEW_LABEL: Record<DeskView, string> = {
   needs_attention: "Needs you",
   all_orders: "All orders",
-  pickup_pending: "Pickups to hand over",
-  service_followup: "Service work to finish",
+  pickup_pending: "Ready for pickup",
+  service_followup: "Service work",
   access_failed: "Downloads not opened",
   completed: "Fulfilled",
   payments_uncertain: "Payments to check",

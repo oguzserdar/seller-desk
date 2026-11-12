@@ -167,7 +167,7 @@ export function PayPalSetup({
           Then make one test purchase
         </h3>
         <p className="text-ink-2 mt-2 text-[15px]">
-          Open the buyer page and pay using the Personal test account under{" "}
+          Open the customer shop and pay using the Personal test account under{" "}
           <strong>Testing Tools → Sandbox Accounts</strong>. Confirm the payment
           also appears in the sandbox Business account. A successful connection
           check alone does not prove checkout.
@@ -178,7 +178,7 @@ export function PayPalSetup({
           target="_blank"
           rel="noreferrer"
         >
-          Open buyer page
+          Open customer shop
         </a>
       </div>
     </section>

@@ -193,7 +193,7 @@ export function ImportForm() {
             ))}
           </ul>
           <p className="text-ink-2 text-[14px]">
-            This adds new drafts. It does not update your existing store or keep
+            This adds new drafts. It does not update your existing shop or keep
             stock in sync. Photos, files, shipping and tax rules are not
             imported.
           </p>
