@@ -23,9 +23,11 @@ type Stored = { token: string; expiresAt: string };
 const KEY = "seller-desk.buyer";
 let memory: Stored | null = null;
 
+// localStorage, not sessionStorage: the customer can close the tab and come back to the same chat
+// (the server keeps the session for 7 days). "End chat" removes it.
 function storage(): Storage | null {
   try {
-    const store = window.sessionStorage;
+    const store = window.localStorage;
     const probe = "seller-desk.probe";
     store.setItem(probe, "1");
     store.removeItem(probe);
@@ -40,7 +42,12 @@ export function readToken(): Stored | null {
   let value: Stored | null = memory;
   if (store) {
     try {
-      const raw = store.getItem(KEY);
+      let raw = store.getItem(KEY);
+      if (!raw) {
+        // Saved by the previous version in this tab's sessionStorage: move it so an open chat or checkout survives the deploy.
+        raw = window.sessionStorage.getItem(KEY);
+        if (raw) { store.setItem(KEY, raw); window.sessionStorage.removeItem(KEY); }
+      }
       value = raw ? (JSON.parse(raw) as Stored) : memory;
     } catch {
       value = memory;
@@ -65,6 +72,7 @@ export function saveToken(value: Stored): StorageMode {
 export function clearToken(): void {
   memory = null;
   try {
+    window.localStorage.removeItem(KEY);
     window.sessionStorage.removeItem(KEY);
   } catch {
     // storage blocked: nothing persisted
