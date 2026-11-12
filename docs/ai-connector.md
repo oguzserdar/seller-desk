@@ -23,6 +23,7 @@ can remove an AI app from Setup at any time. Whether a connected app may answer 
 3. **Vendor documentation.** Intercom's MCP server (developers.intercom.com/docs/guides/mcp, read 23 Oct):
    OAuth with a consent page naming the app; supports Claude Desktop, Claude Code, Claude.ai, OpenAI,
    Cursor; reads conversations and contacts; its only conversation write is an internal note. MCP
+   authorization spec 2025-11-25 and OpenAI Apps SDK auth, as summarised in that app's
    `research/connector-auth.md` (PKCE S256, `resource` parameter, RFC 9728 discovery, RFC 9207 `iss`).
 4. **How it fails elsewhere.** Zendesk announced a general MCP server in May 2026 that had not shipped
    by September; every server reading Zendesk tickets was third-party (tldv.io/blog/zendesk-mcp). The
