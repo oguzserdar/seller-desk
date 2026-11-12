@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getAuth } from "@/server/auth/auth";
 import { actionClient } from "@/server/actions/safe-action";
@@ -10,9 +9,7 @@ import { clientKey, requireUsage } from "@/server/domain/usage";
 import { findSellerForUser } from "@/server/domain/seller";
 import { VIEWER_COOKIE } from "@/server/auth/viewer-pass";
 
-const SignInInput = z
-  .object({ email: z.email().max(200), password: z.string().min(1).max(200), resumesConnector: z.boolean().optional() })
-  .strict();
+const SignInInput = z.object({ email: z.email().max(200), password: z.string().min(1).max(200) }).strict();
 
 export const signInOwner = actionClient.inputSchema(SignInInput).action(async ({ parsedInput }) => {
   const requestHeaders = await headers();
@@ -31,10 +28,9 @@ export const signInOwner = actionClient.inputSchema(SignInInput).action(async ({
     if (error instanceof DomainError) throw error;
     throw new DomainError("unauthorized", "That email or password is not correct.");
   }
-  // An AI app's sign-in resumes at its authorize endpoint, a full page load the form starts itself.
-  if (parsedInput.resumesConnector) return { ok: true as const };
-  // Redirect from the action, so the form stays pending until the desk has rendered.
-  redirect("/owner/orders");
+  // The form navigates after success: a redirect() thrown inside a Server Action is not treated as
+  // navigation on this runtime (vinext), so it surfaced as an error after the session was already set.
+  return { ok: true as const };
 });
 
 export const signOutOwner = actionClient.action(async () => {
