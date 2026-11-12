@@ -6,7 +6,7 @@
 
 **The one rule:** the AI talks, the server decides money. The assistant answers from the shop's real prices, stock and terms. It cannot invent a price, change a total or mark anything paid. A haggler, a fake "system" message, a tampered amount, a forged webhook and a double payment all end the same way: refused, or one order and one payment.
 
-[Live demo](https://sellerdesk.dev) · [Try the shop](https://sellerdesk.dev/buy) · [How to test it](docs/how-to-test.md) · [How the AI works](#how-the-ai-works) · [How PayPal is used](#how-paypal-is-used) · [Install](#deploy)
+[Live demo](https://sellerdesk.dev) · [Demo film (2:47)](https://youtu.be/n_DQS2b5YT4) · [Try the shop](https://sellerdesk.dev/buy) · [How to test it](docs/how-to-test.md) · [How the AI works](#how-the-ai-works) · [How PayPal is used](#how-paypal-is-used) · [Install](#deploy)
 
 ![Seller Desk in motion: the shop catalog, a quote with Pay with PayPal, a service order and the owner's desk](docs/media/hero.gif)
 
@@ -18,7 +18,21 @@ No install. The shop is fictional and payments run in the PayPal sandbox; no rea
 2. **Be the owner.** On [sellerdesk.dev](https://sellerdesk.dev) press **Look around the owner's desk** (no login, read-only). You see paid orders, customers waiting for an answer, Knowledge, Insights and Setup.
 3. **Pay as a sandbox buyer.** The owner login and the PayPal sandbox buyer login are in the submission's private testing field, not in this repository. With them, follow [the 15-minute checklist](docs/how-to-test.md): answer a customer, send a quote, pay it, and watch one order appear.
 
-<!-- Demo film: paste the GitHub-uploaded mp4 URL on its own line here, with a thumbnail linking to the full film on YouTube, once both are published. -->
+
+## Where to look in the code
+
+Each claim above, and the file that makes it true.
+
+| Claim | Where |
+|---|---|
+| PayPal decides what is paid, not the model: the server checks payee, amount, currency and capture before an order exists | [`src/server/payments/engine.ts`](src/server/payments/engine.ts) |
+| A forged or replayed PayPal webhook is refused | [`src/server/payments/webhooks.ts`](src/server/payments/webhooks.ts) |
+| The owner's desk assistant reads PayPal through the Agent Toolkit, read-only | [`src/server/paypal/agent-toolkit.ts`](src/server/paypal/agent-toolkit.ts) |
+| Help me write drafts from the shop's own facts and leaves `[[blanks]]`; a reply with a blank left cannot be sent | [`src/server/ai/owner-reply.ts`](src/server/ai/owner-reply.ts), [`src/lib/reply-blanks.ts`](src/lib/reply-blanks.ts) |
+| Every answer the owner sends becomes a knowledge draft; only the owner's approval publishes it | [`src/server/ai/learning-review.ts`](src/server/ai/learning-review.ts), [`src/server/domain/learning-review.ts`](src/server/domain/learning-review.ts) |
+| The owner's own AI app connects over MCP with OAuth and can answer only if the owner allows it | [`src/app/api/mcp/route.ts`](src/app/api/mcp/route.ts), [`src/server/connector/tools.ts`](src/server/connector/tools.ts), [`docs/ai-connector.md`](docs/ai-connector.md) |
+| Insights runs on AG Studio and AG Grid | [`src/components/insights/`](src/components/insights) |
+| All of it is tested on every push: types, the full suite and PostgreSQL integration tests | [`.github/workflows/ci.yml`](.github/workflows/ci.yml), [`tests/`](tests) |
 
 ## How the AI works
 
