@@ -46,11 +46,14 @@ it("shows the question as the headline and each detail as its own row", async ()
   expect(send.disabled).toBe(true);
 });
 
-it("a demo visitor sees the question without an answer form that can never send", async () => {
+it("a demo visitor sees where the owner answers, switched off, and how to sign in", async () => {
   const container = await render({ questions: [question], orders: [], readOnly: true });
-  expect(container.querySelector("textarea")).toBeNull();
-  expect([...container.querySelectorAll("button")].some((b) => b.textContent?.includes("Send to customer"))).toBe(false);
-  expect(container.textContent).toContain("The owner answers here");
+  const box = container.querySelector("textarea")!;
+  expect(box.disabled).toBe(true);
+  expect(box.placeholder).toContain("demo desk");
+  const send = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Send to customer"))!;
+  expect(send.disabled).toBe(true);
+  expect(container.querySelector('a[href="/owner/login"]')?.textContent).toBe("Sign in as the owner");
 });
 
 it("says plainly when nothing needs the owner", async () => {

@@ -77,22 +77,30 @@ function QuestionCard({ item, readOnly }: { item: CustomerQuestion; readOnly: bo
                 Review quote and answer together
               </Link>
             ) : null}
-            {/* A demo visitor sees the question, not a form that can never send. */}
-            {readOnly ? (
-              <p className="text-ink-3 mt-4 text-[13px]">The owner answers here, in their own words. The assistant passes the answer on and promises nothing more.</p>
-            ) : (
-              <>
-                <div className="mt-4">
-                  <Textarea label="Your answer to the customer" rows={3} maxLength={1000} value={answer} onChange={(event) => setAnswer(event.target.value)} />
-                </div>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-ink-3 text-[13px]">The assistant passes on your words. It promises nothing more.</p>
-                  <Button type="submit" variant="primary" loading={send.isPending} disabled={answer.trim().length === 0}>
-                    Send to customer
-                  </Button>
-                </div>
-              </>
-            )}
+            {/* A demo visitor sees the real answer box, switched off, with the reason and the way in. */}
+            <div className="mt-4">
+              <Textarea
+                label="Your answer to the customer"
+                rows={3}
+                maxLength={1000}
+                value={answer}
+                onChange={(event) => setAnswer(event.target.value)}
+                disabled={readOnly}
+                placeholder={readOnly ? "In the demo desk you can read this question but not answer it." : "Write it the way you would tell the customer."}
+              />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              {readOnly ? (
+                <p className="text-ink-3 text-[13px]">
+                  <Link href="/owner/login" className="text-ink decoration-line-strong font-medium underline underline-offset-4">Sign in as the owner</Link> to answer. Your words go to the customer, and the assistant promises nothing more.
+                </p>
+              ) : (
+                <p className="text-ink-3 text-[13px]">The assistant passes on your words. It promises nothing more.</p>
+              )}
+              <Button type="submit" variant="primary" loading={send.isPending} disabled={readOnly || answer.trim().length === 0}>
+                Send to customer
+              </Button>
+            </div>
             {send.result.serverError ? (
               <Alert tone="danger" className="mt-3" title={send.result.serverError} />
             ) : null}
