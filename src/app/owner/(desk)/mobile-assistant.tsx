@@ -29,7 +29,7 @@ export function MobileAssistant({ assistantOn }: { assistantOn: boolean }) {
           </Button>
         }
       >
-        <DeskAssistant assistantOn={assistantOn} active={open} />
+        <DeskAssistant assistantOn={assistantOn} active={open} showTitle={false} />
       </BottomSheet>
     </div>
   );

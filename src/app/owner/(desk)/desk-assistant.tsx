@@ -160,10 +160,13 @@ export function DeskAssistant({
   assistantOn,
   className,
   active = true,
+  showTitle = true,
 }: {
   assistantOn: boolean;
   className?: string;
   active?: boolean;
+  /** False inside the mobile sheet, which shows the same title in its own header. */
+  showTitle?: boolean;
 }) {
   const { chat, history } = useDeskChat();
   const { messages, sendMessage, status, stop, error, clearError } = useChat({
@@ -202,9 +205,11 @@ export function DeskAssistant({
       aria-label="Ask your desk"
       className={cx("flex min-h-0 flex-col", className)}
     >
-      <h2 className="text-[20px] font-semibold tracking-[-0.01em]">
-        Ask your desk
-      </h2>
+      {showTitle ? (
+        <h2 className="text-[20px] font-semibold tracking-[-0.01em]">
+          Ask your desk
+        </h2>
+      ) : null}
       {history.messages.length ? (
         <p className="text-ink-3 mt-1 text-[13px]">
           Recent conversation saved. Earlier order details may have changed.
