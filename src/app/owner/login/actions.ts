@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getAuth } from "@/server/auth/auth";
 import { actionClient } from "@/server/actions/safe-action";
@@ -9,7 +10,9 @@ import { clientKey, requireUsage } from "@/server/domain/usage";
 import { findSellerForUser } from "@/server/domain/seller";
 import { VIEWER_COOKIE } from "@/server/auth/viewer-pass";
 
-const SignInInput = z.object({ email: z.email().max(200), password: z.string().min(1).max(200) }).strict();
+const SignInInput = z
+  .object({ email: z.email().max(200), password: z.string().min(1).max(200), resumesConnector: z.boolean().optional() })
+  .strict();
 
 export const signInOwner = actionClient.inputSchema(SignInInput).action(async ({ parsedInput }) => {
   const requestHeaders = await headers();
@@ -24,11 +27,14 @@ export const signInOwner = actionClient.inputSchema(SignInInput).action(async ({
       throw new DomainError("unauthorized", "That email or password is not correct.");
     }
     (await cookies()).delete(VIEWER_COOKIE);
-    return { ok: true as const };
   } catch (error) {
     if (error instanceof DomainError) throw error;
     throw new DomainError("unauthorized", "That email or password is not correct.");
   }
+  // An AI app's sign-in resumes at its authorize endpoint, a full page load the form starts itself.
+  if (parsedInput.resumesConnector) return { ok: true as const };
+  // Redirect from the action, so the form stays pending until the desk has rendered.
+  redirect("/owner/orders");
 });
 
 export const signOutOwner = actionClient.action(async () => {
