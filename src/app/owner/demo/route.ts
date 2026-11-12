@@ -22,3 +22,10 @@ export async function POST(request: NextRequest): Promise<Response> {
   });
   return response;
 }
+
+/** Ends a demo visit: removes the read-only pass. Signing out of an owner session is Better Auth's own. */
+export async function DELETE(): Promise<Response> {
+  const response = new NextResponse(null, { status: 204 });
+  response.cookies.delete(VIEWER_COOKIE);
+  return response;
+}

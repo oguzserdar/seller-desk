@@ -2,7 +2,6 @@
 
 import { ChevronsUpDown, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
 import { useCallback, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/shadcn/avatar";
 import {
@@ -20,7 +19,7 @@ import {
   useSidebar,
 } from "@/components/shadcn/sidebar";
 import { Alert } from "@/components/arc/alert/alert";
-import { signOutOwner } from "../login/actions";
+import { authClient } from "@/lib/auth-client";
 import { forgetOwnerHistory } from "@/components/insights/analyst-history";
 
 /** Official shadcn sidebar-07 account composition, wired only to real owner settings and sign-out. */
@@ -41,22 +40,31 @@ export function AccountMenu({
   const triggerRef = useCallback((node: HTMLButtonElement | null) => {
     if (node) setContainer(node.closest<HTMLElement>(".desk-theme"));
   }, []);
-  const { executeAsync, isPending } = useAction(signOutOwner);
+  const [isPending, setPending] = useState(false);
   const firstName = name.trim().split(/\s+/)[0] || "Your account";
   const initials = firstName.slice(0, 1).toLocaleUpperCase();
+  // Better Auth ends the owner session; the demo pass is a cookie of its own. Then a full page load.
   const signOut = async () => {
     setError(null);
+    setPending(true);
     try {
-      const result = await executeAsync();
-      if (result?.data?.ok) {
+      const [session, pass] = await Promise.all([
+        authClient.signOut(),
+        fetch("/owner/demo", { method: "DELETE" }),
+      ]);
+      // A demo visitor has no Better Auth session; that sign-out "error" is not a failure, the pass is what ends.
+      const ended = !session.error || session.error.code === "FAILED_TO_GET_SESSION";
+      if (ended && pass.ok) {
         // Analyst chats hold customer labels and amounts; a shared browser should not keep them.
         forgetOwnerHistory();
-        setOpen(false);
-        router.replace("/owner/login");
-      } else setError(result?.serverError ?? "Could not sign out. Try again.");
+        window.location.assign("/owner/login");
+        return; // stays busy until the page leaves
+      }
     } catch {
-      setError("Could not sign out. Try again.");
+      // Shown below.
     }
+    setError("Could not sign out. Try again.");
+    setPending(false);
   };
   return (
     <>
