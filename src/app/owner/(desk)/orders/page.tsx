@@ -203,7 +203,7 @@ export default async function DeskPage({
             aria-label="Ask your desk"
             className="border-line bg-surface hidden border-l lg:block"
           >
-            <div className="sticky top-0 flex h-[calc(100dvh-3rem)] flex-col px-6 pt-8 pb-6">
+            <div className="sticky top-0 flex h-[calc(100dvh-var(--banner-h,0px)-3.5rem)] flex-col px-6 pt-8 pb-6">
               <DeskAssistant assistantOn={assistantOn} className="h-full" />
             </div>
           </aside>
