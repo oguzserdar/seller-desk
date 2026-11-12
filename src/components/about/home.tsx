@@ -11,7 +11,7 @@ import { getSeller } from "@/server/domain/seller";
 import { getServerConfig } from "@/server/env";
 import "./about.css";
 
-const TITLE = "Seller Desk: the open-source AI sales assistant for PayPal sellers";
+const TITLE = "Seller Desk: your agentic sales team, open 24/7";
 const DESCRIPTION = "Seller Desk answers customers from your catalog, asks you only what it cannot know, and closes the sale with a PayPal payment the server has checked. Open source, MIT licensed.";
 
 /**
@@ -48,7 +48,7 @@ const STEPS = [
 
 // Plain answers to what people and answer engines ask first. The same text feeds the structured data.
 const QUESTIONS = [
-  { q: "What is Seller Desk?", a: "An open-source AI sales assistant for small sellers who take PayPal. It answers customers from the shop's catalog, asks the owner when it cannot know, builds a quote and takes payment through PayPal checkout." },
+  { q: "What is Seller Desk?", a: "An open-source AI sales agent for businesses that take PayPal. It answers customers from the shop's catalog, asks the owner when it cannot know, builds a quote and takes payment through PayPal checkout." },
   { q: "Can the AI change a price or mark something paid?", a: "No. Prices come from the shop's catalog or the owner's reviewed quote, and payment status comes from PayPal. The server checks the merchant, amount and currency with PayPal before it creates an order or releases a download." },
   { q: "Which PayPal APIs does it use?", a: "PayPal Orders v2 to create, retrieve and capture the payment, and verified webhooks as a backup. The owner's desk assistant can also read orders, transactions, invoices and disputes through PayPal's own Agent Toolkit. The hosted demo runs in the PayPal sandbox, so no real money moves." },
   { q: "Why not let the AI call PayPal to take the payment?", a: "Because a model that can create or capture a payment decides money. Seller Desk uses PayPal's Agent Toolkit for reading and its own server code for checkout, where the amount comes from a saved quote and the merchant, amount and currency are checked before an order exists." },
@@ -86,8 +86,7 @@ export async function SellerDeskHome() {
         </div>
 
         <div className="about-hero-stage">
-          <p className="about-eyebrow">Open source · PayPal checkout · AI assistant</p>
-          <h1 className="about-headline">The sales team a small seller <em>never had</em></h1>
+          <h1 className="about-headline">Your agentic sales team, <em>open 24/7</em></h1>
           <p className="about-lede">
             Seller Desk answers customers from your catalog, asks you only what it cannot know, and
             closes the sale with a PayPal payment the server has checked.

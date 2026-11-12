@@ -12,7 +12,7 @@ export function GET(): Response {
   const home = getServerConfig().appUrl;
   const text = `# Seller Desk
 
-> Seller Desk is an open-source AI sales assistant for small sellers who take PayPal. It answers customers from the shop's catalog, asks the owner only what it cannot know, and closes the sale with a PayPal payment the server has checked.
+> Seller Desk is an open-source AI sales agent for businesses that take PayPal. It answers customers from the shop's catalog, asks the owner only what it cannot know, and closes the sale with a PayPal payment the server has checked.
 
 Facts:
 - Prices come from the shop's catalog or the owner's reviewed quote. The AI model cannot set a price or mark anything paid.

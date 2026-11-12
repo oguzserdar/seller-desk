@@ -1,10 +1,10 @@
 # Seller Desk
 
-**The open-source AI sales assistant for PayPal sellers.**
+**Your agentic sales team, open 24/7.** An open-source AI sales agent for businesses that take PayPal.
 
 It answers customers from your catalog, asks you only what it can't know, and closes the sale with a verified PayPal payment.
 
-**Who it's for:** a one-person shop that takes PayPal and answers every customer message itself, such as a bike repairer, a maker or a tutor. A question that arrives at 9 pm and waits until morning is often a sale lost.
+**Who it's for:** any business that takes PayPal and still answers customers by hand, such as a bike repairer, a maker or a tutor. A question that arrives at 9 pm and waits until morning is often a sale lost.
 
 **The one rule:** the AI talks, the server decides money. The model cannot set a price, change a total or mark anything paid. A haggler, a fake "system" message, a tampered amount, a forged webhook and a double payment all end the same way: refused, or one order and one payment.
 

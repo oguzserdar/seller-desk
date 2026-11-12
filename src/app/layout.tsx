@@ -16,7 +16,7 @@ const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", dis
 
 export const metadata: Metadata = {
   title: { default: "Seller Desk", template: "%s · Seller Desk" },
-  description: "Open-source seller desk for PayPal sellers: a buyer assistant, reviewed quotes, verified PayPal checkout and an owner desk.",
+  description: "Open-source AI sales agent for businesses that take PayPal: answers customers from the catalog, sends reviewed quotes, checks every PayPal payment and keeps an owner desk.",
   robots: { index: false, follow: false },
 };
 

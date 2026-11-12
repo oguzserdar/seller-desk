@@ -2,7 +2,7 @@
 
 The [README](../README.md) is the short version. This page keeps every detail.
 
-**An open-source AI shop assistant that takes customers from a question to a PayPal purchase and helps sellers handle what comes next.**
+**An open-source AI sales agent that takes customers from a question to a PayPal purchase and helps sellers handle what comes next.**
 
 Customers ask about products, describe a service or find a download. Seller Desk
 reads the seller's published catalog and policies, builds a priced quote, and
