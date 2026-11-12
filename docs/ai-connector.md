@@ -16,19 +16,15 @@ can remove an AI app from Setup at any time. Whether a connected app may answer 
    and on D1. Owner-only mutations already check the owner and a revision (`src/server/domain/shop-guide.ts`,
    `src/server/domain/seller-questions.ts`), and tools enforce permission inside execution, not in
    observers (`docs/conversation-ownership.md`).
-   `app/src/lib/auth.ts` adds `jwt()`, `mcp()` and `cimd()` to Better Auth 1.7.7; `app/src/app/api/mcp/route.ts`
-   uses `requireMcpAuth` and `@modelcontextprotocol/server` 2.3.1. Its only write saves drafts. Known
-   gotcha from their build: dynamically registered clients default to `application_type: "web"`, so
-   desktop and CLI clients with localhost redirects need registering as native.
-3. **Vendor documentation.** Intercom's MCP server (developers.intercom.com/docs/guides/mcp, read 23 Oct):
+2. **Vendor documentation.** Intercom's MCP server (developers.intercom.com/docs/guides/mcp, read 23 Oct):
    OAuth with a consent page naming the app; supports Claude Desktop, Claude Code, Claude.ai, OpenAI,
    Cursor; reads conversations and contacts; its only conversation write is an internal note. MCP
-   authorization spec 2025-11-25 and OpenAI Apps SDK auth, as summarised in that app's
-   `research/connector-auth.md` (PKCE S256, `resource` parameter, RFC 9728 discovery, RFC 9207 `iss`).
-4. **How it fails elsewhere.** Zendesk announced a general MCP server in May 2026 that had not shipped
+   authorization spec 2025-11-25 and OpenAI Apps SDK auth (PKCE S256, `resource` parameter, RFC 9728
+   discovery, RFC 9207 `iss`).
+3. **How it fails elsewhere.** Zendesk announced a general MCP server in May 2026 that had not shipped
    by September; every server reading Zendesk tickets was third-party (tldv.io/blog/zendesk-mcp). The
    lesson for us: ship read and draft tools first, keep buyer-facing sends behind the owner.
-5. **Pinned versions.** `better-auth`, `@better-auth/mcp` and `@better-auth/oauth-provider` are all
+4. **Pinned versions.** `better-auth`, `@better-auth/mcp` and `@better-auth/oauth-provider` are all
    1.7.7; `@modelcontextprotocol/server` is 2.3.1. Client ID Metadata Documents are not offered:
    `@better-auth/cimd`'s safe fetcher needs Node's DNS pinning (`node:https`, `node:net`), which Workers
    lack, and ChatGPT, Claude and Codex all register dynamically instead. 1.7.7 also has no
