@@ -78,6 +78,9 @@ function createAuth(database?: BetterAuthOptions["database"]) {
       ...authSchemaOptions.advanced,
       useSecureCookies: config.appUrl.startsWith("https://"),
       cookiePrefix: "seller-desk",
+      // The client's address from the host's trusted header (same rule as clientKey in usage.ts):
+      // CLIENT_IP_HEADER per host (cf-connecting-ip on Cloudflare), else x-forwarded-for, which Vercel sets.
+      ipAddress: { ipAddressHeaders: [process.env.CLIENT_IP_HEADER?.toLowerCase() || "x-forwarded-for"] },
     },
     telemetry: { enabled: false },
     hooks: connectorHooks,
