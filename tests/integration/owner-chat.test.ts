@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ownerTools } from "@/server/ai/owner-tools";
@@ -51,11 +52,18 @@ describe("owner chat reads", () => {
 
 describe("paid totals", () => {
   it("uses calendar boundaries through daylight saving, not the UTC date", async () => {
-    await paidAt("2026-11-01T05:59:59Z"); // October 31 in Edmonton.
-    await paidAt("2026-11-01T06:00:00Z"); // Midnight November 1.
-    await paidAt("2026-11-02T06:59:59Z"); // End of the 25-hour day.
-    await paidAt("2026-11-02T07:00:00Z"); // November 2.
-    const report = await readPaidSummary(owner, { period: "yesterday", timeZone: "America/Edmonton" }, new Date("2026-11-02T20:00:00Z"));
+    // Midnights come from the running time zone data, not hardcoded instants: zone rules change
+    // (tz 2026e ended Alberta's clock change), and the report must follow whatever rules the host has.
+    // In New York, 1 November 2026 is the 25-hour day that ends daylight saving.
+    const zone = "America/New_York";
+    const midnight = (day: string) => Temporal.PlainDate.from(day).toZonedDateTime(zone).epochMilliseconds;
+    const start = midnight("2026-11-01");
+    const end = midnight("2026-11-02");
+    await paidAt(new Date(start - 1000).toISOString()); // the last second of 31 October
+    await paidAt(new Date(start).toISOString()); // midnight, 1 November
+    await paidAt(new Date(end - 1000).toISOString()); // the last second of 1 November
+    await paidAt(new Date(end).toISOString()); // midnight, 2 November
+    const report = await readPaidSummary(owner, { period: "yesterday", timeZone: zone }, new Date(end + 14 * 3_600_000));
     expect(report).toMatchObject({ startDate: "2026-11-01", endDateExclusive: "2026-11-02", totals: [{ currency: "USD", paidOrders: 2, paidMinor: 7000 }] });
   });
   it("separates currencies and excludes future, pending and other-shop records", async () => {
