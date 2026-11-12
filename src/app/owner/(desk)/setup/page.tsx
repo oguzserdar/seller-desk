@@ -71,6 +71,8 @@ export default async function SetupPage() {
         }
       />
       <AiApps address={connectorResource(config.appUrl)} agentLine={setupLine(config.appUrl)} apps={viewer ? [] : apps} />
+      {/* The demo desk shows every setting; nothing in these forms can be sent. */}
+      <fieldset disabled={viewer} className="min-w-0">
       <PayPalSetup
         mode={config.mode}
         appUrl={config.appUrl}
@@ -96,6 +98,7 @@ export default async function SetupPage() {
           theme: seller.theme,
         }}
       />
+      </fieldset>
     </section>
   );
 }

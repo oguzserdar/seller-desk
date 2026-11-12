@@ -30,7 +30,7 @@ export default async function OwnerQuotePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { owner } = await requireOwner(await headers());
+  const { owner, viewer } = await requireOwner(await headers());
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const detail = await readOwnerQuoteReview(owner, id).catch((error) => {
@@ -91,6 +91,7 @@ export default async function OwnerQuotePage({
         </Alert>
       ) : null}
       {status === "seller_review" ? (
+        <fieldset disabled={viewer} className="min-w-0">
         <ScopeReview
           quoteId={row.id}
           revision={row.revision}
@@ -106,6 +107,7 @@ export default async function OwnerQuotePage({
             }),
           )}
         />
+        </fieldset>
       ) : (
         <Alert
           tone="info"

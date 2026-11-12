@@ -12,7 +12,7 @@ import { PublishToggle } from "../publish-toggle";
 export const metadata: Metadata = { title: "Edit offer" };
 
 export default async function EditOfferPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ created?: string; saved?: string }> }) {
-  const { owner, seller } = await requireOwner(await headers());
+  const { owner, seller, viewer } = await requireOwner(await headers());
   const { id } = await params;
   const query = await searchParams;
   const created = query.created === "1";
@@ -30,7 +30,7 @@ export default async function EditOfferPage({ params, searchParams }: { params: 
           <h1 className="page-title">{row.title}</h1>
           {row.published ? <Badge tone="success">Published</Badge> : <Badge tone="neutral">Draft</Badge>}
         </div>
-        <PublishToggle offerId={row.id} revision={row.revision} published={row.published} blocked={blockers.length > 0} title={row.title} />
+        {viewer ? null : <PublishToggle offerId={row.id} revision={row.revision} published={row.published} blocked={blockers.length > 0} title={row.title} />}
       </div>
       {created ? (
         <Alert tone="success" className="mb-4" title={"Offer created as a draft. Publish it when it is ready for buyers."} />
@@ -53,6 +53,8 @@ export default async function EditOfferPage({ params, searchParams }: { params: 
           Stock: {stock.total} total · {stock.held} held for checkouts in progress · {stock.sold} sold
         </p>
       ) : null}
+      {/* The demo desk shows the form; nothing in it can be sent. */}
+      <fieldset disabled={viewer} className="min-w-0">
       <OfferForm
         key={row.revision}
         currency={seller.currency}
@@ -73,6 +75,7 @@ export default async function EditOfferPage({ params, searchParams }: { params: 
           stockTotal: stock ? stock.total : null,
         }}
       />
+      </fieldset>
     </section>
   );
 }
